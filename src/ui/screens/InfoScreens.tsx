@@ -6,7 +6,7 @@ import { CHARMS, COINS, ENGRAVINGS } from '../../engine';
 import { CoinArt } from '../art/CoinArt';
 import { Icon } from '../art/Icons';
 import { CoinRow } from '../components/CoinInfo';
-import { Button, Overlay, Panel, Txt } from '../components/ui';
+import { Button, Overlay, Panel, Ribbon, Stitch, Txt } from '../components/ui';
 import { HOW_TO_PLAY, PRIVACY_TEXT, TUTORIAL_STEPS } from '../content/text';
 import { useGame, type Speed } from '../state/GameContext';
 import { TOUCH, colors, font, radius } from '../theme';
@@ -16,9 +16,7 @@ function Page({ title, onBack, children }: { title: string; onBack: () => void; 
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 8 }]}>
       <View style={styles.head}>
-        <Txt style={styles.title} accessibilityRole="header">
-          {title}
-        </Txt>
+        <Ribbon title={title} width={190} />
       </View>
       <ScrollView contentContainerStyle={styles.scroll}>{children}</ScrollView>
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
@@ -60,6 +58,7 @@ export function HowToScreen({ onBack }: { onBack: () => void }) {
       </Txt>
       {CHARMS.map((c) => (
         <View key={c.id} style={styles.guideRow} accessible accessibilityLabel={`${c.name}. ${c.text}`}>
+          <Stitch r={radius.md} inset={4} opacity={0.35} />
           <Icon name="charm" size={30} />
           <View style={{ flex: 1 }}>
             <Txt style={styles.guideName}>
@@ -75,6 +74,7 @@ export function HowToScreen({ onBack }: { onBack: () => void }) {
       </Txt>
       {ENGRAVINGS.map((e) => (
         <View key={e.id} style={styles.guideRow} accessible accessibilityLabel={`${e.name}. ${e.text}`}>
+          <Stitch r={radius.md} inset={4} opacity={0.35} />
           <Icon name="engraving" size={30} />
           <View style={{ flex: 1 }}>
             <Txt style={styles.guideName}>{e.name}</Txt>
@@ -250,8 +250,8 @@ export function MenuOverlay({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  head: { paddingHorizontal: 16, paddingBottom: 8 },
+  screen: { flex: 1, backgroundColor: 'transparent' },
+  head: { paddingHorizontal: 16, paddingBottom: 4, alignItems: 'center' },
   title: { fontSize: font.h1, fontWeight: '900' },
   scroll: { padding: 16, gap: 12, paddingTop: 4 },
   footer: { paddingHorizontal: 16, paddingTop: 8 },

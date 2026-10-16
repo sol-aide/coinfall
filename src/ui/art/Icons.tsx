@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Polygon, Rect } from 'react-native-svg';
 import { colors } from '../theme';
 
 export type IconName = 'gold' | 'melt' | 'reroll' | 'bag' | 'gear' | 'charm' | 'engraving' | 'seal' | 'close' | 'info' | 'play';
@@ -7,11 +7,19 @@ export type IconName = 'gold' | 'melt' | 'reroll' | 'bag' | 'gear' | 'charm' | '
 export function Icon({ name, size = 22, color }: { name: IconName; size?: number; color?: string }) {
   const c = color ?? colors.text;
   return (
-    <Svg width={size} height={size} viewBox="0 0 100 100">
-      {render(name, c)}
+    <Svg width={size} height={size} viewBox="-4 -4 108 108">
+      {OUTLINED.has(name) ? (
+        <G stroke={colors.ink} strokeWidth={6} strokeLinejoin="round">
+          {render(name, c)}
+        </G>
+      ) : (
+        render(name, c)
+      )}
     </Svg>
   );
 }
+
+const OUTLINED = new Set<IconName>(['gold', 'melt', 'bag', 'charm', 'engraving', 'seal', 'gear']);
 
 function render(name: IconName, c: string) {
   switch (name) {

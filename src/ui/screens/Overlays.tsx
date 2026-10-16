@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { MIN_BAG, charmDef, coinDef, type RunState } from '../../engine';
 import { Icon } from '../art/Icons';
 import { CoinDetail, CoinRow } from '../components/CoinInfo';
-import { Button, Overlay, Txt } from '../components/ui';
+import { Button, Overlay, Stitch, Txt } from '../components/ui';
 import { colors, font, radius, raceColors } from '../theme';
 
 const RACE_ORDER = { human: 0, orc: 1, elf: 2, neutral: 3 } as const;
@@ -99,6 +99,7 @@ export function CharmsOverlay({ run, onClose }: { run: RunState; onClose: () => 
           const c = charmDef(id);
           return (
             <View key={id} style={styles.charm} accessible accessibilityLabel={`${c.name}. ${c.text}`}>
+              <Stitch r={radius.md} inset={4} opacity={0.35} />
               <Icon name="charm" size={34} />
               <View style={{ flex: 1 }}>
                 <Txt style={styles.charmName}>{c.name}</Txt>

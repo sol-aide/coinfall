@@ -4,7 +4,8 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepe
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PHASES } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
-import { Button, Txt } from '../components/ui';
+import { Logo } from '../art/Logo';
+import { Button, Stitch, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
 import { colors, font, raceColors, radius } from '../theme';
 
@@ -26,12 +27,11 @@ export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowT
           <FallingCoin defId="grunt" delay={500} x={0} still={reduceMotion} />
           <FallingCoin defId="archer" delay={1000} x={90} still={reduceMotion} />
         </View>
-        <Txt style={styles.title} accessibilityRole="header">
-          Coinfall
-        </Txt>
+        <Logo still={reduceMotion} />
         <Txt style={styles.tag}>Toss coins. Pay the Guild. Survive {PHASES} phases.</Txt>
       </View>
       <View style={styles.races} accessible accessibilityLabel="Humans: economy and teamwork. Orcs: big values and chaos. Elves: precision and control.">
+        <Stitch r={radius.lg} inset={6} opacity={0.4} />
         {RACES.map((r) => (
           <View key={r.race} style={styles.raceRow}>
             <RaceBadge race={r.race} size={34} />
@@ -87,7 +87,7 @@ function FallingCoin({ defId, delay, x, still }: { defId: string; delay: number;
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 20, justifyContent: 'space-between' },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 20, justifyContent: 'space-between' },
   hero: { alignItems: 'center', marginTop: 0 },
   coins: { height: 130, width: '100%', alignItems: 'center', justifyContent: 'center' },
   coin: { position: 'absolute' },
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 0,
   },
   tag: { fontSize: font.body, color: colors.textDim, textAlign: 'center', marginTop: 6 },
-  races: { backgroundColor: colors.panel, borderRadius: radius.lg, padding: 14, gap: 10, borderWidth: 1, borderColor: colors.border },
+  races: { backgroundColor: colors.panel, borderRadius: radius.lg, padding: 16, gap: 10, borderBottomWidth: 4, borderBottomColor: 'rgba(10,6,12,0.45)' },
   raceRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   raceName: { fontSize: font.body, fontWeight: '900', minWidth: 78 },
   raceText: { fontSize: font.body, color: colors.textDim, flex: 1 },

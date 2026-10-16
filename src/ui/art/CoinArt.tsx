@@ -1,7 +1,7 @@
 import React, { useId } from 'react';
-import Svg, { Circle, Defs, G, Polygon, RadialGradient, Stop } from 'react-native-svg';
-import { coinDef, type Face } from '../../engine';
-import { raceColors } from '../theme';
+import Svg, { Circle, ClipPath, Defs, Ellipse, G, Polygon } from 'react-native-svg';
+import { coinDef, type Face, type Race } from '../../engine';
+import { colors, raceColors } from '../theme';
 import { GLYPHS, raceEmblem } from './glyphs';
 
 interface Props {
@@ -12,64 +12,109 @@ interface Props {
   engraved?: boolean;
 }
 
-/** A coin drawn entirely in SVG: race-coloured rim, golden heads face with the
- * character glyph, or a race-coloured tails face with the race emblem. */
+const INK = colors.ink;
+const BORDER = '#FFFFFF';
+/** Extra stroke width for the glyph outline pass (in glyph units). */
+const GLYPH_OUTLINE = 4.5;
+
+/**
+ * A coin drawn as a die-cut sticker: soft shadow, white border, warm ink
+ * outline, then flat cel-shaded colour (one base tone, one hard-edged shadow
+ * tone, a white specular). The character glyph is inked the same way.
+ */
 function CoinArtImpl({ defId, face = 'heads', size, level = 1, engraved }: Props) {
   const def = coinDef(defId);
   const rc = raceColors[def.race];
   const id = useId().replace(/[^a-zA-Z0-9]/g, '');
   const glyph = GLYPHS[defId] ?? GLYPHS.copper;
   const heads = face === 'heads';
-  const isCopper = def.race === 'neutral';
-  const faceA = heads ? (isCopper ? '#F2B27A' : '#FFE9A3') : rc.light;
-  const faceB = heads ? (isCopper ? '#B8692E' : '#E7A92E') : rc.main;
-  const ink = heads ? rc.dark : 'rgba(255,255,255,0.9)';
-  const accent = heads ? (isCopper ? '#FFD9B0' : '#FFF6D6') : rc.dark;
+  const copper = def.race === 'neutral';
+
+  const rimBase = heads ? rc.main : rc.dark;
+  const rimShade = heads ? rc.dark : shade(rc.dark);
+  const faceBase = heads ? (copper ? '#F3B47A' : '#FFDF7E') : rc.main;
+  const faceShade = heads ? (copper ? '#DB8C4A' : '#F2B41E') : rc.dark;
+  const glyphFill = heads ? (copper ? '#9A5A24' : rc.main) : colors.paper;
+  const glyphAccent = heads ? '#FFFFFF' : rc.dark;
 
   return (
-    <Svg width={size} height={size} viewBox="0 0 100 100">
+    <Svg width={size} height={size} viewBox="-9 -9 118 118">
       <Defs>
-        <RadialGradient id={`f${id}`} cx="40%" cy="35%" r="70%">
-          <Stop offset="0" stopColor={faceA} />
-          <Stop offset="1" stopColor={faceB} />
-        </RadialGradient>
+        <ClipPath id={`r${id}`}>
+          <Circle cx={50} cy={50} r={45} />
+        </ClipPath>
+        <ClipPath id={`f${id}`}>
+          <Circle cx={50} cy={50} r={36} />
+        </ClipPath>
       </Defs>
-      <Circle cx={50} cy={52} r={47} fill="rgba(0,0,0,0.28)" />
-      <Circle cx={50} cy={50} r={47} fill={rc.dark} />
-      <Circle cx={50} cy={50} r={42} fill={rc.main} />
-      <Circle cx={50} cy={50} r={36} fill={`url(#f${id})`} />
-      <Circle cx={50} cy={50} r={36} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={1.5} />
-      {!heads && <Circle cx={50} cy={50} r={42} fill="rgba(10,12,30,0.32)" />}
+      {/* soft shadow, die-cut white border, ink outline */}
+      <Ellipse cx={50} cy={57} rx={53} ry={51} fill="rgba(25,15,25,0.3)" />
+      <Circle cx={50} cy={50} r={54} fill={BORDER} />
+      <Circle cx={50} cy={50} r={48} fill={INK} />
+      {/* rim: base + hard-edged shadow crescent */}
+      <G clipPath={`url(#r${id})`}>
+        <Circle cx={50} cy={50} r={45} fill={rimShade} />
+        <Circle cx={46} cy={45} r={45} fill={rimBase} />
+      </G>
+      {/* face */}
+      <Circle cx={50} cy={50} r={38.5} fill={INK} />
+      <G clipPath={`url(#f${id})`}>
+        <Circle cx={50} cy={50} r={36} fill={faceShade} />
+        <Circle cx={47} cy={46} r={36} fill={faceBase} />
+      </G>
       {heads ? (
-        <G transform="translate(50 50) scale(0.74) translate(-50 -50)">{glyph(ink, accent)}</G>
+        <G transform="translate(50 51) scale(0.76) translate(-50 -50)">
+          <G stroke={INK} strokeWidth={GLYPH_OUTLINE} strokeLinejoin="round" strokeLinecap="round">
+            {glyph(INK, INK, GLYPH_OUTLINE)}
+          </G>
+          {glyph(glyphFill, glyphAccent, 0)}
+        </G>
       ) : (
-        <G transform="translate(50 50) scale(0.55) translate(-50 -50)" opacity={0.9}>
-          {raceEmblem(def.race, ink)}
+        <G transform="translate(50 51) scale(0.6) translate(-50 -50)">
+          <G stroke={INK} strokeWidth={7} strokeLinejoin="round">
+            {raceEmblem(def.race as Race, INK, 7)}
+          </G>
+          {raceEmblem(def.race as Race, colors.paper)}
         </G>
       )}
+      {/* specular highlights */}
+      <Ellipse cx={30} cy={25} rx={8} ry={4.2} fill="#FFFFFF" opacity={0.85} transform="rotate(-38 30 25)" />
+      <Circle cx={22} cy={35} r={2.4} fill="#FFFFFF" opacity={0.85} />
       {level > 1 &&
         Array.from({ length: level }).map((_, i) => {
-          const cx = 50 + (i - (level - 1) / 2) * 13;
+          const cx = 50 + (i - (level - 1) / 2) * 16;
           return (
-            <Polygon
-              key={i}
-              points={star(cx, 8.5, 6)}
-              fill="#FFE27A"
-              stroke="#7A4E00"
-              strokeWidth={1.2}
-            />
+            <G key={i}>
+              <Polygon points={star(cx, 4, 10.5)} fill={BORDER} stroke={BORDER} strokeWidth={5} strokeLinejoin="round" />
+              <Polygon points={star(cx, 4, 9)} fill={colors.gold} stroke={INK} strokeWidth={2.4} strokeLinejoin="round" />
+            </G>
           );
         })}
-      {engraved && <Polygon points="86,64 93,72 86,80 79,72" fill="#B9F3FF" stroke="#1B5E7A" strokeWidth={1.5} />}
+      {engraved && (
+        <G>
+          <Polygon points="88,60 99,72 88,84 77,72" fill={BORDER} stroke={BORDER} strokeWidth={6} strokeLinejoin="round" />
+          <Polygon points="88,60 99,72 88,84 77,72" fill="#8FE3F0" stroke={INK} strokeWidth={2.4} strokeLinejoin="round" />
+        </G>
+      )}
     </Svg>
   );
 }
 
-function star(cx: number, cy: number, r: number): string {
+/** Darkens a hex colour by ~25% (for a second cel tone). */
+function shade(hex: string): string {
+  const n = parseInt(hex.slice(1), 16);
+  const f = (c: number) => Math.round(c * 0.75);
+  const r = f((n >> 16) & 255);
+  const g = f((n >> 8) & 255);
+  const b = f(n & 255);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+}
+
+export function star(cx: number, cy: number, r: number, points = 5, inner = 0.48): string {
   const pts: string[] = [];
-  for (let i = 0; i < 10; i++) {
-    const rr = i % 2 === 0 ? r : r * 0.45;
-    const a = (Math.PI / 5) * i - Math.PI / 2;
+  for (let i = 0; i < points * 2; i++) {
+    const rr = i % 2 === 0 ? r : r * inner;
+    const a = (Math.PI / points) * i - Math.PI / 2;
     pts.push(`${(cx + rr * Math.cos(a)).toFixed(1)},${(cy + rr * Math.sin(a)).toFixed(1)}`);
   }
   return pts.join(' ');
@@ -77,12 +122,31 @@ function star(cx: number, cy: number, r: number): string {
 
 export const CoinArt = React.memo(CoinArtImpl);
 
+/** A round race sticker (used on the title screen and charm cards). */
 export function RaceBadge({ race, size }: { race: keyof typeof raceColors; size: number }) {
   const rc = raceColors[race];
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
-    <Svg width={size} height={size} viewBox="0 0 100 100">
-      <Circle cx={50} cy={50} r={48} fill={rc.main} />
-      <G transform="translate(50 50) scale(0.7) translate(-50 -50)">{raceEmblem(race, '#FFFFFF')}</G>
+    <Svg width={size} height={size} viewBox="-9 -9 118 118">
+      <Defs>
+        <ClipPath id={`b${id}`}>
+          <Circle cx={50} cy={50} r={45} />
+        </ClipPath>
+      </Defs>
+      <Ellipse cx={50} cy={57} rx={53} ry={51} fill="rgba(25,15,25,0.3)" />
+      <Circle cx={50} cy={50} r={54} fill={BORDER} />
+      <Circle cx={50} cy={50} r={48} fill={INK} />
+      <G clipPath={`url(#b${id})`}>
+        <Circle cx={50} cy={50} r={45} fill={rc.dark} />
+        <Circle cx={46} cy={45} r={45} fill={rc.main} />
+      </G>
+      <G transform="translate(50 50) scale(0.62) translate(-50 -50)">
+        <G stroke={INK} strokeWidth={8} strokeLinejoin="round">
+          {raceEmblem(race as Race, INK, 8)}
+        </G>
+        {raceEmblem(race as Race, colors.paper)}
+      </G>
+      <Ellipse cx={30} cy={24} rx={9} ry={4.5} fill="#FFFFFF" opacity={0.8} transform="rotate(-38 30 24)" />
     </Svg>
   );
 }

@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { STARTING_BAG, charmDef, chooseStarter, coinDef, type Race, type RunState } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
-import { Button, Txt } from '../components/ui';
+import { Button, Ribbon, Stitch, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
 import { colors, font, raceColors, radius } from '../theme';
 
@@ -21,9 +21,9 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 12, paddingBottom: Math.max(insets.bottom, 12) }]}>
       <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: 12 }}>
-        <Txt style={styles.title} accessibilityRole="header">
-          Choose your patron
-        </Txt>
+        <View style={{ alignItems: 'center' }}>
+          <Ribbon title="Choose your patron" width={230} />
+        </View>
         <Txt style={styles.sub}>Your starting Charm lasts the whole run. Every run starts with this bag:</Txt>
         <View style={styles.bag} accessible accessibilityLabel={`Starting bag: ${STARTING_BAG.map((d) => coinDef(d).name).join(', ')}`}>
           {STARTING_BAG.map((d, i) => (
@@ -43,8 +43,9 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
               accessibilityRole="button"
               accessibilityState={{ selected: sel }}
               accessibilityLabel={`${c.name}, ${rc.label} charm. ${c.text} ${RACE_BLURB[race]}`}
-              style={({ pressed }) => [styles.card, { borderColor: sel ? colors.gold : rc.dark }, pressed && { opacity: 0.9 }]}
+              style={({ pressed }) => [styles.card, sel && { backgroundColor: '#463F5C' }, pressed && { opacity: 0.9 }]}
             >
+              <Stitch r={radius.lg} inset={6} opacity={sel ? 1 : 0.4} color={sel ? colors.gold : colors.stitch} />
               <RaceBadge race={race} size={56} />
               <View style={{ flex: 1 }}>
                 <Txt style={[styles.race, { color: rc.light }]}>{rc.plural}</Txt>
@@ -72,9 +73,9 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   title: { fontSize: font.h1, fontWeight: '900', textAlign: 'center' },
-  sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center' },
+  sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center', textShadowColor: 'rgba(10,6,12,0.9)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   bag: { flexDirection: 'row', justifyContent: 'center', gap: 4, flexWrap: 'wrap' },
   card: {
     flexDirection: 'row',
@@ -82,8 +83,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.panel,
     borderRadius: radius.lg,
-    borderWidth: 3,
-    padding: 14,
+    borderBottomWidth: 4,
+    borderBottomColor: 'rgba(10,6,12,0.45)',
+    padding: 16,
   },
   race: { fontSize: font.tiny, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
   name: { fontSize: font.h2, fontWeight: '900' },

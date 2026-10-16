@@ -190,6 +190,20 @@ Result: a sensible strategy wins about **29%** of runs, the greedy bot about **9
 - **Berserker** runs win ~45% of the time when it survives to the end of the run (it is still the riskiest coin: it destroys your own coins). Deep Pockets and Golden Scales are the strongest Charms (rare, 15 gold).
 - Copper in the final bag correlates with losing, as intended: melting and outgrowing Copper is part of the strategy.
 
+## Art direction
+
+Inspired by the sticker-craft look of tabletop toy battlers (reference screenshots and notes supplied by the project owner), drawn entirely from scratch for Coinfall. Nothing was traced or extracted; no characters, icons, layouts or fonts from any other game are used.
+
+- **Sticker build.** Every coin, badge and the logo is a die-cut sticker: soft drop shadow, white border, warm ink outline (`colors.ink` `#2B2320`, never pure black), then flat cel shading: one base tone, one hard-edged shadow crescent, a white specular highlight. Glyphs are inked by drawing them twice (fat in ink, then in colour). See `src/ui/art/CoinArt.tsx`.
+- **Diorama.** Stickers sit on a soft, low-contrast scene: a night bazaar stall with a moonlit window, lantern glow (gently breathing), shelves, bunting and a vignette (`src/ui/components/Backdrop.tsx`). The table is a lacquered wooden tray with a teal cloth runner, an original coin-and-diamond print and a stitched hem (`src/ui/table/Table.tsx`).
+- **Stitched UI.** Buttons are card-stock pills with a dashed stitch inset on a dark backing tab that compresses when pressed; panels and sheets are dark rounded plaques with pale stitching; page titles sit on a folded ribbon; the HUD is a wood-framed plaque. Type is Fredoka (rounded, SIL Open Font License), bundled with `@expo-google-fonts/fredoka`.
+- **Motion** (1x speed; divided by the speed setting; Reduce Motion fades in place instead):
+  - Landing: the coin arcs in and drops into an outlined cream smoke poof that reaches full size in ~130 ms, then breaks into puffs drifting out and down, gone by ~650 ms.
+  - Hits (bumps, smashes): a cream slash ring with yellow-white speed lines (~250 ms) and a white flash on the struck coin (~100 ms). Destruction adds shards, a bigger poof and a short shake.
+  - Numbers: big rounded numerals with an ink edge and a thick cream outline (gold for gold, green for growth, red for losses) pop in at 130%, settle in ~100 ms, linger ~650 ms and fade instead of flying away.
+  - Neighbours: a glowing orange-white link beam joins adjacent coins.
+  - Prompts and sheets pop in from ~30% with a small overshoot; the end-of-round card (cream sunburst, scalloped stitched bottom) drops in with the round's total before the reward sheet.
+
 ## Playtest log
 
 All playtests were run on the web build in headless Chromium at iPhone sizes (390×844, plus 375×667 and 440×956), driving the real UI and reading the screenshots.
@@ -210,8 +224,16 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 4 | Glyphs were small at 54px. | Glyph scale increased. |
 | 4 | Toss animation felt slow (~0.43s per coin). | Event durations trimmed ~15%; Fast/Turbo speeds available; Skip button. |
 | 4 | Reduce Motion (emulated): coins fade in place, no arcs/spins, and the game is fully playable. | — |
+| Art | First toy pass (thick black outlines, BONK!/KABOOM! words) judged ugly by the owner. | Restyled to the sticker/stitch direction from reference screenshots; old pass kept on `toy-style-wip`. |
+| Art | Bursts and numbers spilled past the table edge; on web, absolutely-positioned SVG painted over its text. | Effects are clamped to the table; text layers are positioned above their SVG backgrounds. |
+| Art | Page titles and the dues caption sat on top of the busy backdrop (moon, bunting). | Titles moved onto ribbon plates; the dues caption has its own dark pill. |
+| Art | Glyphs were small inside the new sticker coins. | Larger face and glyph scale. |
+| Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
+
+- **Art direction (after owner feedback):** a first "toy" pass with heavy black outlines and comic word bursts (BONK!/KABOOM!) was rejected as ugly and parked on branch `toy-style-wip`. The game was restyled from the owner's reference screenshots and notes into the sticker-and-stitch look described under Art direction. Comic words were dropped in favour of smoke, slash rings and outlined numbers.
+- **Fredoka font** is bundled (SIL Open Font License 1.1) for the rounded, friendly type; it is the only third-party asset and is free to ship in a commercial app.
 
 - **Expo SDK 58** (latest stable on npm at the time), blank TypeScript template, **no Expo Router**: the game is a single-screen state machine, so a router adds weight without benefit.
 - **Plain Copper never fuses.** The starting bag holds five Coppers; by the letter of the fusion rule they would fuse instantly. Copper is treated as plain currency so fusion is reserved for character coins.

@@ -90,7 +90,7 @@ Optional extras worth capturing on a device: a fusion toast ("Three Captain coin
 |---|---|---|---|
 | 1 | Complete and polished: no placeholder text, empty screens, crashes or debug UI (2.1) | **Pass** | Every screen has content; no dev menus or debug UI; playtested every screen at 375×667, 390×844 and 440×956 with no console errors; test checks content text for placeholders |
 | 2 | Real native app with lasting value, not a website wrapper (4.2) | **Pass** | React Native app with native rendering, haptics, local saves, and a replayable roguelike loop (8 phases, 28 coins, 22 Charms, 8 Engravings) |
-| 3 | Distinct name, icon and art; nothing copied (4.1, 4.3, 5.2) | **Pass** | Original name, original SVG icon/splash (`assets/source/`), every coin glyph hand-drawn in `src/ui/art/glyphs.tsx`, all text original; no third-party art or fonts |
+| 3 | Distinct name, icon and art; nothing copied (4.1, 4.3, 5.2) | **Pass** | Original name, original SVG icon/splash (`assets/source/`), every coin glyph hand-drawn in `src/ui/art/glyphs.tsx`, all text original; no third-party art; the only third-party asset is the Fredoka font (SIL Open Font License) |
 | 4 | Play money only; can't be bought or cashed out; no real money (5.3) | **Pass** | No purchase code or IAP libraries; stated in How to play, Privacy, Settings footer and review notes |
 | 5 | Fantasy coin-toss look, not a casino (no slots, cards, chips) | **Pass** | Wooden bazaar table, character coins with race emblems; no slot machines, playing cards, chips, roulette or felt |
 | 6 | No accounts, ads, analytics, tracking or data collection; saves on device (5.1.1) | **Pass** | Only AsyncStorage on device; no network code; no SDKs that collect data |

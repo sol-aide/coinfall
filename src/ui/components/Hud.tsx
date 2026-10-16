@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PHASES, ROUNDS_PER_PHASE, computeMods, currentDues, duesFor, type RunState } from '../../engine';
 import { colors, font } from '../theme';
-import { IconButton, Pill, Txt } from './ui';
+import { IconButton, Pill, Stitch, Txt } from './ui';
 
 export function Hud({
   run,
@@ -26,6 +26,7 @@ export function Hud({
   const short = Math.max(0, dues - gold);
   return (
     <View style={styles.hud}>
+      <Stitch r={16} inset={5} opacity={0.4} />
       <View style={styles.row}>
         <View style={{ flex: 1 }} accessible accessibilityRole="header" accessibilityLabel={`Phase ${run.phase} of ${PHASES}${showRound ? `, round ${run.round} of ${ROUNDS_PER_PHASE}` : ''}`}>
           <Txt style={styles.phase}>
@@ -66,13 +67,24 @@ export function Hud({
 }
 
 const styles = StyleSheet.create({
-  hud: { paddingHorizontal: 12, paddingTop: 4, gap: 6 },
+  hud: {
+    marginHorizontal: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    gap: 6,
+    backgroundColor: colors.panel,
+    borderRadius: 16,
+    borderWidth: 3,
+    borderColor: colors.wood,
+    borderBottomWidth: 5,
+    borderBottomColor: colors.woodDark,
+  },
   row: { flexDirection: 'row', alignItems: 'center', gap: 2 },
   row2: { flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'space-between' },
   phase: { fontSize: font.h2, fontWeight: '900' },
   phaseOf: { fontSize: font.small, color: colors.textMuted, fontWeight: '700' },
   dots: { flexDirection: 'row', gap: 5, marginTop: 3 },
-  dot: { width: 14, height: 6, borderRadius: 3, backgroundColor: colors.panelLight },
+  dot: { width: 14, height: 8, borderRadius: 4, backgroundColor: colors.panelLight },
   dotDone: { backgroundColor: colors.gold },
   dotNow: { backgroundColor: colors.accent },
   dues: {
@@ -81,6 +93,9 @@ const styles = StyleSheet.create({
     gap: 5,
     backgroundColor: colors.bgDeep,
     borderRadius: 999,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(158,168,200,0.55)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     flexShrink: 1,

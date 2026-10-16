@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { Backdrop } from './components/Backdrop';
 import { CharmPickScreen } from './screens/CharmPickScreen';
 import { DuesScreen } from './screens/DuesScreen';
 import { EndScreen } from './screens/EndScreen';
@@ -14,6 +15,16 @@ type Route = 'title' | 'game' | 'howto' | 'settings' | 'privacy';
 
 /** Top-level navigation: a tiny state machine. In-run screens follow the run's own screen. */
 export function Root() {
+  const { reduceMotion } = useGame();
+  return (
+    <View style={styles.fill}>
+      <Backdrop still={reduceMotion} />
+      <Screens />
+    </View>
+  );
+}
+
+function Screens() {
   const { loaded, run, abandonRun } = useGame();
   const [route, setRoute] = useState<Route>('title');
   const [back, setBack] = useState<Route>('title');
@@ -27,7 +38,7 @@ export function Root() {
 
   if (!loaded) {
     return (
-      <View style={[styles.fill, styles.center]}>
+      <View style={[styles.clear, styles.center]}>
         <ActivityIndicator color={colors.gold} />
       </View>
     );
@@ -59,7 +70,7 @@ export function Root() {
 
   const openMenu = () => setMenu(true);
   return (
-    <View style={styles.fill}>
+    <View style={styles.clear}>
       {run.screen === 'pickCharm' && <CharmPickScreen onBack={() => setRoute('title')} />}
       {(run.screen === 'ready' || run.screen === 'reward') && <GameScreen onMenu={openMenu} />}
       {run.screen === 'dues' && <DuesScreen />}
@@ -83,6 +94,7 @@ export function Root() {
 }
 
 const styles = StyleSheet.create({
-  fill: { flex: 1, backgroundColor: colors.bg },
+  fill: { flex: 1, backgroundColor: colors.bgDeep },
+  clear: { flex: 1 },
   center: { alignItems: 'center', justifyContent: 'center' },
 });

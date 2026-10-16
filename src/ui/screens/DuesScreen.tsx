@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PHASES, canPayDues, charmDef, coinDef, currentDues, payDues, type GameEvent, type RunState } from '../../engine';
 import { Icon } from '../art/Icons';
-import { Button, Panel, Txt, thud } from '../components/ui';
+import { Button, Panel, Ribbon, Txt, thud } from '../components/ui';
 import { useGame } from '../state/GameContext';
 import { colors, font } from '../theme';
 
@@ -36,10 +36,7 @@ export function DuesScreen() {
     <View style={[styles.screen, { paddingTop: insets.top + 16, paddingBottom: Math.max(insets.bottom, 12) }]}>
       <ScrollView contentContainerStyle={{ gap: 14, paddingBottom: 12 }}>
         <View style={styles.head}>
-          <Icon name="seal" size={78} />
-          <Txt style={styles.title} accessibilityRole="header">
-            Phase {r.phase} complete
-          </Txt>
+          <Ribbon title={`Phase ${r.phase} complete`} width={230} />
           <Txt style={styles.sub}>The Lenders' Guild collects its dues{final ? ' for the last time' : ''}.</Txt>
         </View>
         {lines.length > 0 && (
@@ -92,10 +89,10 @@ function Row({ label, value, color }: { label: string; value: number; color: str
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   head: { alignItems: 'center', gap: 6 },
   title: { fontSize: font.h1, fontWeight: '900' },
-  sub: { fontSize: font.body, color: colors.textDim, textAlign: 'center' },
+  sub: { fontSize: font.body, color: colors.textDim, textAlign: 'center', textShadowColor: 'rgba(10,6,12,0.9)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   section: { fontSize: font.small, color: colors.textMuted, fontWeight: '800', marginBottom: 4, textTransform: 'uppercase' },
   line: { fontSize: font.body, color: colors.text, marginVertical: 2 },
   bill: { gap: 6 },

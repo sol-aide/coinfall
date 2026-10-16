@@ -12,7 +12,7 @@ import {
 } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
 import { TOUCH, colors, font, raceColors, radius, rarityColors } from '../theme';
-import { Overlay, Txt } from './ui';
+import { Overlay, Stitch, Txt } from './ui';
 
 export function levelNote(level: number) {
   return level > 1 ? `Level ${level}: base value and ability numbers ×${level} (shown above).` : '';
@@ -46,6 +46,7 @@ export function CoinRow({
   const eng = inst?.engraving ? engravingDef(inst.engraving) : undefined;
   const body = (
     <>
+      <Stitch r={radius.md} inset={4} opacity={selected ? 0.9 : 0.35} color={selected ? colors.gold : colors.stitch} />
       <CoinArt defId={defId} size={54} level={level} engraved={!!eng} />
       <View style={styles.rowText}>
         <View style={styles.rowTitle}>
@@ -147,10 +148,10 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: 10,
     minHeight: TOUCH + 20,
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderBottomWidth: 3,
+    borderBottomColor: 'rgba(10,6,12,0.45)',
   },
-  rowSelected: { borderColor: colors.gold },
+  rowSelected: { backgroundColor: '#4E4766' },
   rowText: { flex: 1 },
   rowTitle: { flexDirection: 'row', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' },
   name: { fontSize: font.body, fontWeight: '800' },

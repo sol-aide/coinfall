@@ -19,7 +19,7 @@ import {
 import { Icon, type IconName } from '../art/Icons';
 import { CoinRow } from '../components/CoinInfo';
 import { Hud } from '../components/Hud';
-import { Button, Txt } from '../components/ui';
+import { Button, Ribbon, Stitch, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
 import { colors, font, radius, rarityColors } from '../theme';
 import { BagOverlay, CharmsOverlay } from './Overlays';
@@ -87,6 +87,7 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
           }
           return (
             <View key={i} style={[styles.item, item.sold && { opacity: 0.55 }]} accessible={false}>
+              <Stitch r={radius.md} inset={4} opacity={0.35} />
               <Icon name={icon} size={40} />
               <View style={{ flex: 1 }} accessible accessibilityLabel={`${name}. ${text}`}>
                 <Txt style={styles.itemName}>
@@ -108,9 +109,7 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
       <Hud run={r} onBag={() => setBagOpen(true)} onCharms={() => setCharmsOpen(true)} onMenu={onMenu} showRound={false} nextPhase />
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.banner}>
-          <Txt style={styles.title} accessibilityRole="header">
-            Bazaar
-          </Txt>
+          <Ribbon title="Bazaar" width={150} />
           <Txt style={styles.sub}>
             Dues paid. Next phase's dues: <Txt style={{ color: colors.gold, fontWeight: '900' }}>{nextDues}</Txt> gold.
           </Txt>
@@ -192,11 +191,11 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   scroll: { padding: 12, gap: 14, paddingBottom: 24 },
   banner: { alignItems: 'center', gap: 2 },
   title: { fontSize: font.h1, fontWeight: '900' },
-  sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center' },
+  sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center', textShadowColor: 'rgba(10,6,12,0.9)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   tools: { flexDirection: 'row', gap: 8 },
   section: { fontSize: font.small, color: colors.textMuted, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
   item: {

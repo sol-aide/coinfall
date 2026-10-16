@@ -19,6 +19,7 @@ import { Button, Overlay, Txt, thud } from '../components/ui';
 import { useGame } from '../state/GameContext';
 import { Table } from '../table/Table';
 import { usePlayback } from '../table/playback';
+import { RoundCard } from '../table/RoundCard';
 import { colors, font, radius } from '../theme';
 import { Tutorial } from './InfoScreens';
 import { BagOverlay, CharmsOverlay } from './Overlays';
@@ -35,13 +36,30 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
   const [showDetails, setShowDetails] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(true);
+  const [haul, setHaul] = useState<number | null>(null);
+  const sawPlaying = useRef(false);
 
   const roundKey = r.lastRound ? `${r.lastRound.phase}-${r.lastRound.round}-${r.stats.roundsPlayed}` : 'none';
   const mountKey = useRef(roundKey);
   const instant = roundKey === mountKey.current;
   const showRound = r.screen === 'reward' ? r.lastRound : undefined;
-  const { state, popups, skip } = usePlayback(showRound, showRound ? roundKey : 'none', settings.speed, reduceMotion, instant);
+  const { state, fx, shake, skip } = usePlayback(showRound, showRound ? roundKey : 'none', settings.speed, reduceMotion, instant);
   const playing = !!state && !state.done && r.screen === 'reward';
+
+  // After an animated round, show the round card for a moment before the reward sheet.
+  useEffect(() => {
+    if (playing) {
+      sawPlaying.current = true;
+      return;
+    }
+    if (!state?.done || !sawPlaying.current || !r.lastRound) return;
+    sawPlaying.current = false;
+    setHaul(r.lastRound.total);
+    if (r.lastRound.total >= 30) thud(settings.haptics);
+    const id = setTimeout(() => setHaul(null), reduceMotion ? 900 : 1300 / Math.sqrt(settings.speed));
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, state?.done]);
 
   useEffect(() => {
     setSelected(null);
@@ -83,7 +101,8 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
           <Table
             width={tableW}
             coins={coins}
-            popups={popups}
+            fx={fx}
+            shake={shake}
             adjacency={adjRadius(mods)}
             speed={settings.speed}
             reduceMotion={reduceMotion}
@@ -101,13 +120,18 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
             )}
           </Table>
         )}
+        {haul !== null && (
+          <View style={styles.haul} pointerEvents="none">
+            <RoundCard total={haul} still={reduceMotion} />
+          </View>
+        )}
       </View>
 
       <View style={[styles.bottom, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         {r.screen === 'ready' && (
           <Button big label="Toss coins" icon="play" onPress={toss} testID="toss" a11yHint="Draws coins from your bag and tosses them onto the table" />
         )}
-        {r.screen === 'reward' && state?.done && !sheetOpen && r.lastRound && (
+        {r.screen === 'reward' && state?.done && haul === null && !sheetOpen && r.lastRound && (
           <View style={styles.playRow}>
             <View style={{ flex: 1 }}>
               <Txt style={styles.stage}>Round {r.lastRound.round}</Txt>
@@ -138,7 +162,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
         )}
       </View>
 
-      {r.screen === 'reward' && state?.done && sheetOpen && r.lastRound && (
+      {r.screen === 'reward' && state?.done && haul === null && sheetOpen && r.lastRound && (
         <Overlay position="bottom">
           <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8 }}>
             <View style={styles.sumRow}>
@@ -265,15 +289,16 @@ function Breakdown({ run }: { run: RunState }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   duesBar: { paddingHorizontal: 12, marginTop: 8, gap: 3 },
-  duesTrack: { height: 8, borderRadius: 4, backgroundColor: colors.bgDeep, overflow: 'hidden' },
-  duesFill: { height: 8, borderRadius: 4 },
-  duesTxt: { fontSize: font.tiny, color: colors.textDim, textAlign: 'center' },
+  duesTrack: { height: 14, borderRadius: 7, backgroundColor: colors.panel, overflow: 'hidden', borderWidth: 1.5, borderStyle: 'dashed', borderColor: 'rgba(158,168,200,0.6)', padding: 2 },
+  duesFill: { height: '100%', borderRadius: 4 },
+  duesTxt: { fontSize: font.tiny, color: colors.textDim, textAlign: 'center', alignSelf: 'center', backgroundColor: 'rgba(23,19,29,0.8)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 2, overflow: 'hidden' },
+  haul: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
   tableArea: { flex: 1, alignItems: 'center', justifyContent: 'center', marginVertical: 6 },
   emptyHint: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 6 },
-  emptyTitle: { fontSize: font.h1, fontWeight: '900', color: '#FFF3DD' },
-  emptyText: { fontSize: font.body, color: '#FFE9C9', textAlign: 'center' },
+  emptyTitle: { fontSize: 30, fontWeight: '700', color: colors.paper, textShadowColor: 'rgba(10,6,12,0.6)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
+  emptyText: { fontSize: font.body, fontWeight: '600', color: '#E9F2EE', textAlign: 'center', textShadowColor: 'rgba(10,6,12,0.6)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
   bottom: { paddingHorizontal: 12, minHeight: 86, justifyContent: 'center' },
   playRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   stage: { fontSize: font.tiny, color: colors.textMuted, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
