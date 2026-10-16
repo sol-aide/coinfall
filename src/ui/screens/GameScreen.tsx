@@ -3,7 +3,9 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   BASE_DRAW,
+  ROUNDS_PER_PHASE,
   SKIP_GOLD,
+  currentDues,
   chooseReward,
   computeMods,
   playRound,
@@ -71,6 +73,11 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
         goldOverride={playing && state && r.lastRound ? r.gold - r.lastRound.total + state.total : undefined}
         onBag={() => setBagOpen(true)} onCharms={() => setCharmsOpen(true)} onMenu={onMenu} />
 
+      <DuesBar
+        gold={playing && state && r.lastRound ? r.gold - r.lastRound.total + state.total : r.gold}
+        dues={currentDues(r)}
+        roundsLeft={ROUNDS_PER_PHASE - r.round + (r.screen === 'ready' ? 1 : 0)}
+      />
       <View style={styles.tableArea} onLayout={(e) => setArea({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
         {tableW > 0 && (
           <Table
@@ -113,9 +120,14 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
           <View style={styles.playRow}>
             <View style={{ flex: 1 }} accessibilityLiveRegion="polite">
               <Txt style={styles.stage}>{state.stage ?? ''}</Txt>
-              <Txt style={styles.caption} numberOfLines={2}>
+              <Txt style={styles.caption} numberOfLines={1}>
                 {state.caption}
               </Txt>
+              {!!state.detail && (
+                <Txt style={styles.detail} numberOfLines={2}>
+                  {state.detail}
+                </Txt>
+              )}
             </View>
             <View style={styles.totalBox}>
               <Txt style={styles.totalSmall}>Gold</Txt>
@@ -172,7 +184,8 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
             />
             <Button
               label="Reroll"
-              sub={`${r.rerollTokens} token${r.rerollTokens === 1 ? '' : 's'}`}
+              sub={`${r.rerollTokens} left`}
+              a11yLabel={`Reroll the choices with a token, ${r.rerollTokens} left`}
               icon="reroll"
               variant="secondary"
               disabled={r.rerollTokens < 1}
@@ -196,7 +209,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
       )}
 
       {toast && (
-        <View style={[styles.toast, { top: insets.top + 90 }]} pointerEvents="none" accessibilityLiveRegion="assertive">
+        <View style={[styles.toast, { top: insets.top + 6 }]} pointerEvents="none" accessibilityLiveRegion="assertive">
           <Txt style={styles.toastTxt}>{toast}</Txt>
         </View>
       )}
@@ -204,6 +217,26 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
       {detail && <CoinDetail run={r} uid={detail} onClose={() => setDetail(null)} />}
       {bagOpen && <BagOverlay run={r} onClose={() => setBagOpen(false)} />}
       {charmsOpen && <CharmsOverlay run={r} onClose={() => setCharmsOpen(false)} />}
+    </View>
+  );
+}
+
+function DuesBar({ gold, dues, roundsLeft }: { gold: number; dues: number; roundsLeft: number }) {
+  const pct = Math.min(1, gold / Math.max(1, dues));
+  const done = gold >= dues;
+  return (
+    <View
+      style={styles.duesBar}
+      accessible
+      accessibilityRole="progressbar"
+      accessibilityLabel={`Guild dues: ${gold} of ${dues} gold, ${roundsLeft} round${roundsLeft === 1 ? '' : 's'} left this phase`}
+    >
+      <View style={styles.duesTrack}>
+        <View style={[styles.duesFill, { width: `${pct * 100}%`, backgroundColor: done ? colors.success : colors.gold }]} />
+      </View>
+      <Txt style={styles.duesTxt}>
+        {done ? 'Dues covered' : `${gold} / ${dues} for the Guild`} · {roundsLeft} round{roundsLeft === 1 ? '' : 's'} left
+      </Txt>
     </View>
   );
 }
@@ -233,6 +266,10 @@ function Breakdown({ run }: { run: RunState }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
+  duesBar: { paddingHorizontal: 12, marginTop: 8, gap: 3 },
+  duesTrack: { height: 8, borderRadius: 4, backgroundColor: colors.bgDeep, overflow: 'hidden' },
+  duesFill: { height: 8, borderRadius: 4 },
+  duesTxt: { fontSize: font.tiny, color: colors.textDim, textAlign: 'center' },
   tableArea: { flex: 1, alignItems: 'center', justifyContent: 'center', marginVertical: 6 },
   emptyHint: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 6 },
   emptyTitle: { fontSize: font.h1, fontWeight: '900', color: '#FFF3DD' },
@@ -241,6 +278,7 @@ const styles = StyleSheet.create({
   playRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   stage: { fontSize: font.tiny, color: colors.textMuted, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
   caption: { fontSize: font.body, fontWeight: '700' },
+  detail: { fontSize: font.tiny, color: colors.textDim, marginTop: 1 },
   totalBox: { alignItems: 'center', minWidth: 58 },
   totalSmall: { fontSize: font.tiny, color: colors.textDim },
   total: { fontSize: font.h2, fontWeight: '900', color: colors.gold },

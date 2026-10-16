@@ -1,12 +1,14 @@
 // Player-facing long-form text. PRIVACY_TEXT is mirrored verbatim in PRIVACY.md.
 
+export const PRIVACY_CONTACT = 'https://github.com/sol-aide/coinfall/issues';
+
 export const PRIVACY_TEXT = [
-  'Coinfall does not collect, store or share any personal data.',
-  'There are no accounts, no sign-in, no ads, no analytics and no tracking of any kind. The game does not use the internet to play.',
-  'Your current run, your settings and your run records are saved only on this device, using the app’s local storage. They never leave the device, and they are deleted when you delete the app.',
-  'Gold, Melt tokens, Reroll tokens and every other currency in Coinfall are play money. They can only be earned by playing, can never be bought with real money, and can never be exchanged for money or anything of real-world value.',
-  'Coinfall contains no in-app purchases.',
-  'If this policy ever changes, the new version will be published with an app update before it takes effect.',
+  'Coinfall does not collect, transmit or share any personal data or usage data.',
+  'There are no accounts, no sign-in, no ads, no analytics, no tracking and no third-party SDKs that receive data. The game does not use the internet to play.',
+  'What is stored: your current run, your settings (animation speed, haptics, whether you have seen the tutorial) and your run records (runs played, wins, best phase). This is saved only on this device, in the app’s local storage, so that closing the app keeps your progress. It never leaves the device and is not shared with anyone, including the developer.',
+  'Keeping and deleting it: the data stays on the device until you remove it. You can delete it at any time with Settings → Delete all saved data, by abandoning a run, or by deleting the app. Because nothing is sent to the developer, there is no copy anywhere else to request or delete.',
+  'Gold, Melt tokens, Reroll tokens and every other currency in Coinfall are play money. They can only be earned by playing, can never be bought with real money, and can never be exchanged for money or anything of real-world value. Coinfall contains no in-app purchases.',
+  'If this policy changes, the new version will ship with an app update before it takes effect. Questions: ' + PRIVACY_CONTACT,
 ];
 
 export interface HelpSection {

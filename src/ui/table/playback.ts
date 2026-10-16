@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { coinDef, type Face, type GameEvent, type RoundResult, type StageName } from '../../engine';
+import { abilityText, charmDef, coinDef, type Face, type GameEvent, type RoundResult, type StageName } from '../../engine';
 
 export interface DisplayCoin {
   uid: string;
@@ -29,26 +29,36 @@ export interface PlaybackState {
   order: string[];
   stage: StageName | null;
   caption: string;
+  /** Rules text of the ability currently resolving, if any. */
+  detail: string;
   total: number;
   index: number;
   done: boolean;
 }
 
+const STAGE_HINT: Record<StageName, string> = {
+  'Round start': 'Drawing coins from your bag',
+  Toss: 'Coins land heads or tails',
+  Adjacency: 'Neighbouring coins interact',
+  'Round end': 'End-of-round abilities',
+  Scoring: 'Heads coins pay their value',
+};
+
 /** Base durations in ms at speed 1. */
 const DURATION: Record<GameEvent['t'], number> = {
-  stage: 320,
-  draw: 150,
-  land: 430,
-  trigger: 300,
-  flip: 360,
-  reflip: 360,
-  move: 340,
-  value: 260,
-  gold: 320,
-  destroy: 460,
-  revive: 360,
-  token: 300,
-  score: 230,
+  stage: 280,
+  draw: 120,
+  land: 360,
+  trigger: 280,
+  flip: 340,
+  reflip: 340,
+  move: 320,
+  value: 240,
+  gold: 300,
+  destroy: 440,
+  revive: 340,
+  token: 280,
+  score: 200,
 };
 
 export function eventDuration(e: GameEvent, speed: number, reduceMotion: boolean): number {
@@ -73,7 +83,7 @@ function initial(result: RoundResult): PlaybackState {
       scored: 0,
     };
   }
-  return { coins, order: result.table.map((c) => c.uid), stage: null, caption: '', total: 0, index: 0, done: false };
+  return { coins, order: result.table.map((c) => c.uid), stage: null, caption: '', detail: '', total: 0, index: 0, done: false };
 }
 
 /** Pure reducer: applies one engine event to the display state. */
@@ -83,10 +93,11 @@ export function applyEvent(s: PlaybackState, e: GameEvent): PlaybackState {
     if (coins[uid]) coins[uid] = { ...coins[uid], ...patch };
   };
   let { caption, total, stage } = s;
+  let detail = '';
   switch (e.t) {
     case 'stage':
       stage = e.stage;
-      caption = e.stage;
+      caption = STAGE_HINT[e.stage];
       break;
     case 'land':
       upd(e.uid, { x: e.x, y: e.y, face: e.face, value: e.value, landed: true });
@@ -95,21 +106,27 @@ export function applyEvent(s: PlaybackState, e: GameEvent): PlaybackState {
     case 'trigger':
       if (e.uid) upd(e.uid, { pulse: (coins[e.uid]?.pulse ?? 0) + 1 });
       caption = e.label;
+      if (e.uid && coins[e.uid]) detail = abilityText(coinDef(coins[e.uid].defId), coins[e.uid].level);
+      else if (e.charmId) detail = charmDef(e.charmId).text;
       break;
     case 'flip':
     case 'reflip':
       upd(e.uid, { face: e.face });
       if (e.t === 'reflip') upd(e.uid, { pulse: (coins[e.uid]?.pulse ?? 0) + 1 });
+      detail = s.detail;
       break;
     case 'move':
       upd(e.uid, { x: e.x, y: e.y });
+      detail = s.detail;
       break;
     case 'value':
       upd(e.uid, { value: e.value });
+      detail = s.detail;
       break;
     case 'gold':
       total += e.amount;
       caption = `${e.label}: +${e.amount} gold`;
+      detail = s.detail;
       break;
     case 'destroy':
       upd(e.uid, { destroyed: true });
@@ -128,13 +145,13 @@ export function applyEvent(s: PlaybackState, e: GameEvent): PlaybackState {
     case 'draw':
       break;
   }
-  return { ...s, coins, caption, total, stage, index: s.index + 1 };
+  return { ...s, coins, caption, detail, total, stage, index: s.index + 1 };
 }
 
 export function finalState(result: RoundResult): PlaybackState {
   let s = initial(result);
   for (const e of result.events) s = applyEvent(s, e);
-  return { ...s, done: true, caption: '' };
+  return { ...s, done: true, caption: '', detail: '' };
 }
 
 function popupFor(e: GameEvent, s: PlaybackState, id: number): Popup | null {

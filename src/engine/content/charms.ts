@@ -17,8 +17,8 @@ export const CHARMS: CharmDef[] = [
     rarity: 'starter',
     race: 'orc',
     starter: true,
-    text: 'Orcs get +1 value. +2 gold whenever a coin is destroyed.',
-    mods: { valueBonus: { orc: 1 } },
+    text: 'Orcs get +2 value. +2 gold whenever a coin is destroyed.',
+    mods: { valueBonus: { orc: 2 } },
     effects: [{ trigger: 'onDestroy', noScale: true, do: { kind: 'gold', amount: 2 } }],
   },
   {
@@ -27,8 +27,8 @@ export const CHARMS: CharmDef[] = [
     rarity: 'starter',
     race: 'elf',
     starter: true,
-    text: 'Elves land heads 65% of the time.',
-    mods: { headsBonus: { elf: 0.15 } },
+    text: 'Elves land heads 68% of the time.',
+    mods: { headsBonus: { elf: 0.18 } },
   },
 
   // ------------------------------------------------ Shop charms

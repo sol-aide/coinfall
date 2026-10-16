@@ -354,7 +354,8 @@ export function execute(
       const inst = ctx.inst.get(self.uid)!;
       if (self.face === 'heads') {
         inst.streak += 1;
-        const gain = scaled(e, a.amount, level);
+        // Streaks grow: the n-th heads in a row adds n (times amount and level).
+        const gain = scaled(e, a.amount, level) * inst.streak;
         inst.streakBonus += gain;
         trig();
         changeValue(ctx, self, gain, true);

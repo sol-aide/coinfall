@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import {
+  abilityText,
   coinDef,
   computeMods,
   displayValue,
@@ -14,7 +15,7 @@ import { TOUCH, colors, font, raceColors, radius, rarityColors } from '../theme'
 import { Overlay, Txt } from './ui';
 
 export function levelNote(level: number) {
-  return level > 1 ? `Level ${level}: base value and ability numbers ×${level}.` : '';
+  return level > 1 ? `Level ${level}: base value and ability numbers ×${level} (shown above).` : '';
 }
 
 /** Compact row: coin art, name, race and ability. Used by rewards, shop and the bag. */
@@ -54,7 +55,7 @@ export function CoinRow({
           <Txt style={[styles.race, { color: rc.light }]}>{rc.label}</Txt>
           {def.rarity === 'rare' && <Txt style={[styles.race, { color: rarityColors.rare }]}>Rare</Txt>}
         </View>
-        <Txt style={styles.ability}>{def.text}</Txt>
+        <Txt style={styles.ability}>{abilityText(def, level)}</Txt>
         {eng && <Txt style={styles.eng}>◆ {eng.name}: {eng.text}</Txt>}
         {level > 1 && <Txt style={styles.eng}>{levelNote(level)}</Txt>}
       </View>
@@ -67,7 +68,7 @@ export function CoinRow({
       </View>
     </>
   );
-  const label = `${def.name}, ${rc.label}, value ${value}. ${def.text}${eng ? ` Engraved ${eng.name}.` : ''}`;
+  const label = `${def.name}, ${rc.label}${level > 1 ? `, level ${level}` : ''}, value ${value}. ${abilityText(def, level)}${eng ? ` Engraved ${eng.name}.` : ''}`;
   if (!onPress)
     return (
       <View style={styles.row} accessible accessibilityLabel={label}>
@@ -110,7 +111,7 @@ export function CoinDetail({ run, uid, defId, onClose }: { run: RunState; uid?: 
         <Txt style={[styles.detailRace, { color: rc.light }]}>{rc.label}</Txt>
         <Txt style={[styles.detailRace, { color: rarityColors[def.rarity] }]}>{def.rarity === 'starter' ? 'Starter' : def.rarity[0].toUpperCase() + def.rarity.slice(1)}</Txt>
       </View>
-      <Txt style={styles.detailText}>{def.text}</Txt>
+      <Txt style={styles.detailText}>{abilityText(def, probe.level)}</Txt>
       {probe.level > 1 && <Txt style={styles.detailSub}>{levelNote(probe.level)}</Txt>}
       {eng && (
         <Txt style={styles.detailSub}>
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   valueTxt: { color: colors.text, fontWeight: '900', fontSize: 17, lineHeight: 19 },
-  valueCap: { color: colors.textMuted, fontSize: 10, fontWeight: '700', lineHeight: 12 },
+  valueCap: { color: colors.textMuted, fontSize: 11, fontWeight: '700', lineHeight: 13 },
   detailArt: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 18, marginVertical: 6 },
   detailMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 },
   detailRace: { fontWeight: '800', fontSize: font.small },

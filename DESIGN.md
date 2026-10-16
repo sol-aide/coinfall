@@ -1,9 +1,232 @@
 # Coinfall — Design
 
-_Work in progress; filled in as milestones land._
+Coinfall is an original roguelike coin-toss bag builder. You are a moneylender at a crossroads bazaar where Humans, Orcs and Elves gamble. The Lenders' Guild demands dues at the end of every phase: pay, or lose the run.
+
+## Rules
+
+### Run structure
+- A run is **8 phases** of **5 rounds**. After the 5th round of a phase the Guild collects **dues**. If your gold is short, the run is lost. Paying the 8th phase's dues wins the run.
+- Dues per phase: **22, 40, 65, 100, 150, 210, 285, 375** gold (Golden Scales lowers them by 15%).
+- A run starts with **0 gold**, **1 Reroll token** and the starting bag: **5 Copper, 1 Squire (Human), 1 Grunt (Orc), 1 Archer (Elf)**.
+- Before the first round you choose one of three **starting race Charms** (Commons Banner, Tusk Warhorn, Silverleaf Brooch).
+
+### A round
+1. **Draw**: 5 coins (6 with Deep Pockets) are drawn at random from the bag. The whole bag is available every round.
+2. **Round start** abilities fire (coins in hand, then Charms).
+3. **Toss**: coins land one by one at random, non-overlapping spots on the table. Each lands heads with 50% (modified by Charms, Engravings and abilities). *On land* abilities fire immediately as each coin lands, so landing order matters.
+4. **Adjacency**: each coin, in landing order, resolves its adjacency abilities. Coins are adjacent when their centres are within 0.4 table-widths (Long Table: +30%). The table shows adjacency as dashed lines.
+5. **Round end**: each coin's round-end abilities resolve in landing order, then Charms.
+6. **Scoring**: every heads coin pays its current value in gold. Tails coins pay nothing unless an ability, Engraving (Weighted) or Charm (Tailwind Sash) says otherwise. Ability gold is added to the round total. The round shows a full breakdown.
+- **Reactive triggers**: *On flip* fires whenever a coin on the table changes face after landing; *On destroy* fires when a coin is destroyed. A coin's own reactive effects fire first, then other coins' "whenever any coin…" effects, then Charms.
+- **Destroyed coins** leave the bag for good (Second Wind brings a coin back once; Ironclad coins can't be destroyed). The bag never drops below **5 coins**: at 5, coins hold firm.
+- **Phase start / Phase end** abilities fire from the bag (the coin doesn't need to be drawn).
+
+### Values
+- Coin value = (base value × level) + permanent growth + Charm bonuses + this round's temporary buffs, then × Double (Engraving). Values never go below 0.
+- "This round" buffs vanish after scoring; "permanently" changes stay with the coin for the rest of the run.
+
+### After each round
+- Choose **1 of 3** new coins (4 with Collector's Case) to add to your bag, or **skip for 3 gold**. A Reroll token re-rolls the choices.
+- **Fusion**: three identical coins of the same level automatically fuse into one coin a level higher (max level 3). A level-*n* coin has *n*× base value and *n*× ability numbers (chances and "all tails" style effects don't scale). Fused coins keep the sum of their parts' permanent growth (minus streak growth) and the first engraving found. Plain Copper never fuses.
+
+### Phase end, dues and the bazaar
+- At phase end you gain **1 Melt token** and **1 Reroll token** (Crucible / Bone Knucklebones add more), and phase-end abilities pay out.
+- After paying dues you visit the **bazaar**: 3 coins, 2 Charms, 2 Engravings and a Melt token are for sale. Prices rise 8% per phase. Rerolling the stock costs **2, 4, 6, 8…** gold within one visit (resets next visit), or one Reroll token.
+- **Charms** are permanent run-wide passives; you can hold **6** (including the starting Charm).
+- **Engravings** attach to one coin; a coin holds one engraving and a new one replaces the old.
+- **Melt tokens** remove any coin from the bag (minimum bag size 5). They can be used in the bazaar.
+
+### Prices
+| Item | Common | Uncommon | Rare |
+|---|---|---|---|
+| Coin | 5 | 8 | 12 |
+| Charm | 8 | 11 | 15 |
+| Engraving | 6 | 9 | 12 |
+| Melt token | 4 | | |
+
+Base prices × (1 + 0.08 × (phase − 1)) × (1 − Haggler discount), rounded.
+
+## Races
+
+- **Humans — economy and teamwork.** Direct gold (Merchant, Moneychanger, Guildmaster, Innkeeper, Tinker), buffs for other Humans (Squire, Captain, Patron), copying and retriggering neighbours (Bard, Apprentice).
+- **Orcs — big values and chaos.** High base values (Grunt, Firebrand, Warlord), smashing neighbours to absorb their value (Berserker), ramming and flipping (Charger, Wrecker), growth from chaos (Looter, Brawler) and risky self-destruction (Firebrand).
+- **Elves — precision and control.** Forced heads (Sentinel, Seer), re-flipping tails (Moon Priestess, Starweaver), long-range buffs (Archer, Longbow, Ranger), streaks and growth (Bladedancer, Druid).
+
+## Content
+
+All content is data in `src/engine/content/`, built from effect building blocks keyed by trigger (see CLAUDE.md). Tables below are generated by `npx tsx scripts/content-tables.ts`.
+
+**Plain**
+
+| Coin | Rarity | Value | Ability | Triggers |
+|---|---|---|---|---|
+| Copper | starter | 2 | A plain coin. No ability. | — |
+
+**Humans**
+
+| Coin | Rarity | Value | Ability | Triggers |
+|---|---|---|---|---|
+| Squire | common | 2 | Round end: +2 value for each other Human on the table. | onRoundEnd |
+| Merchant | common | 2 | Heads: +2 gold for each adjacent coin. | onAdjacent |
+| Moneychanger | common | 2 | Heads: +4 gold. | onRoundEnd |
+| Captain | uncommon | 2 | Adjacent Humans get +3 value this round. | onAdjacent |
+| Bard | uncommon | 2 | Retrigger the ability of the best adjacent coin. | onAdjacent |
+| Apprentice | uncommon | 2 | Copies the ability of the nearest coin that has one. | onAdjacent |
+| Patron | common | 2 | Heads: every other Human on the table gains +1 value permanently. | onRoundEnd |
+| Innkeeper | uncommon | 2 | Phase end: +6 gold, even from the bag. | onPhaseEnd |
+| Tinker | common | 2 | Phase end: +1 gold for each Human in your bag, even from the bag. | onPhaseEnd |
+| Guildmaster | rare | 2 | Heads: +3 gold for each heads Human on the table (itself included). | onRoundEnd |
+
+**Orcs**
+
+| Coin | Rarity | Value | Ability | Triggers |
+|---|---|---|---|---|
+| Grunt | common | 4 | No ability. Just heavy. | — |
+| Berserker | uncommon | 3 | Destroys the lowest-value adjacent coin and permanently gains its value. | onAdjacent |
+| Charger | common | 3 | On land: rams the nearest coin, pushing it away and flipping it. | onLand |
+| Shaman | common | 2 | Adjacent Orcs get +3 value this round. | onAdjacent |
+| Firebrand | uncommon | 6 | Round end: 1 in 4 chance to blow up. When destroyed: +10 gold. | onRoundEnd, onDestroy |
+| Wrecker | common | 4 | On land: flips every adjacent coin. | onLand |
+| Looter | common | 2 | Whenever any coin on the table is destroyed: +2 value permanently. | onDestroy |
+| Brawler | common | 2 | Whenever this coin is flipped: +3 value permanently. | onFlip |
+| Warlord | rare | 4 | Round end: +3 value for each other Orc on the table. | onRoundEnd |
+
+**Elfs**
+
+| Coin | Rarity | Value | Ability | Triggers |
+|---|---|---|---|---|
+| Archer | common | 2 | Heads: +3 value to the highest-value other heads coin on the table. | onRoundEnd |
+| Moon Priestess | uncommon | 1 | Round end: re-flips the 2 highest-value tails coins. | onRoundEnd |
+| Sentinel | common | 3 | Always lands heads. | static |
+| Bladedancer | uncommon | 2 | Round end: heads grows it permanently by its heads streak (+1, +2, +3…). Tails loses all streak growth. | onRoundEnd |
+| Ranger | common | 2 | Heads: every other heads Elf on the table gets +3 value this round. | onRoundEnd |
+| Seer | common | 1 | On land: the next 2 coins tossed land heads. | onLand |
+| Longbow | uncommon | 2 | Heads: +5 value to the farthest heads coin. | onRoundEnd |
+| Druid | common | 2 | Heads: the lowest-value other coin on the table gains +2 value permanently. | onRoundEnd |
+| Starweaver | rare | 3 | Round end: re-flips every tails coin on the table. | onRoundEnd |
+
+**Charms**
+
+| Charm | Rarity | Effect |
+|---|---|---|
+| Commons Banner | starter | Humans get +1 value. |
+| Tusk Warhorn | starter | Orcs get +2 value. +2 gold whenever a coin is destroyed. |
+| Silverleaf Brooch | starter | Elves land heads 68% of the time. |
+| Four-Leaf Pin | uncommon | All coins are 6% more likely to land heads. |
+| Deep Pockets | rare | Draw 1 extra coin every round. |
+| Interest Ledger | uncommon | Phase end: +1 gold for every 10 gold you hold (up to +6). |
+| Haggler's Tongue | common | Shop prices are 25% lower. |
+| Whirlwind Feather | common | +1 gold whenever a coin on the table flips. |
+| Gravedigger's Spade | common | +3 gold whenever a coin on the table is destroyed. |
+| Golden Scales | rare | Guild dues are 15% lower. |
+| Long Table | uncommon | Coins count as adjacent from 30% farther away. |
+| Collector's Case | common | Coin rewards offer 4 choices instead of 3. |
+| Copper Crown | common | Copper coins get +3 value. |
+| Crucible | common | Gain 1 extra Melt token every phase. |
+| Bone Knucklebones | common | Gain 2 extra Reroll tokens every phase. Shop rerolls cost 1 less. |
+| Tailwind Sash | uncommon | Tails coins score 1 gold each. |
+| First Light | uncommon | The first coin tossed each round always lands heads. |
+| Guild Charter | uncommon | Round end: +1 gold for each heads Human on the table. |
+| Skull Cup | uncommon | Orcs get +2 value. |
+| Moonwell Vial | uncommon | Elves get +1 value and are 5% more likely to land heads. |
+| Seeker's Lantern | common | Rare coins show up much more often. |
+| Tiny Anvil | rare | Phase start: a random coin in your bag gains +2 value permanently. |
+
+**Engravings**
+
+| Engraving | Rarity | Effect |
+|---|---|---|
+| Double | rare | This coin’s value is doubled. |
+| Echo | uncommon | This coin’s ability triggers twice. |
+| Lucky | common | Lands heads 65% of the time. |
+| Second Wind | common | The first time this coin is destroyed, it returns to your bag. |
+| Growth | uncommon | Round end: heads gives +1 value permanently. |
+| Gilded | common | Heads: +2 gold. |
+| Ironclad | common | This coin can’t be destroyed. |
+| Weighted | uncommon | Tails still scores half its value. |
+
+## Balance
+
+Balance is tuned with `npm run simulate -- 1000 --detail`, which plays 1,000 seeded runs for each of three bots:
+
+- **sensible**: rates coins (with a bonus for its starting race and for completing a fusion), skips weak rewards, uses Reroll tokens on bad offers, melts the weakest coins, keeps a 20% gold reserve, buys good Charms first, engraves its best coin.
+- **greedy**: always takes the best-looking reward (never skips) but otherwise shops like the sensible bot.
+- **random**: picks rewards and purchases at random.
+
+### Final results (1,000 runs each)
+
+```
+Dues: 22, 40, 65, 100, 150, 210, 285, 375
+
+sensible: 288/1000 wins (28.8%), avg best round 64.9
+  lost in phase: 1:20 2:16 3:26 4:85 5:163 6:141 7:143 8:118
+  by starter: warhorn 30.8%, silverleaf 27.9%, banner 27.8%
+  median gold at dues: 1:42/22 2:76/40 3:110/65 4:150/100 5:207/150 6:275/210 7:375/285 8:484/375
+  win% when coin in final bag: berserker(301) 45.5%, starweaver(282) 29.4%, druid(240) 28.3%, patron(233) 27.9%, tinker(217) 25.3%, moneychanger(218) 24.8%, warlord(340) 23.8%, innkeeper(271) 23.6%, guildmaster(330) 23.3%, bladedancer(292) 23.3%, moonpriestess(278) 22.3%, longbow(266) 22.2%, ranger(221) 22.2%, looter(181) 21.5%, merchant(409) 20.3%, bard(140) 20.0%, captain(304) 19.7%, sentinel(222) 19.4%, archer(722) 19.1%, squire(738) 19.1%, apprentice(84) 19.0%, grunt(628) 17.8%, charger(115) 16.5%, wrecker(106) 16.0%, shaman(171) 15.8%, seer(97) 15.5%, firebrand(153) 15.0%, brawler(192) 13.5%, copper(348) 13.5%
+  win% when charm owned: pockets(100) 66.0%, scales(73) 56.2%, firstlight(248) 50.8%, dice(4) 50.0%, lantern(77) 49.4%, clover(239) 46.9%, anvil(79) 45.6%, skullcup(255) 43.9%, collector(51) 43.1%, charter(225) 42.7%, ledger(265) 42.6%, tailwind(284) 42.6%, spade(76) 40.8%, crucible(55) 40.0%, moonwell(231) 39.8%, longtable(236) 38.6%, whirlwind(73) 38.4%, crown(416) 37.3%, haggler(342) 34.5%, warhorn(321) 30.8%, silverleaf(344) 27.9%, banner(335) 27.8%
+
+greedy: 94/1000 wins (9.4%), avg best round 50.8
+  lost in phase: 1:20 2:9 3:39 4:148 5:264 6:238 7:135 8:53
+  by starter: warhorn 13.4%, silverleaf 6.1%, banner 9.0%
+  median gold at dues: 1:42/22 2:73/40 3:104/65 4:136/100 5:169/150 6:214/210 7:280/285 8:447/375
+
+random: 0/1000 wins (0.0%), avg best round 20.7
+  lost in phase: 1:9 2:34 3:257 4:545 5:138 6:13 7:3 8:1
+  by starter: warhorn 0.0%, silverleaf 0.0%, banner 0.0%
+  median gold at dues: 1:43/22 2:65/40 3:76/65 4:80/100 5:91/150 6:167/210 7:274/285 8:303/375
+```
+
+### What changed during tuning
+1. **First pass** (dues 25/45/70/105/150/205/270/350, original numbers): sensible bot won ~7%; Orcs dominated (Warhorn 12.6% vs Banner 3%).
+2. **Degenerate Berserker**: a Berserker could eat the whole bag and win with a single 60+ value coin. Fix: the bag can't drop below 5 coins through destruction (same floor as melting). Win rate fell to 3.6%, which showed how much the exploit carried.
+3. **Human and Elf numbers were too small to keep up with dues**, so median gold fell behind dues from phase 4. Buffs: Squire +2 per Human, Merchant +2 gold per neighbour, Moneychanger +4, Captain +3, Guildmaster +3 per Human, Patron grows *every* other Human, Innkeeper +6, Tinker became a Human-count economy coin; Archer +3, Ranger +3, Longbow +5, Druid +2 permanent, Moon Priestess re-flips 2 coins, Seer blesses 2 coins, Sentinel/Starweaver value 3; Bladedancer's streak now grows (+1, +2, +3…). Orcs: Shaman +3, Wrecker value 4, Brawler +3 per flip.
+4. **Charm hoarding**: the bot ended runs with 16 Charms. Added a 6-slot Charm cap, which makes Charm choices matter.
+5. **Starter parity**: Tusk Warhorn raised to Orcs +2 value, Silverleaf to 68% heads. Starters now win 28–31% each.
+6. **Curve**: dues softened early (22/40/65) so ~2% of sensible runs die in phase 1, and raised late (150/210/285/375) so runs are decided in phases 5–8.
+
+Result: a sensible strategy wins about **29%** of runs, the greedy bot about **9%**, and random play essentially never. Runs usually end in phases 4–8, so most runs reach the interesting mid-game.
+
+### Known strengths to watch
+- **Berserker** runs win ~45% of the time when it survives to the end of the run (it is still the riskiest coin: it destroys your own coins). Deep Pockets and Golden Scales are the strongest Charms (rare, 15 gold).
+- Copper in the final bag correlates with losing, as intended: melting and outgrowing Copper is part of the strategy.
+
+## Playtest log
+
+All playtests were run on the web build in headless Chromium at iPhone sizes (390×844, plus 375×667 and 440×956), driving the real UI and reading the screenshots.
+
+| Milestone | What I saw | Change |
+|---|---|---|
+| 2 | HUD gold jumped to the round's final total while coins were still landing. | HUD shows gold counted so far during playback. |
+| 2 | Starting race label read "Elfs". | Added proper plurals. |
+| 2 | Reward sheet hid the final table. | Added "See table" / "Pick a coin" toggle. |
+| 3 | A scripted player died in phase 2 after ~8 gold rounds; early rounds felt flat. | Rebalanced economy (see Balance). The same script now reaches phase 5. |
+| 3 | Bot win state had a single 63-value Berserker as the whole bag. | 5-coin bag floor for destruction. |
+| 3 | Shop HUD still showed the already-paid dues. | Shop HUD shows next phase's dues. |
+| 3 | Coin value chip looked like a price tag next to the buy button. | Value chip restyled with a "value" caption. |
+| 4 | 375×667: "Humans" wrapped on the title screen; "4 toke…" truncated on the reward reroll button; the fusion toast covered the reward header. | Wider label, "4 left", toast moved to the top. |
+| 4 | Playback caption repeated the stage name ("ADJACENCY / Adjacency") and abilities only showed the coin's name. | Stage captions explain the step; resolving abilities show their rules text under the name. |
+| 4 | Copper heads and tails looked almost the same. | Tails faces are dimmed for every coin. |
+| 4 | The Moon Priestess glyph rendered blank (degenerate SVG arc). | Redrew the crescent. Added a full Coin/Charm/Engraving guide to How to play, which also made it easy to check every glyph. |
+| 4 | Glyphs were small at 54px. | Glyph scale increased. |
+| 4 | Toss animation felt slow (~0.43s per coin). | Event durations trimmed ~15%; Fast/Turbo speeds available; Skip button. |
+| 4 | Reduce Motion (emulated): coins fade in place, no arcs/spins, and the game is fully playable. | — |
 
 ## Decisions
 
-- **Expo SDK 58** (latest stable at time of writing), blank TypeScript template, no Expo Router: the game is a single-screen state machine, so a router adds weight without benefit.
-- **Plain Copper never fuses.** The starting bag holds five Coppers; by the letter of the fusion rule they would fuse instantly. Copper is treated as plain currency instead, so fusion is reserved for character coins.
-- **Engine actions are pure** (`(state) => newState`); the RNG state lives on the run so a saved run continues with identical randomness.
+- **Expo SDK 58** (latest stable on npm at the time), blank TypeScript template, **no Expo Router**: the game is a single-screen state machine, so a router adds weight without benefit.
+- **Plain Copper never fuses.** The starting bag holds five Coppers; by the letter of the fusion rule they would fuse instantly. Copper is treated as plain currency so fusion is reserved for character coins.
+- **Engine actions are pure** (`(state) => newState`, input never mutated); the RNG state lives on the run, so a saved run continues with identical randomness and runs are reproducible from a seed.
+- **The whole round resolves at once** in the engine and produces an ordered event log; the UI only replays it. This keeps rules out of the UI and makes Skip / speed / Reduce Motion trivial.
+- **Draws are from the whole bag each round** (no discard pile). Simpler to understand on a phone, and bag size still matters because only 5 coins are drawn.
+- **Adjacency** uses a fixed radius in table units (0.4 table widths, table is 1 × 1.2) so it is independent of screen size.
+- **Retrigger/copy** replays a coin's On land / Adjacency / Round end effects once (no chains; streak effects are excluded so Bladedancer can't double-count).
+- **Charm cap of 6** (incl. starter) — added after the bot hoarded 16 Charms.
+- **Bag floor of 5 coins** for both melting and destruction (destroy "holds firm" at 5).
+- **Skipping a reward pays 3 gold** so skipping is a real choice rather than a pure loss.
+- **Reroll tokens also work on round rewards**, not only the shop, to give them more uses.
+- **Starting race Charms** only change their race's coins (they don't add extra coins), keeping the starting bag exactly as specified.
+- **iPhone only on iOS** (`supportsTablet: false`), portrait, dark interface. iPad would need its own screenshots and layout pass.
+- **No Android config** in app.json (`platforms: ["ios", "web"]`), so nothing in the app or metadata mentions other platforms.
+- **Play money only**: no purchases, ads, accounts or network calls. A Settings option deletes all saved data on the device.
+- **The table is wood, not felt**, and coins are characters, not chips, to read as a fantasy bazaar rather than a casino.
+- **Web build** is used for automated playtesting and GitHub Pages; the base URL is `/coinfall` (from the git remote).

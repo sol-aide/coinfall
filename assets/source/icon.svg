@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#34449A"/>
+      <stop offset="1" stop-color="#121830"/>
+    </radialGradient>
+    <radialGradient id="face" cx="40%" cy="34%" r="72%">
+      <stop offset="0" stop-color="#FFF0B8"/>
+      <stop offset="0.55" stop-color="#F7C548"/>
+      <stop offset="1" stop-color="#C9861B"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- motion streaks -->
+  <g stroke="#F7C548" stroke-linecap="round" opacity="0.55">
+    <line x1="250" y1="120" x2="330" y2="250" stroke-width="26"/>
+    <line x1="390" y1="70" x2="440" y2="190" stroke-width="20"/>
+    <line x1="160" y1="250" x2="240" y2="360" stroke-width="16"/>
+  </g>
+  <!-- big falling coin, slightly tilted -->
+  <g transform="rotate(-14 520 520)">
+    <ellipse cx="520" cy="560" rx="330" ry="318" fill="#000" opacity="0.28"/>
+    <ellipse cx="520" cy="530" rx="330" ry="318" fill="#8E5A0E"/>
+    <ellipse cx="520" cy="515" rx="312" ry="300" fill="#E2A12C"/>
+    <ellipse cx="520" cy="515" rx="262" ry="252" fill="url(#face)"/>
+    <ellipse cx="520" cy="515" rx="262" ry="252" fill="none" stroke="#FFF6D6" stroke-width="8" opacity="0.6"/>
+    <!-- crossroads emblem: three paths meeting under a star -->
+    <path d="M520 420 L548 492 L626 494 L564 540 L587 616 L520 572 L453 616 L476 540 L414 494 L492 492 Z" fill="#8E5A0E"/>
+      <circle cx="735" cy="515" r="14" fill="#B9771A"/><circle cx="719" cy="594" r="14" fill="#B9771A"/><circle cx="672" cy="661" r="14" fill="#B9771A"/><circle cx="602" cy="705" r="14" fill="#B9771A"/><circle cx="520" cy="721" r="14" fill="#B9771A"/><circle cx="438" cy="705" r="14" fill="#B9771A"/><circle cx="368" cy="661" r="14" fill="#B9771A"/><circle cx="321" cy="594" r="14" fill="#B9771A"/><circle cx="305" cy="515" r="14" fill="#B9771A"/><circle cx="321" cy="436" r="14" fill="#B9771A"/><circle cx="368" cy="369" r="14" fill="#B9771A"/><circle cx="438" cy="325" r="14" fill="#B9771A"/><circle cx="520" cy="309" r="14" fill="#B9771A"/><circle cx="602" cy="325" r="14" fill="#B9771A"/><circle cx="672" cy="369" r="14" fill="#B9771A"/><circle cx="719" cy="436" r="14" fill="#B9771A"/>
+  </g>
+  <!-- three race coins -->
+  <g>
+    <circle cx="230" cy="860" r="92" fill="#22489A"/><circle cx="230" cy="860" r="74" fill="#3C7BE0"/>
+    <path d="M230 812 L276 828 Q276 890 230 916 Q184 890 184 828 Z" fill="#FFFFFF"/>
+    <circle cx="512" cy="900" r="92" fill="#8E2418"/><circle cx="512" cy="900" r="74" fill="#D94A3A"/>
+    <path d="M478 948 Q462 892 492 856 Q484 900 498 944 Z M546 948 Q562 892 532 856 Q540 900 526 944 Z" fill="#FFFFFF"/>
+    <circle cx="794" cy="860" r="92" fill="#176238"/><circle cx="794" cy="860" r="74" fill="#2FA866"/>
+    <path d="M794 806 Q846 852 794 916 Q742 852 794 806 Z" fill="#FFFFFF"/>
+  </g>
+</svg>

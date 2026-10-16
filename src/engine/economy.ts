@@ -11,9 +11,11 @@ export const PHASES = 8;
 export const ROUNDS_PER_PHASE = 5;
 export const MAX_LEVEL = 3;
 export const MIN_BAG = 5;
+/** Charm slots, including the starting Charm. */
+export const MAX_CHARMS = 6;
 
 /** Guild dues owed at the end of each phase (before Charm discounts). */
-export const DUES = [25, 45, 70, 105, 150, 205, 270, 350];
+export const DUES = [22, 40, 65, 100, 150, 210, 285, 375];
 
 export function duesFor(phase: number, mods: Mods): number {
   const base = DUES[Math.min(phase, DUES.length) - 1];

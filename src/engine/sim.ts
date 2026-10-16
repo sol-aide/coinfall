@@ -2,7 +2,7 @@
 
 import { charmDef } from './content/charms';
 import { coinDef } from './content/coins';
-import { duesFor } from './economy';
+import { MAX_CHARMS, duesFor } from './economy';
 import { computeMods, displayValue } from './mods';
 import * as R from './rng';
 import {
@@ -35,14 +35,14 @@ export const COIN_RATING: Record<string, number> = {
   apprentice: 2.4,
   patron: 2.6,
   innkeeper: 3,
-  tinker: 1.6,
+  tinker: 2.6,
   guildmaster: 4.4,
   grunt: 2.4,
   berserker: 3,
   charger: 2.4,
   shaman: 2.6,
   firebrand: 3.4,
-  wrecker: 2,
+  wrecker: 2.4,
   looter: 2.6,
   brawler: 2.6,
   warlord: 4.4,
@@ -163,10 +163,11 @@ function botShop(run: RunState, strategy: Strategy): RunState {
     if (strategy === 'random') {
       if (R.chance(h, 0.3)) break;
       choice = options[R.int(h, options.length)];
+      if (choice.item.kind === 'charm' && run.charms.length >= MAX_CHARMS) break;
     } else {
       const rate = (o: (typeof options)[number]) => {
         const it = o.item;
-        if (it.kind === 'charm') return (CHARM_RATING[it.charmId] ?? 2) * 1.2;
+        if (it.kind === 'charm') return run.charms.length >= MAX_CHARMS ? -1 : (CHARM_RATING[it.charmId] ?? 2) * 1.2;
         if (it.kind === 'coin') return rateCoin(run, it.defId) - bagAverage(run);
         if (it.kind === 'engraving') return bestCoinFor(run, it.engravingId) ? 2.5 : -1;
         return run.bag.length > 10 ? 0.8 : -1;
@@ -196,7 +197,7 @@ function botShop(run: RunState, strategy: Strategy): RunState {
 
 function botShopBuyOnly(run: RunState, reserve: number): RunState {
   for (let pass = 0; pass < 2; pass++) {
-    const charm = run.shop.findIndex((it) => it.kind === 'charm' && !it.sold && it.price <= run.gold - reserve && (CHARM_RATING[it.charmId] ?? 0) >= 3);
+    const charm = run.shop.findIndex((it) => it.kind === 'charm' && run.charms.length < MAX_CHARMS && !it.sold && it.price <= run.gold - reserve && (CHARM_RATING[it.charmId] ?? 0) >= 3);
     if (charm >= 0) {
       run = buyItem(run, charm);
       continue;
@@ -232,6 +233,10 @@ export interface SimResult {
   starter: string;
   roundsPlayed: number;
   bestRound: number;
+  /** Gold held when each phase's dues came due. */
+  goldAtDues: number[];
+  finalBag: string[];
+  charms: string[];
 }
 
 export function simulateRun(seed: number | string, strategy: Strategy = 'sensible', starterIndex?: number): SimResult {
@@ -240,7 +245,11 @@ export function simulateRun(seed: number | string, strategy: Strategy = 'sensibl
   const starter = run.starterChoices[starterIndex ?? R.int(h, run.starterChoices.length)];
   run = chooseStarter(run, starter);
   let guard = 0;
-  while (run.screen !== 'won' && run.screen !== 'lost' && guard++ < 1000) run = botStep(run, strategy);
+  const goldAtDues: number[] = [];
+  while (run.screen !== 'won' && run.screen !== 'lost' && guard++ < 1000) {
+    if (run.screen === 'dues') goldAtDues.push(run.gold);
+    run = botStep(run, strategy);
+  }
   return {
     won: run.screen === 'won',
     phaseReached: run.phase,
@@ -249,6 +258,9 @@ export function simulateRun(seed: number | string, strategy: Strategy = 'sensibl
     starter,
     roundsPlayed: run.stats.roundsPlayed,
     bestRound: run.stats.bestRound,
+    goldAtDues,
+    finalBag: run.bag.map((c) => c.defId),
+    charms: run.charms,
   };
 }
 

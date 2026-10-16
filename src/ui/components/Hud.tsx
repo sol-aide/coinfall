@@ -56,7 +56,7 @@ export function Hud({
         <View style={styles.dues} accessible accessibilityLabel={`Guild dues at the end of ${nextPhase ? 'next' : 'this'} phase: ${dues} gold${short ? `, ${short} more needed` : ', covered'}`}>
           <Txt style={styles.duesLabel}>{nextPhase ? 'Next dues' : 'Dues'}</Txt>
           <Txt style={[styles.duesValue, { color: short ? colors.text : colors.success }]}>{dues}</Txt>
-          <Txt style={[styles.duesNeed, { color: short ? colors.accent : colors.success }]}>{short ? `need ${short}` : 'covered ✓'}</Txt>
+          {!nextPhase && <Txt style={[styles.duesNeed, { color: short ? colors.accent : colors.success }]}>{short ? `need ${short}` : 'covered ✓'}</Txt>}
         </View>
         <Pill icon="melt" value={run.meltTokens} label="Melt tokens" />
         <Pill icon="reroll" value={run.rerollTokens} label="Reroll tokens" />

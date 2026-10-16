@@ -82,9 +82,9 @@ describe('onFlip', () => {
   it('Brawler gains permanent value when flipped', () => {
     const { ctx, coins, inst } = table([{ defId: 'brawler', face: 'heads' }]);
     setFace(ctx, coins[0], 'tails');
-    expect(inst[0].bonus).toBe(2);
+    expect(inst[0].bonus).toBe(3);
     setFace(ctx, coins[0], 'tails'); // no change, no trigger
-    expect(inst[0].bonus).toBe(2);
+    expect(inst[0].bonus).toBe(3);
   });
 
   it('Whirlwind Feather pays 1 gold per flip', () => {
@@ -96,7 +96,7 @@ describe('onFlip', () => {
 });
 
 describe('onAdjacent', () => {
-  it('Merchant on heads earns 1 gold per adjacent coin', () => {
+  it('Merchant on heads earns 2 gold per adjacent coin', () => {
     const { ctx, coins } = table([
       { defId: 'merchant', x: 0.5, y: 0.5, face: 'heads' },
       { defId: 'copper', x: 0.6, y: 0.5 },
@@ -104,7 +104,7 @@ describe('onAdjacent', () => {
       { defId: 'copper', x: 1.0, y: 1.2 },
     ]);
     runCoinTrigger(ctx, coins[0], 'onAdjacent');
-    expect(goldEvents(ctx)).toBe(2);
+    expect(goldEvents(ctx)).toBe(4);
   });
 
   it('Merchant on tails earns nothing', () => {
@@ -125,8 +125,8 @@ describe('onAdjacent', () => {
     ]);
     runCoinTrigger(ctx, coins[0], 'onAdjacent');
     runCoinTrigger(ctx, coins[3], 'onAdjacent');
-    expect(coins[1].temp).toBe(2);
-    expect(coins[2].temp).toBe(2);
+    expect(coins[1].temp).toBe(3);
+    expect(coins[2].temp).toBe(3);
     expect(coins[0].temp).toBe(0);
   });
 
@@ -163,8 +163,8 @@ describe('onAdjacent', () => {
       { defId: 'moneychanger', x: 0.6, y: 0.5, face: 'tails' },
     ]);
     runCoinTrigger(ctx, coins[0], 'onAdjacent');
-    // Moneychanger: heads +3 gold. The Apprentice is heads, so it earns it.
-    expect(goldEvents(ctx)).toBe(3);
+    // Moneychanger: heads +4 gold. The Apprentice is heads, so it earns it.
+    expect(goldEvents(ctx)).toBe(4);
   });
 });
 
@@ -227,10 +227,10 @@ describe('onDestroy', () => {
 });
 
 describe('onRoundEnd', () => {
-  it('Squire gains +1 per other Human on the table', () => {
+  it('Squire gains +2 per other Human on the table', () => {
     const { ctx, coins } = table([{ defId: 'squire' }, { defId: 'merchant' }, { defId: 'patron' }, { defId: 'grunt' }]);
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
-    expect(coins[0].temp).toBe(2);
+    expect(coins[0].temp).toBe(4);
   });
 
   it('Archer buffs the highest-value heads coin', () => {
@@ -241,20 +241,26 @@ describe('onRoundEnd', () => {
       { defId: 'firebrand', face: 'heads', x: 0.9 },
     ]);
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
-    expect(coins[3].temp).toBe(2);
+    expect(coins[3].temp).toBe(3);
     expect(coins[1].temp).toBe(0);
   });
 
-  it('Moon Priestess re-flips the highest-value tails coin', () => {
+  it('Moon Priestess re-flips the two highest-value tails coins', () => {
     let flippedToHeads = 0;
     for (let seed = 1; seed <= 30; seed++) {
       const { ctx, coins } = table(
-        [{ defId: 'moonpriestess', face: 'heads' }, { defId: 'grunt', face: 'tails' }, { defId: 'copper', face: 'tails' }],
+        [
+          { defId: 'moonpriestess', face: 'heads' },
+          { defId: 'grunt', face: 'tails' },
+          { defId: 'copper', face: 'tails' },
+          { defId: 'firebrand', face: 'tails' },
+        ],
         [],
         seed,
       );
       runCoinTrigger(ctx, coins[0], 'onRoundEnd');
       expect(coins[2].face).toBe('tails');
+      expect(ctx.events.some((e) => (e.t === 'reflip' || e.t === 'flip') && e.uid === coins[3].uid)).toBe(true);
       expect(ctx.events.some((e) => (e.t === 'reflip' || e.t === 'flip') && e.uid === coins[1].uid)).toBe(true);
       if (coins[1].face === 'heads') flippedToHeads++;
     }
@@ -279,7 +285,7 @@ describe('onRoundEnd', () => {
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
-    expect(inst[0].bonus).toBe(3);
+    expect(inst[0].bonus).toBe(1 + 2 + 3);
     expect(inst[0].streak).toBe(3);
     coins[0].face = 'tails';
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
@@ -287,14 +293,14 @@ describe('onRoundEnd', () => {
     expect(inst[0].streak).toBe(0);
   });
 
-  it('Guildmaster pays 2 per heads Human including itself', () => {
+  it('Guildmaster pays 3 per heads Human including itself', () => {
     const { ctx, coins } = table([
       { defId: 'guildmaster', face: 'heads' },
       { defId: 'squire', face: 'heads' },
       { defId: 'merchant', face: 'tails' },
     ]);
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
-    expect(goldEvents(ctx)).toBe(4);
+    expect(goldEvents(ctx)).toBe(6);
   });
 
   it('Druid grows the lowest other coin; Longbow hits the farthest heads coin', () => {
@@ -302,12 +308,12 @@ describe('onRoundEnd', () => {
       { defId: 'druid', face: 'heads', x: 0 },
       { defId: 'longbow', face: 'heads', x: 0.1 },
       { defId: 'grunt', face: 'heads', x: 0.2 },
-      { defId: 'moneychanger', face: 'heads', x: 0.9 },
+      { defId: 'seer', face: 'heads', x: 0.9 },
     ]);
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
-    expect(inst[3].bonus).toBe(1);
+    expect(inst[3].bonus).toBe(2);
     runCoinTrigger(ctx, coins[1], 'onRoundEnd');
-    expect(coins[3].temp).toBe(3);
+    expect(coins[3].temp).toBe(5);
   });
 
   it('Ranger buffs other heads Elves; Patron grows another Human', () => {
@@ -319,7 +325,7 @@ describe('onRoundEnd', () => {
       { defId: 'squire', face: 'tails' },
     ]);
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
-    expect(coins[1].temp).toBe(2);
+    expect(coins[1].temp).toBe(3);
     expect(coins[2].temp).toBe(0);
     runCoinTrigger(ctx, coins[3], 'onRoundEnd');
     expect(inst[4].bonus).toBe(1);
@@ -339,11 +345,11 @@ describe('onRoundEnd', () => {
 });
 
 describe('phase triggers', () => {
-  it('onPhaseStart: Tinker grants a Reroll token from the bag', () => {
-    const run = makeRun(['tinker', 'copper']);
-    const before = run.rerollTokens;
-    resolvePhaseTrigger(run, 'onPhaseStart');
-    expect(run.rerollTokens).toBe(before + 1);
+  it('onPhaseEnd: Tinker pays 1 gold per Human in the bag', () => {
+    const run = makeRun(['tinker', 'squire', 'copper']);
+    const r = resolvePhaseTrigger(run, 'onPhaseEnd');
+    expect(r.gold).toBe(2);
+    expect(run.gold).toBe(2);
   });
 
   it('onPhaseStart: Tiny Anvil grows a random bag coin', () => {
@@ -352,14 +358,14 @@ describe('phase triggers', () => {
     expect(run.bag.reduce((s, c) => s + c.bonus, 0)).toBe(2);
   });
 
-  it('onPhaseEnd: Innkeeper pays 4 gold (8 at level 2); Interest Ledger pays interest', () => {
+  it('onPhaseEnd: Innkeeper pays 6 gold (12 at level 2); Interest Ledger pays interest', () => {
     const run = makeRun(['innkeeper', 'innkeeper'], ['ledger']);
     run.bag[1].level = 2;
     run.gold = 45;
     const r = resolvePhaseTrigger(run, 'onPhaseEnd');
-    // 4 + 8 = 12 -> 57 gold -> ledger 5
-    expect(r.gold).toBe(17);
-    expect(run.gold).toBe(62);
+    // 6 + 12 = 18 -> 63 gold -> ledger 6 (max)
+    expect(r.gold).toBe(24);
+    expect(run.gold).toBe(69);
   });
 });
 
@@ -376,7 +382,7 @@ describe('engravings and statics', () => {
   it('Echo triggers abilities twice', () => {
     const { ctx, coins } = table([{ defId: 'moneychanger', face: 'heads', engraving: 'echo' }]);
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
-    expect(goldEvents(ctx)).toBe(6);
+    expect(goldEvents(ctx)).toBe(8);
   });
 
   it('Growth and Gilded fire on heads only', () => {
@@ -431,8 +437,8 @@ describe('engravings and statics', () => {
   it('Fusion level scales base value and ability amounts', () => {
     const { ctx, coins } = table([{ defId: 'moneychanger', face: 'heads', level: 2 }]);
     runCoinTrigger(ctx, coins[0], 'onRoundEnd');
-    expect(goldEvents(ctx)).toBe(6);
-    expect(valueOf(ctx, coins[0])).toBe(2);
+    expect(goldEvents(ctx)).toBe(8);
+    expect(valueOf(ctx, coins[0])).toBe(4);
   });
 });
 

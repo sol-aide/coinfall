@@ -2,7 +2,10 @@ import Constants from 'expo-constants';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CHARMS, COINS, ENGRAVINGS } from '../../engine';
 import { CoinArt } from '../art/CoinArt';
+import { Icon } from '../art/Icons';
+import { CoinRow } from '../components/CoinInfo';
 import { Button, Overlay, Panel, Txt } from '../components/ui';
 import { HOW_TO_PLAY, PRIVACY_TEXT, TUTORIAL_STEPS } from '../content/text';
 import { useGame, type Speed } from '../state/GameContext';
@@ -46,6 +49,39 @@ export function HowToScreen({ onBack }: { onBack: () => void }) {
           ))}
         </Panel>
       ))}
+      <Txt style={[styles.h2, { marginTop: 8 }]} accessibilityRole="header">
+        Coin guide
+      </Txt>
+      {COINS.map((c) => (
+        <CoinRow key={c.id} defId={c.id} />
+      ))}
+      <Txt style={[styles.h2, { marginTop: 8 }]} accessibilityRole="header">
+        Charms
+      </Txt>
+      {CHARMS.map((c) => (
+        <View key={c.id} style={styles.guideRow} accessible accessibilityLabel={`${c.name}. ${c.text}`}>
+          <Icon name="charm" size={30} />
+          <View style={{ flex: 1 }}>
+            <Txt style={styles.guideName}>
+              {c.name}
+              {c.starter ? <Txt style={styles.note}>  starting charm</Txt> : null}
+            </Txt>
+            <Txt style={styles.guideText}>{c.text}</Txt>
+          </View>
+        </View>
+      ))}
+      <Txt style={[styles.h2, { marginTop: 8 }]} accessibilityRole="header">
+        Engravings
+      </Txt>
+      {ENGRAVINGS.map((e) => (
+        <View key={e.id} style={styles.guideRow} accessible accessibilityLabel={`${e.name}. ${e.text}`}>
+          <Icon name="engraving" size={30} />
+          <View style={{ flex: 1 }}>
+            <Txt style={styles.guideName}>{e.name}</Txt>
+            <Txt style={styles.guideText}>{e.text}</Txt>
+          </View>
+        </View>
+      ))}
     </Page>
   );
 }
@@ -71,7 +107,9 @@ const SPEEDS: { value: Speed; label: string }[] = [
 ];
 
 export function SettingsScreen({ onBack, onPrivacy }: { onBack: () => void; onPrivacy: () => void }) {
-  const { settings, updateSettings, reduceMotion } = useGame();
+  const { settings, updateSettings, reduceMotion, deleteAllData } = useGame();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleted, setDeleted] = useState(false);
   const version = Constants.expoConfig?.version ?? '1.0.0';
   return (
     <Page title="Settings" onBack={onBack}>
@@ -115,6 +153,32 @@ export function SettingsScreen({ onBack, onPrivacy }: { onBack: () => void; onPr
       <Panel style={{ gap: 10 }}>
         <Button label="Show the tutorial again" variant="secondary" onPress={() => updateSettings({ tutorialSeen: false })} testID="reset-tutorial" />
         <Button label="Privacy" variant="secondary" onPress={onPrivacy} />
+      </Panel>
+      <Panel style={{ gap: 8 }}>
+        {deleted ? (
+          <Txt style={styles.note}>All saved data on this device was deleted.</Txt>
+        ) : confirmDelete ? (
+          <>
+            <Txt style={[styles.note, { color: colors.danger }]}>
+              Delete your current run, settings and records from this device? This can’t be undone.
+            </Txt>
+            <View style={styles.row}>
+              <Button label="Cancel" variant="secondary" onPress={() => setConfirmDelete(false)} style={{ flex: 1 }} />
+              <Button
+                label="Delete"
+                variant="danger"
+                onPress={() => {
+                  deleteAllData();
+                  setDeleted(true);
+                }}
+                style={{ flex: 1 }}
+                testID="delete-confirm"
+              />
+            </View>
+          </>
+        ) : (
+          <Button label="Delete all saved data" variant="ghost" onPress={() => setConfirmDelete(true)} testID="delete-data" />
+        )}
       </Panel>
       <Txt style={[styles.note, { textAlign: 'center' }]}>Coinfall {version} · Play money only · No ads · No tracking</Txt>
     </Page>
@@ -194,6 +258,9 @@ const styles = StyleSheet.create({
   h2: { fontSize: font.h2, fontWeight: '800' },
   p: { fontSize: font.body, color: colors.textDim, lineHeight: 23 },
   note: { fontSize: font.small, color: colors.textMuted },
+  guideRow: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: colors.panelLight, borderRadius: radius.md, padding: 10 },
+  guideName: { fontSize: font.body, fontWeight: '800' },
+  guideText: { fontSize: font.small, color: colors.textDim },
   coinRow: { flexDirection: 'row', justifyContent: 'center', gap: 10 },
   segment: { flexDirection: 'row', gap: 6, backgroundColor: colors.bgDeep, borderRadius: radius.md, padding: 4 },
   segBtn: { flex: 1, minHeight: TOUCH, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },

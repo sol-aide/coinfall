@@ -36,6 +36,7 @@ interface GameApi {
   startNewRun: () => void;
   abandonRun: () => void;
   updateSettings: (patch: Partial<Settings>) => void;
+  deleteAllData: () => void;
 }
 
 const Ctx = createContext<GameApi | null>(null);
@@ -150,9 +151,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const deleteAllData = useCallback(() => {
+    runRef.current = null;
+    setRun(null);
+    setSettings(DEFAULT_SETTINGS);
+    setRecords(DEFAULT_RECORDS);
+    AsyncStorage.multiRemove([RUN_KEY, SETTINGS_KEY, RECORDS_KEY]).catch(() => {});
+  }, []);
+
   const api = useMemo<GameApi>(
-    () => ({ loaded, run, restoredAt, settings, records, reduceMotion, act, startNewRun, abandonRun, updateSettings }),
-    [loaded, run, restoredAt, settings, records, reduceMotion, act, startNewRun, abandonRun, updateSettings],
+    () => ({ loaded, run, restoredAt, settings, records, reduceMotion, act, startNewRun, abandonRun, updateSettings, deleteAllData }),
+    [loaded, run, restoredAt, settings, records, reduceMotion, act, startNewRun, abandonRun, updateSettings, deleteAllData],
   );
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
 }

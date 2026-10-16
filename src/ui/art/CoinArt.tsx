@@ -39,8 +39,9 @@ function CoinArtImpl({ defId, face = 'heads', size, level = 1, engraved }: Props
       <Circle cx={50} cy={50} r={42} fill={rc.main} />
       <Circle cx={50} cy={50} r={36} fill={`url(#f${id})`} />
       <Circle cx={50} cy={50} r={36} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={1.5} />
+      {!heads && <Circle cx={50} cy={50} r={42} fill="rgba(10,12,30,0.32)" />}
       {heads ? (
-        <G transform="translate(50 50) scale(0.62) translate(-50 -50)">{glyph(ink, accent)}</G>
+        <G transform="translate(50 50) scale(0.74) translate(-50 -50)">{glyph(ink, accent)}</G>
       ) : (
         <G transform="translate(50 50) scale(0.55) translate(-50 -50)" opacity={0.9}>
           {raceEmblem(def.race, ink)}

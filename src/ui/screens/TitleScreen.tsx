@@ -3,10 +3,16 @@ import { StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PHASES } from '../../engine';
-import { CoinArt } from '../art/CoinArt';
+import { CoinArt, RaceBadge } from '../art/CoinArt';
 import { Button, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
-import { colors, font } from '../theme';
+import { colors, font, raceColors, radius } from '../theme';
+
+const RACES = [
+  { race: 'human' as const, text: 'Economy and teamwork' },
+  { race: 'orc' as const, text: 'Big values and chaos' },
+  { race: 'elf' as const, text: 'Precision and control' },
+];
 
 export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowTo: () => void; onSettings: () => void; onPrivacy: () => void; onPlay: () => void }) {
   const { run, startNewRun, records, reduceMotion } = useGame();
@@ -24,6 +30,15 @@ export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowT
           Coinfall
         </Txt>
         <Txt style={styles.tag}>Toss coins. Pay the Guild. Survive {PHASES} phases.</Txt>
+      </View>
+      <View style={styles.races} accessible accessibilityLabel="Humans: economy and teamwork. Orcs: big values and chaos. Elves: precision and control.">
+        {RACES.map((r) => (
+          <View key={r.race} style={styles.raceRow}>
+            <RaceBadge race={r.race} size={34} />
+            <Txt style={[styles.raceName, { color: raceColors[r.race].light }]}>{raceColors[r.race].plural}</Txt>
+            <Txt style={styles.raceText}>{r.text}</Txt>
+          </View>
+        ))}
       </View>
       <View style={styles.buttons}>
         {canContinue && <Button big label="Continue run" icon="play" variant="gold" onPress={onPlay} testID="continue" />}
@@ -73,7 +88,7 @@ function FallingCoin({ defId, delay, x, still }: { defId: string; delay: number;
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 20, justifyContent: 'space-between' },
-  hero: { alignItems: 'center', marginTop: 10 },
+  hero: { alignItems: 'center', marginTop: 0 },
   coins: { height: 130, width: '100%', alignItems: 'center', justifyContent: 'center' },
   coin: { position: 'absolute' },
   title: {
@@ -86,6 +101,10 @@ const styles = StyleSheet.create({
     textShadowRadius: 0,
   },
   tag: { fontSize: font.body, color: colors.textDim, textAlign: 'center', marginTop: 6 },
+  races: { backgroundColor: colors.panel, borderRadius: radius.lg, padding: 14, gap: 10, borderWidth: 1, borderColor: colors.border },
+  raceRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  raceName: { fontSize: font.body, fontWeight: '900', minWidth: 78 },
+  raceText: { fontSize: font.body, color: colors.textDim, flex: 1 },
   buttons: { gap: 10 },
   row: { flexDirection: 'row', gap: 10 },
   records: { textAlign: 'center', color: colors.textMuted, fontSize: font.small },

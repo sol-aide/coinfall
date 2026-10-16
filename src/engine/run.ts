@@ -5,6 +5,7 @@ import { STARTER_CHARMS, charmDef } from './content/charms';
 import { coinDef } from './content/coins';
 import { engravingDef } from './content/engravings';
 import {
+  MAX_CHARMS,
   MIN_BAG,
   PHASES,
   ROUNDS_PER_PHASE,
@@ -199,6 +200,7 @@ export function buyItem(prev: RunState, index: number, targetUid?: string): RunS
       break;
     case 'charm':
       if (run.charms.includes(item.charmId)) throw new ActionError('Already owned');
+      if (run.charms.length >= MAX_CHARMS) throw new ActionError('Charm slots full');
       run.charms.push(item.charmId);
       break;
     case 'engraving': {

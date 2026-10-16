@@ -190,7 +190,7 @@ export const GLYPHS: Record<string, GlyphFn> = {
   ),
   moonpriestess: (ink, accent) => (
     <G>
-      <Path d="M58 22 A28 28 0 1 0 58 78 A22 22 0 1 1 58 22 Z" fill={ink} />
+      <Path d="M62 20 A30 30 0 1 0 62 80 A40 40 0 0 1 62 20 Z" fill={ink} />
       <Polygon points="66,40 68,46 74,46 69,50 71,56 66,52 61,56 63,50 58,46 64,46" fill={accent} />
     </G>
   ),
