@@ -92,7 +92,7 @@ function Row({ label, value, color }: { label: string; value: number; color: str
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   head: { alignItems: 'center', gap: 6 },
   title: { fontSize: font.h1, fontWeight: '900' },
   sub: { fontSize: font.body, color: colors.textDim, textAlign: 'center' },

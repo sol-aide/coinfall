@@ -43,7 +43,7 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
               accessibilityRole="button"
               accessibilityState={{ selected: sel }}
               accessibilityLabel={`${c.name}, ${rc.label} charm. ${c.text} ${RACE_BLURB[race]}`}
-              style={({ pressed }) => [styles.card, { borderColor: sel ? colors.gold : rc.dark }, pressed && { opacity: 0.9 }]}
+              style={({ pressed }) => [styles.card, { borderColor: sel ? colors.gold : colors.ink, backgroundColor: sel ? rc.dark : colors.panel }, pressed && { opacity: 0.9 }]}
             >
               <RaceBadge race={race} size={56} />
               <View style={{ flex: 1 }}>
@@ -72,7 +72,7 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   title: { fontSize: font.h1, fontWeight: '900', textAlign: 'center' },
   sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center' },
   bag: { flexDirection: 'row', justifyContent: 'center', gap: 4, flexWrap: 'wrap' },
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.panel,
     borderRadius: radius.lg,
     borderWidth: 3,
+    borderBottomWidth: 7,
     padding: 14,
   },
   race: { fontSize: font.tiny, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },

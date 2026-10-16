@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { StyleSheet, View } from 'react-native';
 import { PHASES, ROUNDS_PER_PHASE, computeMods, currentDues, duesFor, type RunState } from '../../engine';
 import { colors, font } from '../theme';
@@ -52,7 +53,7 @@ export function Hud({
         <IconButton icon="gear" label="Menu and settings" onPress={onMenu} size={24} />
       </View>
       <View style={styles.row2}>
-        <Pill icon="gold" value={gold} label="Gold" color={colors.gold} />
+        <GoldPill gold={gold} />
         <View style={styles.dues} accessible accessibilityLabel={`Guild dues at the end of ${nextPhase ? 'next' : 'this'} phase: ${dues} gold${short ? `, ${short} more needed` : ', covered'}`}>
           <Txt style={styles.duesLabel}>{nextPhase ? 'Next dues' : 'Dues'}</Txt>
           <Txt style={[styles.duesValue, { color: short ? colors.text : colors.success }]}>{dues}</Txt>
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
   phase: { fontSize: font.h2, fontWeight: '900' },
   phaseOf: { fontSize: font.small, color: colors.textMuted, fontWeight: '700' },
   dots: { flexDirection: 'row', gap: 5, marginTop: 3 },
-  dot: { width: 14, height: 6, borderRadius: 3, backgroundColor: colors.panelLight },
+  dot: { width: 16, height: 9, borderRadius: 5, backgroundColor: colors.panelLight, borderWidth: 2, borderColor: colors.ink },
   dotDone: { backgroundColor: colors.gold },
   dotNow: { backgroundColor: colors.accent },
   dues: {
@@ -81,6 +82,8 @@ const styles = StyleSheet.create({
     gap: 5,
     backgroundColor: colors.bgDeep,
     borderRadius: 999,
+    borderWidth: 2.5,
+    borderColor: colors.ink,
     paddingHorizontal: 10,
     paddingVertical: 5,
     flexShrink: 1,
@@ -89,3 +92,22 @@ const styles = StyleSheet.create({
   duesValue: { fontSize: font.body, fontWeight: '900' },
   duesNeed: { fontSize: font.tiny, fontWeight: '700' },
 });
+
+/** Gold counter that pops whenever the amount changes. */
+function GoldPill({ gold }: { gold: number }) {
+  const s = useSharedValue(1);
+  const last = useRef(gold);
+  useEffect(() => {
+    if (gold === last.current) return;
+    const up = gold > last.current;
+    last.current = gold;
+    s.value = withSequence(withTiming(up ? 1.25 : 0.88, { duration: 90, easing: Easing.out(Easing.quad) }), withTiming(1, { duration: 180, easing: Easing.out(Easing.back(3)) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gold]);
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
+  return (
+    <Animated.View style={style}>
+      <Pill icon="gold" value={gold} label="Gold" color={colors.gold} />
+    </Animated.View>
+  );
+}

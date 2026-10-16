@@ -192,7 +192,7 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   scroll: { padding: 12, gap: 14, paddingBottom: 24 },
   banner: { alignItems: 'center', gap: 2 },
   title: { fontSize: font.h1, fontWeight: '900' },
@@ -205,11 +205,14 @@ const styles = StyleSheet.create({
     gap: 10,
     backgroundColor: colors.panelLight,
     borderRadius: radius.md,
+    borderWidth: 3,
+    borderBottomWidth: 6,
+    borderColor: colors.ink,
     padding: 10,
   },
   itemName: { fontSize: font.body, fontWeight: '800' },
   rarity: { fontSize: font.tiny, fontWeight: '800', textTransform: 'capitalize' },
   itemText: { fontSize: font.small, color: colors.textDim, marginTop: 2 },
   priceBtn: { minWidth: 76, paddingHorizontal: 10 },
-  footer: { paddingHorizontal: 12, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.panelLight, backgroundColor: colors.bg },
+  footer: { paddingHorizontal: 12, paddingTop: 10, borderTopWidth: 3, borderTopColor: colors.ink, backgroundColor: colors.bgDeep },
 });

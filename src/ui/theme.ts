@@ -1,31 +1,34 @@
 import type { Race } from '../engine';
 
 export const colors = {
-  bg: '#1B2340',
-  bgDeep: '#121830',
-  panel: '#26305A',
-  panelLight: '#323E70',
-  border: '#46549A',
-  text: '#F4F1E8',
-  textDim: '#B9BEDA',
-  textMuted: '#8890B8',
-  gold: '#F7C548',
-  goldDeep: '#C9921B',
-  danger: '#F0605D',
-  success: '#5BD18B',
-  accent: '#FF9F43',
-  wood: '#8A5A34',
-  woodLight: '#A26C40',
-  woodDark: '#6B4226',
-  heads: '#F7D774',
-  overlay: 'rgba(8, 10, 24, 0.72)',
+  /** The chunky outline colour used on every toy-style shape. */
+  ink: '#1E1033',
+  bg: '#2E2170',
+  bgDeep: '#1D1450',
+  bgPattern: '#3A2C85',
+  panel: '#43349A',
+  panelLight: '#5546B5',
+  border: '#1E1033',
+  text: '#FFFFFF',
+  textDim: '#DCD6FF',
+  textMuted: '#AFA6E6',
+  gold: '#FFD23F',
+  goldDeep: '#E89B12',
+  danger: '#FF4D5E',
+  success: '#3EE07A',
+  accent: '#FF8A1F',
+  wood: '#E6A15A',
+  woodLight: '#F2B872',
+  woodDark: '#B86E2E',
+  heads: '#FFD23F',
+  overlay: 'rgba(20, 10, 45, 0.72)',
 };
 
 export const raceColors: Record<Race, { main: string; light: string; dark: string; label: string; plural: string }> = {
-  human: { main: '#3C7BE0', light: '#8DB6F5', dark: '#22489A', label: 'Human', plural: 'Humans' },
-  orc: { main: '#D94A3A', light: '#F39486', dark: '#8E2418', label: 'Orc', plural: 'Orcs' },
-  elf: { main: '#2FA866', light: '#86DDA8', dark: '#176238', label: 'Elf', plural: 'Elves' },
-  neutral: { main: '#B87333', light: '#E0A672', dark: '#7A4818', label: 'Plain', plural: 'Plain coins' },
+  human: { main: '#2F8CFF', light: '#9ACBFF', dark: '#1450B8', label: 'Human', plural: 'Humans' },
+  orc: { main: '#FF4A3D', light: '#FFA096', dark: '#B0170E', label: 'Orc', plural: 'Orcs' },
+  elf: { main: '#22CC66', light: '#8BF0B0', dark: '#0B8A3C', label: 'Elf', plural: 'Elves' },
+  neutral: { main: '#E8873A', light: '#FFC48E', dark: '#9C4D12', label: 'Plain', plural: 'Plain coins' },
 };
 
 export const rarityColors = {

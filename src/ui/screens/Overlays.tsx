@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   counts: { flexDirection: 'row', gap: 12, flexWrap: 'wrap', marginBottom: 8 },
   count: { fontSize: font.small, fontWeight: '800' },
   pickRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
-  charm: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: colors.panelLight, borderRadius: radius.md, padding: 10 },
+  charm: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: colors.panelLight, borderRadius: radius.md, borderWidth: 3, borderBottomWidth: 6, borderColor: colors.ink, padding: 10 },
   charmName: { fontWeight: '800', fontSize: font.body },
   charmText: { color: colors.textDim, fontSize: font.small },
 });

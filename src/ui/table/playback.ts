@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { colors, raceColors } from '../theme';
+import { FX_LIFETIME, type Fx } from './fx';
 import { abilityText, charmDef, coinDef, type Face, type GameEvent, type RoundResult, type StageName } from '../../engine';
 
 export interface DisplayCoin {
@@ -14,14 +16,6 @@ export interface DisplayCoin {
   /** Increments each time the coin's ability fires (drives a pulse). */
   pulse: number;
   scored: number;
-}
-
-export interface Popup {
-  id: number;
-  x: number;
-  y: number;
-  text: string;
-  kind: 'gold' | 'value' | 'loss' | 'info';
 }
 
 export interface PlaybackState {
@@ -52,11 +46,11 @@ const DURATION: Record<GameEvent['t'], number> = {
   trigger: 280,
   flip: 340,
   reflip: 340,
-  move: 320,
+  move: 460,
   value: 240,
   gold: 300,
-  destroy: 440,
-  revive: 340,
+  destroy: 640,
+  revive: 460,
   token: 280,
   score: 200,
 };
@@ -154,24 +148,79 @@ export function finalState(result: RoundResult): PlaybackState {
   return { ...s, done: true, caption: '', detail: '' };
 }
 
-function popupFor(e: GameEvent, s: PlaybackState, id: number): Popup | null {
-  const at = (uid?: string) => (uid && s.coins[uid] ? s.coins[uid] : null);
+/** Cosmetic effects for one event. `prev` is the state before the event, `next` after. */
+export function fxFor(e: GameEvent, prev: PlaybackState, next: PlaybackState, nextId: () => number, speed: number, lastEvent?: GameEvent): { fx: Fx[]; shake: number } {
+  const at = (st: PlaybackState, uid?: string) => (uid && st.coins[uid] ? st.coins[uid] : null);
+  const race = (uid?: string) => {
+    const c = at(next, uid);
+    return c ? raceColors[coinDef(c.defId).race].main : colors.gold;
+  };
   switch (e.t) {
     case 'score': {
-      const c = at(e.uid);
-      return c ? { id, x: c.x, y: c.y, text: `+${e.amount}`, kind: 'gold' } : null;
+      const c = at(next, e.uid);
+      return { fx: c ? [{ id: nextId(), kind: 'text', x: c.x, y: c.y, text: `+${e.amount}`, tone: 'gold', big: e.amount >= 10 }] : [], shake: 0 };
     }
     case 'gold': {
-      const c = at(e.uid);
-      return { id, x: c?.x ?? 0.5, y: c?.y ?? 0.15, text: `+${e.amount}`, kind: 'gold' };
+      const c = at(next, e.uid);
+      return { fx: [{ id: nextId(), kind: 'text', x: c?.x ?? 0.5, y: c?.y ?? 0.2, text: `+${e.amount}`, tone: 'gold', big: e.amount >= 10 }], shake: 0 };
     }
     case 'value': {
-      const c = at(e.uid);
-      if (!c) return null;
-      return { id, x: c.x, y: c.y, text: `${e.delta > 0 ? '+' : ''}${e.delta}${e.permanent ? ' ★' : ''}`, kind: e.delta >= 0 ? 'value' : 'loss' };
+      const c = at(next, e.uid);
+      if (!c) return { fx: [], shake: 0 };
+      return {
+        fx: [{ id: nextId(), kind: 'text', x: c.x, y: c.y, text: `${e.delta > 0 ? '+' : ''}${e.delta}${e.permanent ? '★' : ''}`, tone: e.delta >= 0 ? 'value' : 'loss' }],
+        shake: 0,
+      };
+    }
+    case 'land':
+      // Dust puffs when the coin hits the table (after its flight).
+      return {
+        fx: [
+          { id: nextId(), kind: 'dust', x: e.x, y: e.y, delay: Math.max(20, 330 / speed) },
+          ...(e.blessed ? [{ id: nextId(), kind: 'ring' as const, x: e.x, y: e.y, color: '#FFFFFF' }] : []),
+        ],
+        shake: 0,
+      };
+    case 'trigger': {
+      const c = at(next, e.uid);
+      return { fx: c ? [{ id: nextId(), kind: 'ring', x: c.x, y: c.y, color: race(e.uid) }] : [], shake: 0 };
+    }
+    case 'move': {
+      const target = at(prev, e.uid);
+      const by = at(prev, e.by);
+      if (!target) return { fx: [], shake: 0 };
+      const x = by ? (target.x + by.x) / 2 : target.x;
+      const y = by ? (target.y + by.y) / 2 : target.y;
+      return { fx: [{ id: nextId(), kind: 'burst', x, y, word: 'BONK!', color: '#FF8A1F' }], shake: 1 };
+    }
+    case 'flip': {
+      const c = at(next, e.uid);
+      // A bump already shows BONK!; don't stack a FLIP! on top of it.
+      if (!c || (lastEvent?.t === 'move' && lastEvent.uid === e.uid)) return { fx: [], shake: 0 };
+      return { fx: [{ id: nextId(), kind: 'burst', x: c.x, y: c.y, word: 'FLIP!', color: '#B26BFF', size: 0.75 }], shake: 0 };
+    }
+    case 'reflip': {
+      const c = at(next, e.uid);
+      return { fx: c ? [{ id: nextId(), kind: 'ring', x: c.x, y: c.y, color: '#B26BFF' }] : [], shake: 0 };
+    }
+    case 'destroy': {
+      const c = at(prev, e.uid);
+      if (!c) return { fx: [], shake: 0 };
+      const smashed = e.by && e.by !== e.uid;
+      return {
+        fx: [
+          { id: nextId(), kind: 'debris', x: c.x, y: c.y, color: race(e.uid) },
+          { id: nextId(), kind: 'burst', x: c.x, y: c.y, word: smashed ? 'SMASH!' : 'KABOOM!', color: smashed ? '#FF4A3D' : '#FF8A1F', size: 1.1 },
+        ],
+        shake: 2,
+      };
+    }
+    case 'revive': {
+      const c = at(prev, e.uid);
+      return { fx: c ? [{ id: nextId(), kind: 'burst', x: c.x, y: c.y, word: 'BACK!', color: '#22CC66', size: 0.8 }] : [], shake: 0 };
     }
     default:
-      return null;
+      return { fx: [], shake: 0 };
   }
 }
 
@@ -181,9 +230,10 @@ function popupFor(e: GameEvent, s: PlaybackState, id: number): Popup | null {
  */
 export function usePlayback(result: RoundResult | undefined, key: string, speed: number, reduceMotion: boolean, instant: boolean) {
   const [state, setState] = useState<PlaybackState | null>(() => (result ? (instant ? finalState(result) : initial(result)) : null));
-  const [popups, setPopups] = useState<Popup[]>([]);
+  const [fx, setFx] = useState<Fx[]>([]);
+  const [shake, setShake] = useState({ n: 0, power: 0 });
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const popupId = useRef(1);
+  const fxId = useRef(1);
   const keyRef = useRef(key);
   const speedRef = useRef(speed);
   speedRef.current = speed;
@@ -191,7 +241,7 @@ export function usePlayback(result: RoundResult | undefined, key: string, speed:
   useEffect(() => {
     keyRef.current = key;
     if (timer.current) clearTimeout(timer.current);
-    setPopups([]);
+    setFx([]);
     if (!result) {
       setState(null);
       return;
@@ -212,12 +262,13 @@ export function usePlayback(result: RoundResult | undefined, key: string, speed:
       }
       const e = result.events[s.index];
       const next = applyEvent(s, e);
-      const p = popupFor(e, next, popupId.current++);
-      if (p) {
-        setPopups((list) => [...list.slice(-14), p]);
-        const pid = p.id;
-        setTimeout(() => setPopups((list) => list.filter((x) => x.id !== pid)), 1100);
+      const out = fxFor(e, s, next, () => fxId.current++, speedRef.current, s.index > 0 ? result.events[s.index - 1] : undefined);
+      if (out.fx.length) {
+        setFx((list) => [...list.slice(-24), ...out.fx]);
+        const ids = new Set(out.fx.map((f) => f.id));
+        setTimeout(() => setFx((list) => list.filter((x) => !ids.has(x.id))), FX_LIFETIME);
       }
+      if (out.shake && !reduceMotion) setShake((v) => ({ n: v.n + 1, power: out.shake }));
       s = next;
       setState(s);
       timer.current = setTimeout(step, eventDuration(e, speedRef.current, reduceMotion));
@@ -233,9 +284,9 @@ export function usePlayback(result: RoundResult | undefined, key: string, speed:
     if (!result) return;
     keyRef.current = `${key}-skipped`;
     if (timer.current) clearTimeout(timer.current);
-    setPopups([]);
+    setFx([]);
     setState(finalState(result));
   };
 
-  return { state, popups, skip };
+  return { state, fx, shake, skip };
 }

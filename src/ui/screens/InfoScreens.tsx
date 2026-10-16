@@ -250,7 +250,7 @@ export function MenuOverlay({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   head: { paddingHorizontal: 16, paddingBottom: 8 },
   title: { fontSize: font.h1, fontWeight: '900' },
   scroll: { padding: 16, gap: 12, paddingTop: 4 },
@@ -258,13 +258,13 @@ const styles = StyleSheet.create({
   h2: { fontSize: font.h2, fontWeight: '800' },
   p: { fontSize: font.body, color: colors.textDim, lineHeight: 23 },
   note: { fontSize: font.small, color: colors.textMuted },
-  guideRow: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: colors.panelLight, borderRadius: radius.md, padding: 10 },
+  guideRow: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: colors.panelLight, borderRadius: radius.md, borderWidth: 3, borderBottomWidth: 6, borderColor: colors.ink, padding: 10 },
   guideName: { fontSize: font.body, fontWeight: '800' },
   guideText: { fontSize: font.small, color: colors.textDim },
   coinRow: { flexDirection: 'row', justifyContent: 'center', gap: 10 },
-  segment: { flexDirection: 'row', gap: 6, backgroundColor: colors.bgDeep, borderRadius: radius.md, padding: 4 },
+  segment: { flexDirection: 'row', gap: 6, backgroundColor: colors.bgDeep, borderRadius: radius.md, borderWidth: 3, borderColor: colors.ink, padding: 4 },
   segBtn: { flex: 1, minHeight: TOUCH, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  segOn: { backgroundColor: colors.accent },
+  segOn: { backgroundColor: colors.gold, borderWidth: 2.5, borderColor: colors.ink },
   segTxt: { fontWeight: '800', fontSize: font.body },
   toggleRow: { flexDirection: 'row', alignItems: 'center', minHeight: TOUCH },
   dots: { flexDirection: 'row', gap: 6, justifyContent: 'center', marginVertical: 14 },

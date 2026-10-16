@@ -51,12 +51,14 @@ export function Button({ label, onPress, variant = 'primary', disabled, icon, su
       style={({ pressed }) => [
         styles.btn,
         big && styles.btnBig,
-        { backgroundColor: v.bg, borderColor: v.border },
-        pressed && { transform: [{ scale: 0.97 }], opacity: 0.9 },
+        { backgroundColor: v.bg },
+        variant === 'ghost' && styles.btnFlat,
+        pressed && !disabled && styles.btnPressed,
         disabled && styles.disabled,
         style,
       ]}
     >
+      {variant !== 'ghost' && <View pointerEvents="none" style={styles.shine} />}
       <View style={styles.btnRow}>
         {icon && <Icon name={icon} size={big ? 26 : 20} color={v.fg} />}
         <Txt style={[styles.btnLabel, big && styles.btnLabelBig, { color: v.fg }]} numberOfLines={1}>
@@ -72,12 +74,12 @@ export function Button({ label, onPress, variant = 'primary', disabled, icon, su
   );
 }
 
-const variants: Record<Variant, { bg: string; fg: string; border: string }> = {
-  primary: { bg: '#FF9F43', fg: '#2A1300', border: '#FFC48A' },
-  gold: { bg: colors.gold, fg: '#3A2500', border: '#FFE49A' },
-  secondary: { bg: colors.panelLight, fg: colors.text, border: colors.border },
-  ghost: { bg: 'transparent', fg: colors.textDim, border: colors.border },
-  danger: { bg: '#C0392B', fg: '#FFFFFF', border: '#E57368' },
+const variants: Record<Variant, { bg: string; fg: string }> = {
+  primary: { bg: '#FF8A1F', fg: colors.ink },
+  gold: { bg: colors.gold, fg: colors.ink },
+  secondary: { bg: colors.panelLight, fg: colors.text },
+  ghost: { bg: 'rgba(255,255,255,0.08)', fg: colors.textDim },
+  danger: { bg: '#E0303E', fg: '#FFFFFF' },
 };
 
 export function IconButton({ icon, label, onPress, badge, size = 26 }: { icon: IconName; label: string; onPress: () => void; badge?: string | number; size?: number }) {
@@ -149,21 +151,28 @@ export function Overlay({
 
 const styles = StyleSheet.create({
   txt: { color: colors.text, fontSize: font.body },
+  // Toy buttons: thick ink outline with a deep bottom edge that squashes when pressed.
   btn: {
-    minHeight: TOUCH + 4,
+    minHeight: TOUCH + 6,
     paddingHorizontal: 18,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: radius.md,
-    borderWidth: 2,
+    borderWidth: 3,
+    borderBottomWidth: 7,
+    borderColor: colors.ink,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
-  btnBig: { minHeight: 62, borderRadius: radius.lg },
+  btnBig: { minHeight: 66, borderRadius: radius.lg },
+  btnFlat: { borderBottomWidth: 3, marginTop: 4 },
+  btnPressed: { borderBottomWidth: 3, marginTop: 4 },
+  shine: { position: 'absolute', top: 3, left: 10, right: 10, height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.32)' },
   btnRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  btnLabel: { fontSize: font.body, fontWeight: '800' },
-  btnLabelBig: { fontSize: 22 },
-  btnSub: { fontSize: font.tiny, fontWeight: '600', opacity: 0.85, marginTop: 1 },
-  disabled: { opacity: 0.4 },
+  btnLabel: { fontSize: font.body, fontWeight: '900' },
+  btnLabelBig: { fontSize: 23 },
+  btnSub: { fontSize: font.tiny, fontWeight: '700', opacity: 0.9, marginTop: 1 },
+  disabled: { opacity: 0.45 },
   iconBtn: { width: TOUCH, height: TOUCH, alignItems: 'center', justifyContent: 'center' },
   badge: {
     position: 'absolute',
@@ -174,31 +183,43 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 4,
     backgroundColor: colors.accent,
+    borderWidth: 2,
+    borderColor: colors.ink,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeTxt: { fontSize: 12, fontWeight: '800', color: '#2A1300' },
-  panel: { backgroundColor: colors.panel, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: 14 },
+  badgeTxt: { fontSize: 12, fontWeight: '900', color: colors.ink },
+  panel: {
+    backgroundColor: colors.panel,
+    borderRadius: radius.lg,
+    borderWidth: 3,
+    borderBottomWidth: 7,
+    borderColor: colors.ink,
+    padding: 14,
+  },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
     backgroundColor: colors.bgDeep,
     borderRadius: 999,
+    borderWidth: 2.5,
+    borderColor: colors.ink,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 4,
   },
-  pillTxt: { fontWeight: '800', fontSize: font.body },
+  pillTxt: { fontWeight: '900', fontSize: font.body },
   overlay: { backgroundColor: colors.overlay, justifyContent: 'center', padding: 16, zIndex: 50 },
   overlayCard: {
     backgroundColor: colors.panel,
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 3,
+    borderBottomWidth: 8,
+    borderColor: colors.ink,
     padding: 16,
     maxHeight: '92%',
   },
   overlayBottom: { marginBottom: 0 },
   overlayHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, minHeight: TOUCH },
-  overlayTitle: { fontSize: font.h2, fontWeight: '800', flex: 1 },
+  overlayTitle: { fontSize: font.h2, fontWeight: '900', flex: 1 },
 });
