@@ -4,6 +4,8 @@ import { destroyCoin, resolvePhaseTrigger, resolveRound, runCharmTrigger, runCoi
 import type { CoinDef } from '../types';
 import { goldEvents, makeRun, table } from './helpers';
 
+const PAD = Array.from({ length: 5 }, () => ({ defId: 'copper', x: 0.95, y: 1.1 }));
+
 describe('onRoundStart', () => {
   const testCoin: CoinDef = {
     id: 'test_rs',
@@ -133,13 +135,14 @@ describe('onAdjacent', () => {
       { defId: 'berserker', x: 0.5, y: 0.5 },
       { defId: 'grunt', x: 0.6, y: 0.5 },
       { defId: 'copper', x: 0.4, y: 0.5 },
+      ...PAD,
     ]);
     runCoinTrigger(ctx, coins[0], 'onAdjacent');
     expect(coins[2].destroyed).toBe(true);
     expect(coins[1].destroyed).toBe(false);
     expect(inst[0].bonus).toBe(2);
     expect(valueOf(ctx, coins[0])).toBe(5);
-    expect(run.bag).toHaveLength(3); // removed from bag only when the round settles
+    expect(run.bag).toHaveLength(3 + PAD.length); // removed from bag only when the round settles
   });
 
   it('Bard retriggers the best adjacent ability', () => {
@@ -167,10 +170,18 @@ describe('onAdjacent', () => {
 
 describe('onDestroy', () => {
   it('Firebrand pays out when destroyed and Looter grows', () => {
-    const { ctx, coins, inst } = table([{ defId: 'firebrand' }, { defId: 'looter' }]);
+    const { ctx, coins, inst } = table([{ defId: 'firebrand' }, { defId: 'looter' }, ...PAD]);
     destroyCoin(ctx, coins[0]);
     expect(goldEvents(ctx)).toBe(10);
     expect(inst[1].bonus).toBe(2);
+  });
+
+  it('coins hold firm when the bag is at the minimum size', () => {
+    const { ctx, coins } = table([{ defId: 'berserker', x: 0.5 }, { defId: 'copper', x: 0.6 }, { defId: 'copper' }, { defId: 'copper' }, { defId: 'copper' }, { defId: 'copper' }]);
+    destroyCoin(ctx, coins[2]);
+    expect(coins[2].destroyed).toBe(true);
+    destroyCoin(ctx, coins[3]);
+    expect(coins[3].destroyed).toBe(false);
   });
 
   it('Ironclad coins cannot be destroyed', () => {
@@ -180,7 +191,7 @@ describe('onDestroy', () => {
   });
 
   it('Tusk Warhorn and Spade pay gold on destroy', () => {
-    const { ctx, coins } = table([{ defId: 'copper' }], ['warhorn', 'spade']);
+    const { ctx, coins } = table([{ defId: 'copper' }, ...PAD], ['warhorn', 'spade']);
     destroyCoin(ctx, coins[0]);
     expect(goldEvents(ctx)).toBe(5);
   });
@@ -203,10 +214,10 @@ describe('onDestroy', () => {
 
   it('Destroyed coins without Second Wind leave the bag', () => {
     for (let seed = 1; seed < 200; seed++) {
-      const run = makeRun(['firebrand', 'copper'], [], seed);
+      const run = makeRun(['firebrand', 'copper', 'copper', 'copper', 'copper', 'copper'], [], seed);
       const result = resolveRound(run);
       if (result.destroyed.length) {
-        expect(run.bag.map((c) => c.defId)).toEqual(['copper']);
+        expect(run.bag.map((c) => c.defId)).toEqual(['copper', 'copper', 'copper', 'copper', 'copper']);
         expect(result.total).toBeGreaterThanOrEqual(10);
         return;
       }

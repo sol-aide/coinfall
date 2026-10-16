@@ -61,6 +61,7 @@ export function CoinRow({
       <View style={styles.rowRight}>
         <View style={styles.valueChip}>
           <Txt style={styles.valueTxt}>{value}</Txt>
+          <Txt style={styles.valueCap}>value</Txt>
         </View>
         {right}
       </View>
@@ -157,17 +158,16 @@ const styles = StyleSheet.create({
   eng: { fontSize: font.tiny, color: '#9FE8FF', marginTop: 2 },
   rowRight: { alignItems: 'flex-end', gap: 6 },
   valueChip: {
-    minWidth: 34,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#2A1B00',
-    borderWidth: 2,
-    borderColor: colors.gold,
+    minWidth: 40,
+    borderRadius: 10,
+    backgroundColor: colors.bgDeep,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 6,
+    paddingVertical: 3,
   },
-  valueTxt: { color: colors.gold, fontWeight: '900', fontSize: 15 },
+  valueTxt: { color: colors.text, fontWeight: '900', fontSize: 17, lineHeight: 19 },
+  valueCap: { color: colors.textMuted, fontSize: 10, fontWeight: '700', lineHeight: 12 },
   detailArt: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 18, marginVertical: 6 },
   detailMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 },
   detailRace: { fontWeight: '800', fontSize: font.small },

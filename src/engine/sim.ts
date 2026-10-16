@@ -206,6 +206,24 @@ function botShopBuyOnly(run: RunState, reserve: number): RunState {
   return run;
 }
 
+/** Advances a run by one bot decision. */
+export function botStep(run: RunState, strategy: Strategy = 'sensible'): RunState {
+  switch (run.screen) {
+    case 'pickCharm':
+      return chooseStarter(run, run.starterChoices[R.int(rngFor(run), run.starterChoices.length)]);
+    case 'ready':
+      return playRound(run);
+    case 'reward':
+      return botReward(run, strategy);
+    case 'dues':
+      return payDues(run);
+    case 'shop':
+      return leaveShop(botShop(run, strategy));
+    default:
+      return run;
+  }
+}
+
 export interface SimResult {
   won: boolean;
   phaseReached: number;
@@ -222,24 +240,7 @@ export function simulateRun(seed: number | string, strategy: Strategy = 'sensibl
   const starter = run.starterChoices[starterIndex ?? R.int(h, run.starterChoices.length)];
   run = chooseStarter(run, starter);
   let guard = 0;
-  while (run.screen !== 'won' && run.screen !== 'lost' && guard++ < 1000) {
-    switch (run.screen) {
-      case 'ready':
-        run = playRound(run);
-        break;
-      case 'reward':
-        run = botReward(run, strategy);
-        break;
-      case 'dues':
-        run = payDues(run);
-        break;
-      case 'shop':
-        run = leaveShop(botShop(run, strategy));
-        break;
-      default:
-        throw new Error(`Unexpected screen ${run.screen}`);
-    }
-  }
+  while (run.screen !== 'won' && run.screen !== 'lost' && guard++ < 1000) run = botStep(run, strategy);
   return {
     won: run.screen === 'won',
     phaseReached: run.phase,

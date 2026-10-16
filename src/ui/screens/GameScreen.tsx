@@ -18,10 +18,11 @@ import { useGame } from '../state/GameContext';
 import { Table } from '../table/Table';
 import { usePlayback } from '../table/playback';
 import { colors, font, radius } from '../theme';
+import { Tutorial } from './InfoScreens';
 import { BagOverlay, CharmsOverlay } from './Overlays';
 
 export function GameScreen({ onMenu }: { onMenu: () => void }) {
-  const { run, act, settings, reduceMotion } = useGame();
+  const { run, act, settings, reduceMotion, updateSettings } = useGame();
   const r = run as RunState;
   const insets = useSafeAreaInsets();
   const [area, setArea] = useState({ w: 0, h: 0 });
@@ -199,6 +200,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
           <Txt style={styles.toastTxt}>{toast}</Txt>
         </View>
       )}
+      {!settings.tutorialSeen && r.screen === 'ready' && <Tutorial onDone={() => updateSettings({ tutorialSeen: true })} />}
       {detail && <CoinDetail run={r} uid={detail} onClose={() => setDetail(null)} />}
       {bagOpen && <BagOverlay run={r} onClose={() => setBagOpen(false)} />}
       {charmsOpen && <CharmsOverlay run={r} onClose={() => setCharmsOpen(false)} />}

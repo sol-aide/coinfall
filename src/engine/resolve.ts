@@ -2,6 +2,7 @@
 // event log the UI replays as animation.
 
 import { charmDef } from './content/charms';
+import { MIN_BAG } from './economy';
 import { coinDef } from './content/coins';
 import { engravingDef } from './content/engravings';
 import { ABILITY_TRIGGERS, computeMods, hasTableAbility, headsChance, tableValue } from './mods';
@@ -143,6 +144,16 @@ export function destroyCoin(ctx: Ctx, tc: TableCoin, by?: TableCoin) {
   const inst = ctx.inst.get(tc.uid)!;
   if (inst.engraving && engravingDef(inst.engraving).sturdy) {
     ctx.events.push({ t: 'trigger', uid: tc.uid, label: `${nameOf(tc)} is Ironclad` });
+    return;
+  }
+  // The bag never shrinks below MIN_BAG: at the minimum, coins hold firm.
+  const lost = ctx.destroyed.filter((u) => {
+    const i = ctx.inst.get(u);
+    return !(i?.engraving && engravingDef(i.engraving).secondWind);
+  }).length;
+  const saved = !!inst.engraving && !!engravingDef(inst.engraving).secondWind;
+  if (!ctx.phaseMode && !saved && ctx.run.bag.length - lost <= MIN_BAG) {
+    ctx.events.push({ t: 'trigger', uid: tc.uid, label: `${nameOf(tc)} holds firm (bag at ${MIN_BAG} coins)` });
     return;
   }
   tc.destroyed = true;

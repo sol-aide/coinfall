@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PHASES, ROUNDS_PER_PHASE, currentDues, type RunState } from '../../engine';
+import { PHASES, ROUNDS_PER_PHASE, computeMods, currentDues, duesFor, type RunState } from '../../engine';
 import { colors, font } from '../theme';
 import { IconButton, Pill, Txt } from './ui';
 
@@ -11,7 +11,9 @@ export function Hud({
   onMenu,
   showRound = true,
   goldOverride,
+  nextPhase,
 }: {
+  nextPhase?: boolean;
   run: RunState;
   goldOverride?: number;
   onBag: () => void;
@@ -19,7 +21,7 @@ export function Hud({
   onMenu: () => void;
   showRound?: boolean;
 }) {
-  const dues = currentDues(run);
+  const dues = nextPhase ? duesFor(Math.min(run.phase + 1, PHASES), computeMods(run.charms)) : currentDues(run);
   const gold = goldOverride ?? run.gold;
   const short = Math.max(0, dues - gold);
   return (
@@ -51,8 +53,8 @@ export function Hud({
       </View>
       <View style={styles.row2}>
         <Pill icon="gold" value={gold} label="Gold" color={colors.gold} />
-        <View style={styles.dues} accessible accessibilityLabel={`Guild dues at the end of this phase: ${dues} gold${short ? `, ${short} more needed` : ', covered'}`}>
-          <Txt style={styles.duesLabel}>Dues</Txt>
+        <View style={styles.dues} accessible accessibilityLabel={`Guild dues at the end of ${nextPhase ? 'next' : 'this'} phase: ${dues} gold${short ? `, ${short} more needed` : ', covered'}`}>
+          <Txt style={styles.duesLabel}>{nextPhase ? 'Next dues' : 'Dues'}</Txt>
           <Txt style={[styles.duesValue, { color: short ? colors.text : colors.success }]}>{dues}</Txt>
           <Txt style={[styles.duesNeed, { color: short ? colors.accent : colors.success }]}>{short ? `need ${short}` : 'covered ✓'}</Txt>
         </View>
