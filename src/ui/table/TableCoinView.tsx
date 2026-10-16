@@ -1,87 +1,108 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withSequence, withTiming } from 'react-native-reanimated';
 import { coinDef, type Face } from '../../engine';
-import { CoinArt } from '../art/CoinArt';
 import { Txt } from '../components/ui';
 import { colors } from '../theme';
+import { Coin3D } from './Coin3D';
 import type { DisplayCoin } from './playback';
+import { REST_TILT, type Projection } from './projection';
 
 interface Props {
   coin: DisplayCoin;
+  /** Coin diameter at the near edge of the table. */
   size: number;
-  tableW: number;
-  tableH: number;
+  proj: Projection;
   speed: number;
   reduceMotion: boolean;
   engraved: boolean;
   onPress: (uid: string) => void;
 }
 
-const FLIGHT = 380;
+const FLIGHT = 560;
+/** How high (in coin diameters) a tossed coin rises at the top of its arc. */
+const TOSS_HEIGHT = 1.6;
+
+/** Resting angle for a face: tilted away from the viewer, edge showing below. */
+const restAngle = (face: Face) => (face === 'heads' ? REST_TILT : 180 - REST_TILT);
+
+/** The next angle >= current + spins full turns that rests on `face`. */
+function targetAngle(current: number, face: Face, spins: number): number {
+  const base = restAngle(face);
+  const k = Math.ceil((current + spins * 360 - base) / 360);
+  return base + k * 360;
+}
 
 /**
- * One coin on the table. Toy-style motion: it arcs in spinning, squashes flat
- * on impact and springs back, wobbles when its ability fires, pops when its
- * value changes, and shakes before it is destroyed.
+ * One coin on the table, in semi-3D. It is tossed in from below the table,
+ * tumbling end over end, drops onto the cloth with a bounce and a settling
+ * wobble, hops and turns over when flipped, and skids when bumped.
  */
-function TableCoinViewImpl({ coin, size, tableW, tableH, speed, reduceMotion, engraved, onPress }: Props) {
-  const px = coin.x * tableW - size / 2;
-  const py = coin.y * tableW - size / 2;
-  const launchX = tableW / 2 - size / 2;
-  const launchY = tableH + size * 0.2;
+function TableCoinViewImpl({ coin, size: nearSize, proj, speed, reduceMotion, engraved, onPress }: Props) {
+  const p = proj.project(coin.x, coin.y);
+  const size = Math.round(nearSize * p.s);
+  const px = p.x - size / 2;
+  const py = p.y - size / 2;
+  const launchX = proj.width / 2 - size / 2;
+  const launchY = proj.height + size * 0.6;
 
   const left = useSharedValue(coin.landed ? px : launchX);
   const top = useSharedValue(coin.landed ? py : launchY);
-  const lift = useSharedValue(0); // height above the table, drives scale and shadow
-  const spin = useSharedValue(1); // horizontal squash used for spinning and flips
-  const squashY = useSharedValue(1);
+  const lift = useSharedValue(0); // height above the cloth, in coin diameters
+  const angle = useSharedValue(restAngle(coin.face));
+  const roll = useSharedValue(0); // sideways lean, degrees
   const pop = useSharedValue(1);
-  const tilt = useSharedValue(0);
   const opacity = useSharedValue(coin.landed && !coin.destroyed ? 1 : 0);
   const glow = useSharedValue(0);
   const flash = useSharedValue(0);
-  const [shownFace, setShownFace] = useState<Face>(coin.face);
   const wasLanded = useRef(coin.landed);
+  const lastFace = useRef(coin.face);
   const lastValue = useRef(coin.value);
-  const t = (ms: number) => Math.max(20, ms / speed);
+  const t = (ms: number) => Math.max(16, ms / speed);
 
-  // Toss / landing.
+  /** Small decaying rock about the resting angle, like a coin settling. */
+  const settle = (target: number, amp: number) =>
+    withSequence(
+      withTiming(target + amp, { duration: t(90), easing: Easing.out(Easing.quad) }),
+      withTiming(target - amp * 0.55, { duration: t(110), easing: Easing.inOut(Easing.quad) }),
+      withTiming(target + amp * 0.25, { duration: t(100), easing: Easing.inOut(Easing.quad) }),
+      withTiming(target, { duration: t(110), easing: Easing.out(Easing.quad) }),
+    );
+
+  // Toss and landing.
   useEffect(() => {
     if (coin.landed && !wasLanded.current) {
       wasLanded.current = true;
-      setShownFace(coin.face);
+      lastFace.current = coin.face;
+      const rest = restAngle(coin.face);
       if (reduceMotion) {
         left.value = px;
         top.value = py;
+        angle.value = rest;
         opacity.value = withTiming(1, { duration: t(200) });
         return;
       }
       const f = t(FLIGHT);
+      // Start somewhere mid-turn and tumble 2-3 full turns before landing on the drawn face.
+      const start = (coin.uid.charCodeAt(coin.uid.length - 1) * 47) % 360;
+      angle.value = start;
+      const target = targetAngle(start, coin.face, 2 + (start % 2));
       opacity.value = withTiming(1, { duration: t(60) });
       left.value = withTiming(px, { duration: f, easing: Easing.out(Easing.quad) });
       top.value = withTiming(py, { duration: f, easing: Easing.out(Easing.quad) });
       lift.value = withSequence(
-        withTiming(1, { duration: f * 0.5, easing: Easing.out(Easing.quad) }),
-        withTiming(0, { duration: f * 0.5, easing: Easing.in(Easing.quad) }),
+        withTiming(TOSS_HEIGHT, { duration: f * 0.45, easing: Easing.out(Easing.quad) }),
+        withTiming(0, { duration: f * 0.55, easing: Easing.in(Easing.quad) }),
+        withTiming(0.18, { duration: t(110), easing: Easing.out(Easing.quad) }),
+        withTiming(0, { duration: t(120), easing: Easing.in(Easing.quad) }),
       );
-      spin.value = withSequence(
-        withTiming(0.12, { duration: f / 6 }),
-        withTiming(1, { duration: f / 6 }),
-        withTiming(0.12, { duration: f / 6 }),
-        withTiming(1, { duration: f / 6 }),
-        withTiming(0.12, { duration: f / 6 }),
-        withTiming(1, { duration: f / 6 }),
-      );
-      // Impact: squash flat, overshoot tall, settle.
-      squashY.value = withDelay(
-        f,
-        withSequence(
-          withTiming(0.55, { duration: t(60), easing: Easing.out(Easing.quad) }),
-          withTiming(1.18, { duration: t(110), easing: Easing.out(Easing.quad) }),
-          withTiming(0.94, { duration: t(80) }),
-          withTiming(1, { duration: t(70) }),
-        ),
+      angle.value = withSequence(withTiming(target, { duration: f, easing: Easing.out(Easing.cubic) }), settle(target, 16));
+      roll.value = withSequence(
+        withTiming(((start % 3) - 1) * 14, { duration: f * 0.5 }),
+        withTiming(0, { duration: f * 0.5 }),
+        withTiming(6, { duration: t(100) }),
+        withTiming(-3, { duration: t(110) }),
+        withTiming(0, { duration: t(110) }),
       );
     } else if (!coin.landed) {
       wasLanded.current = false;
@@ -92,68 +113,70 @@ function TableCoinViewImpl({ coin, size, tableW, tableH, speed, reduceMotion, en
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coin.landed]);
 
-  // Bumps: skid to the new spot with a wobble.
+  // Bumps: skid to the new spot with a little hop.
   useEffect(() => {
-    if (!coin.landed) return;
-    const d = reduceMotion ? 0 : t(300);
-    left.value = withTiming(px, { duration: d, easing: Easing.out(Easing.back(1.6)) });
-    top.value = withTiming(py, { duration: d, easing: Easing.out(Easing.back(1.6)) });
-    if (!reduceMotion && wasLanded.current) {
-      tilt.value = withSequence(withTiming(-18, { duration: t(80) }), withTiming(12, { duration: t(100) }), withTiming(0, { duration: t(120) }));
+    if (!coin.landed || !wasLanded.current) return;
+    const d = reduceMotion ? 0 : t(320);
+    left.value = withTiming(px, { duration: d, easing: Easing.out(Easing.cubic) });
+    top.value = withTiming(py, { duration: d, easing: Easing.out(Easing.cubic) });
+    if (!reduceMotion) {
+      lift.value = withSequence(withTiming(0.35, { duration: d * 0.4 }), withTiming(0, { duration: d * 0.6, easing: Easing.in(Easing.quad) }));
+      roll.value = withSequence(withTiming(18, { duration: d * 0.4 }), withTiming(-6, { duration: d * 0.4 }), withTiming(0, { duration: d * 0.4 }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [px, py]);
 
-  // Flips: jump up, squash to an edge, swap the face, open again.
+  // Flips: hop up, turn over (one and a half turns) and settle on the new face.
   useEffect(() => {
-    if (!wasLanded.current || coin.face === shownFace) {
-      if (!wasLanded.current) setShownFace(coin.face);
-      return;
-    }
+    if (!wasLanded.current || coin.face === lastFace.current) return;
+    lastFace.current = coin.face;
     if (reduceMotion) {
-      setShownFace(coin.face);
+      angle.value = restAngle(coin.face);
       return;
     }
-    const half = t(160);
-    spin.value = withSequence(withTiming(0.04, { duration: half }), withTiming(1, { duration: half, easing: Easing.out(Easing.back(2)) }));
-    lift.value = withSequence(withTiming(0.6, { duration: half }), withTiming(0, { duration: half, easing: Easing.in(Easing.quad) }));
-    const id = setTimeout(() => setShownFace(coin.face), half);
-    return () => clearTimeout(id);
+    const d = t(520);
+    const target = targetAngle(angle.value, coin.face, 1);
+    lift.value = withSequence(
+      withTiming(0.9, { duration: d * 0.45, easing: Easing.out(Easing.quad) }),
+      withTiming(0, { duration: d * 0.55, easing: Easing.in(Easing.quad) }),
+    );
+    angle.value = withSequence(withTiming(target, { duration: d, easing: Easing.inOut(Easing.quad) }), settle(target, 12));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coin.face]);
 
-  // Ability pulse: glow + a quick wobble.
+  // Ability pulse: a glow and a small eager hop.
   useEffect(() => {
     if (coin.pulse === 0) return;
-    glow.value = withSequence(withTiming(1, { duration: t(110) }), withTiming(0, { duration: t(300) }));
+    glow.value = withSequence(withTiming(1, { duration: t(110) }), withTiming(0, { duration: t(320) }));
     if (!reduceMotion) {
-      tilt.value = withSequence(withTiming(-10, { duration: t(70) }), withTiming(10, { duration: t(90) }), withTiming(0, { duration: t(90) }));
-      pop.value = withSequence(withTiming(1.16, { duration: t(100), easing: Easing.out(Easing.back(3)) }), withTiming(1, { duration: t(150) }));
+      lift.value = withSequence(withTiming(0.22, { duration: t(110), easing: Easing.out(Easing.quad) }), withTiming(0, { duration: t(140), easing: Easing.in(Easing.quad) }));
+      const rest = restAngle(lastFace.current);
+      angle.value = withSequence(withTiming(rest - 14, { duration: t(110) }), settle(rest, 8));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coin.pulse]);
 
-  // Hit flash: the coin goes near-white for ~100 ms when struck.
+  // Hit flash.
   useEffect(() => {
     if (coin.flash === 0 || reduceMotion) return;
-    flash.value = withSequence(withTiming(0.9, { duration: t(30) }), withTiming(0, { duration: t(110) }));
+    flash.value = withSequence(withTiming(0.9, { duration: t(30) }), withTiming(0, { duration: t(120) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coin.flash]);
 
-  // Value changes: a springy pop (bigger for permanent growth is not known here, so keep it uniform).
+  // Value changes: a springy pop.
   useEffect(() => {
     if (coin.value === lastValue.current) return;
     const grew = coin.value > lastValue.current;
     lastValue.current = coin.value;
     if (reduceMotion || !wasLanded.current) return;
     pop.value = withSequence(
-      withTiming(grew ? 1.24 : 0.82, { duration: t(90), easing: Easing.out(Easing.quad) }),
+      withTiming(grew ? 1.18 : 0.86, { duration: t(90), easing: Easing.out(Easing.quad) }),
       withTiming(1, { duration: t(200), easing: Easing.out(Easing.back(3)) }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coin.value]);
 
-  // Destruction: rattle, swell, then vanish into the debris.
+  // Destruction: rattle, then burst.
   useEffect(() => {
     if (!coin.destroyed) {
       if (coin.landed) opacity.value = 1;
@@ -163,48 +186,41 @@ function TableCoinViewImpl({ coin, size, tableW, tableH, speed, reduceMotion, en
       opacity.value = withTiming(0, { duration: t(250) });
       return;
     }
-    tilt.value = withSequence(withTiming(-14, { duration: t(40) }), withTiming(14, { duration: t(40) }), withTiming(-14, { duration: t(40) }), withTiming(0, { duration: t(40) }));
-    pop.value = withSequence(withTiming(1.35, { duration: t(160) }), withTiming(0, { duration: t(120), easing: Easing.in(Easing.quad) }));
-    opacity.value = withDelay(t(220), withTiming(0, { duration: t(80) }));
+    roll.value = withSequence(withTiming(-16, { duration: t(40) }), withTiming(16, { duration: t(40) }), withTiming(-12, { duration: t(40) }), withTiming(0, { duration: t(40) }));
+    pop.value = withSequence(withTiming(1.25, { duration: t(150) }), withTiming(0.2, { duration: t(120), easing: Easing.in(Easing.quad) }));
+    opacity.value = withDelay(t(200), withTiming(0, { duration: t(90) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coin.destroyed]);
 
-  const style = useAnimatedStyle(() => ({
+  const body = useAnimatedStyle(() => ({
     left: left.value,
-    top: top.value - lift.value * size * 0.55,
+    top: top.value - lift.value * size,
     opacity: opacity.value,
-    transform: [
-      { scale: (1 + lift.value * 0.45) * pop.value },
-      { rotate: `${tilt.value}deg` },
-      { scaleX: spin.value * (2 - squashY.value) },
-      { scaleY: squashY.value },
-    ],
+    transform: [{ scale: (1 + lift.value * 0.22) * pop.value }, { rotate: `${roll.value}deg` }],
   }));
-  const shadowStyle = useAnimatedStyle(() => ({
-    left: left.value + size * 0.1,
-    top: top.value + size * 0.72,
-    opacity: opacity.value * (0.18 + 0.22 * (1 - lift.value)),
-    transform: [{ scale: 1 - lift.value * 0.35 }],
+  const shadow = useAnimatedStyle(() => ({
+    left: left.value + size * 0.08 + lift.value * size * 0.15,
+    top: top.value + size * 0.42,
+    opacity: opacity.value * Math.max(0.12, 0.5 - lift.value * 0.2),
+    transform: [{ scaleX: 1 - Math.min(0.5, lift.value * 0.25) }, { scaleY: 1 - Math.min(0.5, lift.value * 0.25) }],
   }));
-  const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value, transform: [{ scale: 1 + glow.value * 0.15 }] }));
-  const flashStyle = useAnimatedStyle(() => ({ opacity: flash.value }));
+  const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value, transform: [{ scaleY: 0.8 }, { scale: 1 + glow.value * 0.2 }] }));
 
   const def = coinDef(coin.defId);
-  const heads = shownFace === 'heads';
+  const heads = coin.face === 'heads';
   return (
     <>
-      <Animated.View pointerEvents="none" style={[styles.shadow, { width: size * 0.8, height: size * 0.28, borderRadius: size }, shadowStyle]} />
-      <Animated.View style={[styles.wrap, { width: size, height: size }, style]} pointerEvents={coin.destroyed ? 'none' : 'auto'}>
+      <Animated.View pointerEvents="none" style={[styles.shadow, { width: size * 0.84, height: size * 0.52, borderRadius: size }, shadow]} />
+      <Animated.View style={[styles.wrap, { width: size, height: size }, body]} pointerEvents={coin.destroyed ? 'none' : 'auto'}>
         <Pressable
           onPress={() => onPress(coin.uid)}
           accessibilityRole="button"
-          accessibilityLabel={`${def.name}, ${shownFace}, value ${coin.value}${coin.destroyed ? ', destroyed' : ''}`}
+          accessibilityLabel={`${def.name}, ${coin.face}, value ${coin.value}${coin.destroyed ? ', destroyed' : ''}`}
           accessibilityHint="Shows this coin's ability"
           style={{ width: size, height: size }}
         >
-          <Animated.View style={[styles.glow, { width: size + 18, height: size + 18, borderRadius: size }, glowStyle]} />
-          <CoinArt defId={coin.defId} face={shownFace} size={size} level={coin.level} engraved={engraved} />
-          <Animated.View pointerEvents="none" style={[styles.flash, { width: size * 0.84, height: size * 0.84, borderRadius: size, left: size * 0.08, top: size * 0.08 }, flashStyle]} />
+          <Animated.View pointerEvents="none" style={[styles.glow, { width: size + 16, height: size + 16, borderRadius: size }, glowStyle]} />
+          <Coin3D defId={coin.defId} level={coin.level} engraved={engraved} size={size} angle={angle} flash={flash} />
           <View style={[styles.value, heads ? styles.valueHeads : styles.valueTails]}>
             <Txt style={[styles.valueTxt, !heads && { color: colors.paper }]}>{coin.value}</Txt>
           </View>
@@ -218,32 +234,22 @@ export const TableCoinView = React.memo(TableCoinViewImpl);
 
 const styles = StyleSheet.create({
   wrap: { position: 'absolute' },
-  shadow: { position: 'absolute', backgroundColor: 'rgba(25,15,25,0.9)' },
-  flash: { position: 'absolute', backgroundColor: '#FFFFFF' },
-  glow: {
-    position: 'absolute',
-    left: -9,
-    top: -9,
-    backgroundColor: 'rgba(255, 236, 170, 0.55)',
-  },
+  shadow: { position: 'absolute', backgroundColor: 'rgba(8,4,8,0.95)' },
+  glow: { position: 'absolute', left: -8, top: -8, backgroundColor: 'rgba(255, 228, 150, 0.55)' },
   value: {
     position: 'absolute',
-    right: -6,
-    bottom: -6,
-    minWidth: 28,
-    height: 28,
-    borderRadius: 14,
+    right: -4,
+    bottom: 2,
+    minWidth: 26,
+    height: 26,
+    borderRadius: 13,
     paddingHorizontal: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2.5,
-    borderColor: colors.ink,
-    // white die-cut edge around the badge sticker
-    outlineColor: '#FFFFFF',
-    outlineWidth: 2.5,
-    outlineStyle: 'solid',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   valueHeads: { backgroundColor: colors.gold },
   valueTails: { backgroundColor: '#5F5A70' },
-  valueTxt: { color: colors.ink, fontWeight: '700', fontSize: 15 },
+  valueTxt: { color: colors.ink, fontWeight: '700', fontSize: 14 },
 });

@@ -181,7 +181,7 @@ export function fxFor(e: GameEvent, prev: PlaybackState, next: PlaybackState, ne
     }
     case 'land':
       // The coin drops into a cartoon smoke poof as it lands.
-      return { fx: [{ id: nextId(), kind: 'poof', x: e.x, y: e.y, delay: Math.max(10, 240 / speed) }], shake: 0 };
+      return { fx: [{ id: nextId(), kind: 'poof', x: e.x, y: e.y, delay: Math.max(10, 520 / speed), dust: true }], shake: 0 };
     case 'trigger': {
       const c = at(next, e.uid);
       return c ? { fx: [{ id: nextId(), kind: 'ring', x: c.x, y: c.y, color: '#FFF3C4' }], shake: 0 } : none;

@@ -25,24 +25,24 @@ export const Backdrop = React.memo(function Backdrop({ still = false }: { still?
     <>
       <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" pointerEvents="none">
         <Defs>
-          <LinearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+          <LinearGradient id="bdWall" x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor="#3B2A33" />
             <Stop offset="0.6" stopColor="#2A1F29" />
             <Stop offset="1" stopColor="#17121B" />
           </LinearGradient>
-          <LinearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <LinearGradient id="bdSky" x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor="#1A2540" />
             <Stop offset="1" stopColor="#33466A" />
           </LinearGradient>
-          <RadialGradient id="vignette" cx="50%" cy="45%" r="75%">
+          <RadialGradient id="bdVignette" cx="50%" cy="45%" r="75%">
             <Stop offset="0.55" stopColor="#000000" stopOpacity={0} />
             <Stop offset="1" stopColor="#000000" stopOpacity={0.6} />
           </RadialGradient>
         </Defs>
-        <Rect width={W} height={H} fill="url(#wall)" />
+        <Rect width={W} height={H} fill="url(#bdWall)" />
         {/* window with a moonlit sky over distant tents */}
         <Rect x={70} y={60} width={250} height={230} rx={18} fill="#4A3330" opacity={0.9} />
-        <Rect x={80} y={70} width={230} height={210} rx={12} fill="url(#sky)" />
+        <Rect x={80} y={70} width={230} height={210} rx={12} fill="url(#bdSky)" />
         <Circle cx={250} cy={120} r={22} fill="#F3E6C2" opacity={0.85} />
         <Circle cx={258} cy={114} r={20} fill="#22304E" opacity={0.95} />
         {[
@@ -87,19 +87,19 @@ export const Backdrop = React.memo(function Backdrop({ still = false }: { still?
           <Path d="M352 0 V130" stroke="#4C352E" strokeWidth={2} />
           <Rect x={340} y={130} width={24} height={34} rx={8} fill="#C97A2E" />
         </G>
-        <Rect width={W} height={H} fill="url(#vignette)" />
+        <Rect width={W} height={H} fill="url(#bdVignette)" />
       </Svg>
       {/* warm lantern glow, gently breathing */}
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, glowStyle]}>
         <Svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice">
           <Defs>
-            <RadialGradient id="lamp" cx="50%" cy="50%" r="50%">
+            <RadialGradient id="bdLamp" cx="50%" cy="50%" r="50%">
               <Stop offset="0" stopColor="#FFC56B" stopOpacity={0.55} />
               <Stop offset="1" stopColor="#FFC56B" stopOpacity={0} />
             </RadialGradient>
           </Defs>
-          <Circle cx={40} cy={112} r={90} fill="url(#lamp)" />
-          <Circle cx={352} cy={147} r={90} fill="url(#lamp)" />
+          <Circle cx={40} cy={112} r={90} fill="url(#bdLamp)" />
+          <Circle cx={352} cy={147} r={90} fill="url(#bdLamp)" />
         </Svg>
       </Animated.View>
     </>

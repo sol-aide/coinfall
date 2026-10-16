@@ -17,7 +17,7 @@ import { CoinDetail, CoinRow } from '../components/CoinInfo';
 import { Hud } from '../components/Hud';
 import { Button, Overlay, Txt, thud } from '../components/ui';
 import { useGame } from '../state/GameContext';
-import { Table } from '../table/Table';
+import { Table, tableHeightFor } from '../table/Table';
 import { usePlayback } from '../table/playback';
 import { RoundCard } from '../table/RoundCard';
 import { colors, font, radius } from '../theme';
@@ -76,7 +76,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
   }, [r.fusionNotes]);
 
   const mods = useMemo(() => computeMods(r.charms), [r.charms]);
-  const tableW = Math.max(0, Math.min(area.w - 24, area.h / 1.2));
+  const tableW = Math.max(0, Math.min(area.w - 16, area.h / (tableHeightFor(100) / 100)));
   const coins = state ? state.order.map((u) => state.coins[u]) : [];
 
   const toss = () => {

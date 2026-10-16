@@ -194,7 +194,9 @@ Result: a sensible strategy wins about **29%** of runs, the greedy bot about **9
 
 Inspired by the sticker-craft look of tabletop toy battlers (reference screenshots and notes supplied by the project owner), drawn entirely from scratch for Coinfall. Nothing was traced or extracted; no characters, icons, layouts or fonts from any other game are used.
 
-- **Sticker build.** Every coin, badge and the logo is a die-cut sticker: soft drop shadow, white border, warm ink outline (`colors.ink` `#2B2320`, never pure black), then flat cel shading: one base tone, one hard-edged shadow crescent, a white specular highlight. Glyphs are inked by drawing them twice (fat in ink, then in colour). See `src/ui/art/CoinArt.tsx`.
+- **Semi-3D table and coins (current).** The table is drawn in perspective (`src/ui/table/projection.ts`): a lacquered tray with a visible front edge and a lamp-lit cloth, with every coin, link and effect placed through the same projection. Coins are thick metal discs (`Coin3D.tsx`): the face is foreshortened by cos(angle) and a stack of edge slices offset by sin(angle) forms the reeded rim, so resting coins lie tilted away and show their thickness. Coin faces are embossed metal (beveled reeded rim, recessed gradient face, raised glyph, specular highlight).
+- **Coin motion.** A tossed coin rises from below the table tumbling 2–3 full turns end over end, shows its edge as it passes edge-on, swaps faces, drops onto the cloth with a small bounce and a decaying settling wobble, and kicks up a little dust. An ability flip makes the coin hop and turn one and a half times onto its new face; bumps skid with a hop and a lean; a lamp glint sweeps the face as it turns.
+- **Sticker build (UI).** Badges, the logo is a die-cut sticker: soft drop shadow, white border, warm ink outline (`colors.ink` `#2B2320`, never pure black), then flat cel shading: one base tone, one hard-edged shadow crescent, a white specular highlight. Glyphs are inked by drawing them twice (fat in ink, then in colour). See `src/ui/art/CoinArt.tsx`.
 - **Diorama.** Stickers sit on a soft, low-contrast scene: a night bazaar stall with a moonlit window, lantern glow (gently breathing), shelves, bunting and a vignette (`src/ui/components/Backdrop.tsx`). The table is a lacquered wooden tray with a teal cloth runner, an original coin-and-diamond print and a stitched hem (`src/ui/table/Table.tsx`).
 - **Stitched UI.** Buttons are card-stock pills with a dashed stitch inset on a dark backing tab that compresses when pressed; panels and sheets are dark rounded plaques with pale stitching; page titles sit on a folded ribbon; the HUD is a wood-framed plaque. Type is Fredoka (rounded, SIL Open Font License), bundled with `@expo-google-fonts/fredoka`.
 - **Motion** (1x speed; divided by the speed setting; Reduce Motion fades in place instead):
@@ -228,11 +230,15 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | Art | Bursts and numbers spilled past the table edge; on web, absolutely-positioned SVG painted over its text. | Effects are clamped to the table; text layers are positioned above their SVG backgrounds. |
 | Art | Page titles and the dues caption sat on top of the busy backdrop (moon, bunting). | Titles moved onto ribbon plates; the dues caption has its own dark pill. |
 | Art | Glyphs were small inside the new sticker coins. | Larger face and glyph scale. |
+| Art | Owner: right direction but not enough; wanted semi-3D with better coin flips. | Perspective table, thick 3D coins with real end-over-end flips, settling wobble, glints; embossed coin faces. |
+| Art | The cloth rendered orange on web: its SVG gradient id clashed with the backdrop's. | Prefixed every SVG id per component. |
+| Art | The landing smoke poof hid the new 3D landing. | Landing uses a small dust puff at the coin's base. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
 
 - **Art direction (after owner feedback):** a first "toy" pass with heavy black outlines and comic word bursts (BONK!/KABOOM!) was rejected as ugly and parked on branch `toy-style-wip`. The game was restyled from the owner's reference screenshots and notes into the sticker-and-stitch look described under Art direction. Comic words were dropped in favour of smoke, slash rings and outlined numbers.
+- **Semi-3D in 2.5D:** the 3D coin is built from transformed Views (scaleY/translateY per slice) rather than a 3D engine, so it runs in Expo Go and on web with no native modules and stays cheap with 6–8 coins.
 - **Fredoka font** is bundled (SIL Open Font License 1.1) for the rounded, friendly type; it is the only third-party asset and is free to ship in a commercial app.
 
 - **Expo SDK 58** (latest stable on npm at the time), blank TypeScript template, **no Expo Router**: the game is a single-screen state machine, so a router adds weight without benefit.

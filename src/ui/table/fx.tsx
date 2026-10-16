@@ -16,10 +16,11 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle, G, Line, Text as SvgText } from 'react-native-svg';
 import { colors, fonts } from '../theme';
+import type { Projection } from './projection';
 
 export type Fx =
   | { id: number; kind: 'number'; x: number; y: number; text: string; tone: 'gold' | 'value' | 'loss'; big?: boolean }
-  | { id: number; kind: 'poof'; x: number; y: number; delay: number; big?: boolean }
+  | { id: number; kind: 'poof'; x: number; y: number; delay: number; big?: boolean; dust?: boolean }
   | { id: number; kind: 'hit'; x: number; y: number }
   | { id: number; kind: 'shards'; x: number; y: number; color: string }
   | { id: number; kind: 'ring'; x: number; y: number; color: string };
@@ -27,17 +28,19 @@ export type Fx =
 const ms = (base: number, speed: number) => Math.max(40, base / speed);
 
 /** Renders every live effect, positioned in table units (x,y scaled by width). */
-export function FxLayer({ items, width, speed, reduceMotion }: { items: Fx[]; width: number; speed: number; reduceMotion: boolean }) {
+export function FxLayer({ items, proj, speed, reduceMotion }: { items: Fx[]; proj: Projection; speed: number; reduceMotion: boolean }) {
+  const width = proj.width;
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {items.map((fx) => {
-        const px = fx.x * width;
-        const py = fx.y * width;
+        const pt = proj.project(fx.x, fx.y);
+        const px = pt.x;
+        const py = pt.y;
         switch (fx.kind) {
           case 'number':
             return <PopNumber key={fx.id} fx={fx} px={Math.min(px, width - 50)} py={py} speed={speed} still={reduceMotion} />;
           case 'poof':
-            return reduceMotion ? null : <Poof key={fx.id} px={px} py={py} delay={fx.delay} big={fx.big} speed={speed} />;
+            return reduceMotion ? null : <Poof key={fx.id} px={px} py={fx.dust ? py + 22 : py} delay={fx.delay} big={fx.big} dust={fx.dust} speed={speed} />;
           case 'hit':
             return reduceMotion ? null : <Hit key={fx.id} px={px} py={py} speed={speed} />;
           case 'shards':
@@ -198,11 +201,12 @@ function Puff({ p, spec, px, py, shard, color }: { p: SharedValue<number>; spec:
  * Summon poof: the cloud reaches full size (~130 ms), holds while the coin
  * lands inside it, then breaks into small puffs drifting out and down (~650 ms).
  */
-function Poof({ px, py, delay, big, speed }: { px: number; py: number; delay: number; big?: boolean; speed: number }) {
+/** `dust` is the small landing puff kicked up around a coin's base (it must not hide the coin). */
+function Poof({ px, py, delay, big, dust, speed }: { px: number; py: number; delay: number; big?: boolean; dust?: boolean; speed: number }) {
   const s = useSharedValue(0);
   const op = useSharedValue(0);
   const p = useSharedValue(0);
-  const size = big ? 120 : 86;
+  const size = big ? 120 : dust ? 44 : 86;
   const specs = useMemo<PuffSpec[]>(
     () =>
       Array.from({ length: 7 }, (_, i) => {

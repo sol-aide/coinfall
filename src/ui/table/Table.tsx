@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
-import Svg, { Circle, Defs, G, Line, LinearGradient, Path, Pattern, Rect, Stop } from 'react-native-svg';
-import { COIN_R, TABLE_H, type CoinInstance } from '../../engine';
+import Svg, { Defs, Ellipse, G, Line, LinearGradient, Path, RadialGradient, Stop } from 'react-native-svg';
+import { COIN_R, type CoinInstance } from '../../engine';
 import { colors } from '../theme';
 import { FxLayer, type Fx } from './fx';
 import type { DisplayCoin } from './playback';
+import { makeProjection, type Projection } from './projection';
 import { TableCoinView } from './TableCoinView';
 
 interface Props {
@@ -21,132 +22,134 @@ interface Props {
   children?: React.ReactNode;
 }
 
+/** Pixel height of the table drawing for a given width. */
 export function tableHeightFor(width: number) {
-  return width * TABLE_H;
+  return makeProjection(width).height;
+}
+
+function trapezoid(top: number, bottom: number, farHalf: number, nearHalf: number, cx: number, r = 14): string {
+  const tl = [cx - farHalf, top];
+  const tr = [cx + farHalf, top];
+  const br = [cx + nearHalf, bottom];
+  const bl = [cx - nearHalf, bottom];
+  // Rounded corners using quadratic curves.
+  const lerp = (a: number[], b: number[], d: number) => {
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    return [a[0] + ((b[0] - a[0]) * d) / len, a[1] + ((b[1] - a[1]) * d) / len];
+  };
+  const pts = [tl, tr, br, bl];
+  let d = '';
+  for (let i = 0; i < 4; i++) {
+    const prev = pts[(i + 3) % 4];
+    const cur = pts[i];
+    const next = pts[(i + 1) % 4];
+    const a = lerp(cur, prev, r);
+    const b = lerp(cur, next, r);
+    d += `${i === 0 ? 'M' : 'L'}${a[0].toFixed(1)} ${a[1].toFixed(1)} Q${cur[0].toFixed(1)} ${cur[1].toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)} `;
+  }
+  return d + 'Z';
 }
 
 /**
- * The moneylender's table: a lacquered wooden tray holding a teal cloth with a
- * printed coin pattern. Coordinates: x in [0,1], y in [0,1.2], scaled by width.
+ * The moneylender's table, seen from above and in front: a lacquered wooden
+ * tray with a visible front edge and a lamp-lit cloth. Coins, links and effects
+ * are placed through the same projection so everything sits on one plane.
  */
 export function Table({ width, coins, fx, shake, adjacency, speed, reduceMotion, bag, onCoinPress, children }: Props) {
-  const height = tableHeightFor(width);
-  const size = Math.round(COIN_R * 2 * width);
+  const proj: Projection = useMemo(() => makeProjection(width), [width]);
+  const { plane, height } = proj;
+  const cx = width / 2;
+  const nearSize = Math.round(COIN_R * 2 * width * 1.14);
   const live = coins.filter((c) => c.landed && !c.destroyed);
   const links: { a: DisplayCoin; b: DisplayCoin }[] = [];
   for (let i = 0; i < live.length; i++)
     for (let j = i + 1; j < live.length; j++) {
-      const a = live[i];
-      const b = live[j];
-      if (Math.hypot(a.x - b.x, a.y - b.y) <= adjacency) links.push({ a, b });
+      if (Math.hypot(live[i].x - live[j].x, live[i].y - live[j].y) <= adjacency) links.push({ a: live[i], b: live[j] });
     }
   const engraved = new Set(bag.filter((c) => c.engraving).map((c) => c.uid));
+  // Draw far coins first so nearer coins overlap them.
+  const ordered = coins.slice().sort((a, b) => (a.landed ? a.y : 9) - (b.landed ? b.y : 9));
 
-  // A short shake, only for destruction.
   const tx = useSharedValue(0);
   useEffect(() => {
     if (!shake.n || reduceMotion) return;
-    const p = shake.power >= 2 ? 6 : 3;
+    const p = shake.power >= 2 ? 5 : 3;
     const step = Math.max(20, 40 / Math.sqrt(speed));
-    tx.value = withSequence(
-      withTiming(p, { duration: step }),
-      withTiming(-p, { duration: step }),
-      withTiming(p * 0.5, { duration: step }),
-      withTiming(0, { duration: step }),
-    );
+    tx.value = withSequence(withTiming(p, { duration: step }), withTiming(-p, { duration: step }), withTiming(p * 0.5, { duration: step }), withTiming(0, { duration: step }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shake.n]);
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }] }));
 
-  const rim = 12;
+  const rim = width * 0.045;
+  const front = width * 0.1;
+  const outerTop = plane.top - rim;
+  const outerBottom = plane.bottom + rim;
+  const outerFar = plane.farHalf + rim * 0.9;
+  const outerNear = plane.nearHalf + rim;
+  const p = (x: number, y: number) => proj.project(x, y);
+
   return (
     <Animated.View style={[{ width, height }, shakeStyle]} accessibilityLabel="Table">
-      <Svg width={width} height={height + 10} style={StyleSheet.absoluteFill}>
+      <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
         <Defs>
-          <LinearGradient id="lacquer" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={colors.woodLight} />
-            <Stop offset="0.5" stopColor={colors.wood} />
-            <Stop offset="1" stopColor={colors.woodDark} />
+          <LinearGradient id="tblWoodTop" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={colors.woodDark} />
+            <Stop offset="0.25" stopColor={colors.wood} />
+            <Stop offset="1" stopColor={colors.woodLight} />
           </LinearGradient>
-          <LinearGradient id="clothShade" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor="#000000" stopOpacity={0.22} />
-            <Stop offset="0.12" stopColor="#000000" stopOpacity={0} />
-            <Stop offset="0.85" stopColor="#000000" stopOpacity={0} />
-            <Stop offset="1" stopColor="#000000" stopOpacity={0.25} />
+          <LinearGradient id="tblWoodFront" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#7A3E1A" />
+            <Stop offset="1" stopColor="#3E1E0C" />
           </LinearGradient>
-          <Pattern id="clothPrint" width={46} height={46} patternUnits="userSpaceOnUse">
-            <Circle cx={11.5} cy={11.5} r={5.5} fill="none" stroke="#7FC1BA" strokeWidth={1.6} opacity={0.5} />
-            <Circle cx={11.5} cy={11.5} r={1.6} fill="#7FC1BA" opacity={0.5} />
-            <Path d="M34.5 28 L38 34.5 L34.5 41 L31 34.5 Z" fill="#E9C46A" opacity={0.35} />
-          </Pattern>
+          <RadialGradient id="tblLamp" cx="50%" cy="38%" r="70%">
+            <Stop offset="0" stopColor="#2E8C96" />
+            <Stop offset="0.6" stopColor={colors.cloth} />
+            <Stop offset="1" stopColor="#103E45" />
+          </RadialGradient>
         </Defs>
-        {/* soft contact shadow, then the wooden tray */}
-        <Rect x={4} y={10} width={width - 8} height={height - 4} rx={22} fill="rgba(10,6,12,0.45)" />
-        <Rect x={1.5} y={1.5} width={width - 3} height={height - 3} rx={22} fill="url(#lacquer)" stroke={colors.ink} strokeWidth={3} />
-        {/* glossy lacquer highlights */}
-        <Path d={`M22 6 H${width * 0.55}`} stroke="#FFD9A8" strokeOpacity={0.55} strokeWidth={3} strokeLinecap="round" />
-        <Path d={`M${width * 0.62} 6 H${width * 0.7}`} stroke="#FFD9A8" strokeOpacity={0.4} strokeWidth={3} strokeLinecap="round" />
-        {/* cloth runner */}
-        <Rect x={rim} y={rim} width={width - rim * 2} height={height - rim * 2} rx={14} fill={colors.cloth} stroke={colors.ink} strokeWidth={2.5} />
-        <Rect x={rim} y={rim} width={width - rim * 2} height={height - rim * 2} rx={14} fill="url(#clothPrint)" />
-        <Rect x={rim} y={rim} width={width - rim * 2} height={height - rim * 2} rx={14} fill="url(#clothShade)" />
-        {/* stitched hem */}
-        <Rect
-          x={rim + 7}
-          y={rim + 7}
-          width={width - rim * 2 - 14}
-          height={height - rim * 2 - 14}
-          rx={9}
+        {/* floor shadow */}
+        <Ellipse cx={cx} cy={outerBottom + front * 0.9} rx={outerNear * 1.02} ry={front * 0.55} fill="rgba(5,2,6,0.55)" />
+        {/* front face of the table */}
+        <Path
+          d={`M${cx - outerNear} ${outerBottom - 12} L${cx + outerNear} ${outerBottom - 12} L${cx + outerNear * 0.985} ${outerBottom + front - 8} Q${cx + outerNear * 0.985} ${outerBottom + front} ${cx + outerNear * 0.95} ${outerBottom + front} L${cx - outerNear * 0.95} ${outerBottom + front} Q${cx - outerNear * 0.985} ${outerBottom + front} ${cx - outerNear * 0.985} ${outerBottom + front - 8} Z`}
+          fill="url(#tblWoodFront)"
+          stroke={colors.ink}
+          strokeWidth={2}
+        />
+        <Line x1={cx - outerNear * 0.9} y1={outerBottom + front * 0.45} x2={cx + outerNear * 0.9} y2={outerBottom + front * 0.45} stroke="#9A5226" strokeOpacity={0.5} strokeWidth={2} />
+        {/* lacquered top */}
+        <Path d={trapezoid(outerTop, outerBottom, outerFar, outerNear, cx, 18)} fill="url(#tblWoodTop)" stroke={colors.ink} strokeWidth={2.5} />
+        <Path d={`M${cx - outerFar + 20} ${outerTop + 4} L${cx + outerFar - 60} ${outerTop + 4}`} stroke="#FFD9A8" strokeOpacity={0.45} strokeWidth={2.5} strokeLinecap="round" />
+        <Path d={`M${cx - outerNear + 16} ${outerBottom - 5} L${cx + outerNear - 16} ${outerBottom - 5}`} stroke="#FFD9A8" strokeOpacity={0.35} strokeWidth={2} strokeLinecap="round" />
+        {/* lamp-lit cloth with a stitched hem */}
+        <Path d={trapezoid(plane.top, plane.bottom, plane.farHalf, plane.nearHalf, cx, 12)} fill="url(#tblLamp)" stroke="rgba(10,30,34,0.9)" strokeWidth={2} />
+        <Path
+          d={trapezoid(plane.top + 9, plane.bottom - 9, plane.farHalf - 9 * 0.85, plane.nearHalf - 9, cx, 8)}
           fill="none"
           stroke="#E9DFC8"
-          strokeOpacity={0.55}
-          strokeWidth={1.8}
+          strokeOpacity={0.45}
+          strokeWidth={1.6}
           strokeDasharray="7 6"
         />
-        {/* glowing links between neighbouring coins */}
+        {/* links between neighbouring coins, on the cloth */}
         <G>
-          {links.map(({ a, b }) => (
-            <Line
-              key={`g-${a.uid}-${b.uid}`}
-              x1={a.x * width}
-              y1={a.y * width}
-              x2={b.x * width}
-              y2={b.y * width}
-              stroke="#F7A04A"
-              strokeOpacity={0.45}
-              strokeWidth={10}
-              strokeLinecap="round"
-            />
-          ))}
-          {links.map(({ a, b }) => (
-            <Line
-              key={`c-${a.uid}-${b.uid}`}
-              x1={a.x * width}
-              y1={a.y * width}
-              x2={b.x * width}
-              y2={b.y * width}
-              stroke="#FFF4DC"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-            />
-          ))}
+          {links.map(({ a, b }) => {
+            const A = p(a.x, a.y);
+            const B = p(b.x, b.y);
+            return <Line key={`g-${a.uid}-${b.uid}`} x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke="#F7A04A" strokeOpacity={0.4} strokeWidth={9} strokeLinecap="round" />;
+          })}
+          {links.map(({ a, b }) => {
+            const A = p(a.x, a.y);
+            const B = p(b.x, b.y);
+            return <Line key={`c-${a.uid}-${b.uid}`} x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke="#FFF4DC" strokeWidth={2.2} strokeLinecap="round" />;
+          })}
         </G>
       </Svg>
       {children}
-      {coins.map((c) => (
-        <TableCoinView
-          key={c.uid}
-          coin={c}
-          size={size}
-          tableW={width}
-          tableH={height}
-          speed={speed}
-          reduceMotion={reduceMotion}
-          engraved={engraved.has(c.uid)}
-          onPress={onCoinPress}
-        />
+      {ordered.map((c) => (
+        <TableCoinView key={c.uid} coin={c} size={nearSize} proj={proj} speed={speed} reduceMotion={reduceMotion} engraved={engraved.has(c.uid)} onPress={onCoinPress} />
       ))}
-      <FxLayer items={fx} width={width} speed={speed} reduceMotion={reduceMotion} />
+      <FxLayer items={fx} proj={proj} speed={speed} reduceMotion={reduceMotion} />
     </Animated.View>
   );
 }

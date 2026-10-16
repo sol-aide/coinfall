@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PHASES } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
 import { Logo } from '../art/Logo';
+import { Coin3D } from '../table/Coin3D';
 import { Button, Stitch, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
 import { colors, font, raceColors, radius } from '../theme';
@@ -69,19 +70,21 @@ export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowT
   );
 }
 
+/** A coin turning end over end in 3D while it floats. */
 function FallingCoin({ defId, delay, x, still }: { defId: string; delay: number; x: number; still: boolean }) {
   const y = useSharedValue(still ? 0 : -30);
-  const rot = useSharedValue(1);
+  const angle = useSharedValue(25);
+  const flash = useSharedValue(0);
   useEffect(() => {
     if (still) return;
     y.value = withDelay(delay, withRepeat(withTiming(18, { duration: 1600, easing: Easing.inOut(Easing.sin) }), -1, true));
-    rot.value = withDelay(delay, withRepeat(withTiming(0.2, { duration: 1100, easing: Easing.inOut(Easing.sin) }), -1, true));
+    angle.value = withDelay(delay, withRepeat(withTiming(25 + 360, { duration: 2600, easing: Easing.linear }), -1, false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const style = useAnimatedStyle(() => ({ transform: [{ translateX: x }, { translateY: y.value }, { scaleX: rot.value }] }));
+  const style = useAnimatedStyle(() => ({ transform: [{ translateX: x }, { translateY: y.value }] }));
   return (
     <Animated.View style={[styles.coin, style]}>
-      <CoinArt defId={defId} size={84} />
+      <Coin3D defId={defId} level={1} engraved={false} size={84} angle={angle} flash={flash} />
     </Animated.View>
   );
 }
