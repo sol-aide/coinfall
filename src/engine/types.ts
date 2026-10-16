@@ -151,7 +151,7 @@ export interface TableCoin {
 export type GameEvent =
   | { t: 'stage'; stage: StageName }
   | { t: 'draw'; uids: string[] }
-  | { t: 'land'; uid: string; x: number; y: number; face: Face; blessed?: boolean }
+  | { t: 'land'; uid: string; x: number; y: number; face: Face; value: number; blessed?: boolean }
   | { t: 'trigger'; uid?: string; charmId?: string; label: string }
   | { t: 'flip'; uid: string; face: Face }
   | { t: 'reflip'; uid: string; face: Face }

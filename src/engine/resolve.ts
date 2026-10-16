@@ -462,7 +462,7 @@ export function resolveRound(run: RunState): RoundResult {
     const p = headsChance(ctx.inst.get(tc.uid)!, ctx.mods);
     tc.face = blessed || R.chance(run, p) ? 'heads' : 'tails';
     tc.landed = true;
-    ctx.events.push({ t: 'land', uid: tc.uid, x: tc.x, y: tc.y, face: tc.face, blessed: blessed && p < 1 });
+    ctx.events.push({ t: 'land', uid: tc.uid, x: tc.x, y: tc.y, face: tc.face, value: valueOf(ctx, tc), blessed: blessed && p < 1 });
     runCoinTrigger(ctx, tc, 'onLand');
   });
 
