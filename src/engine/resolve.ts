@@ -75,6 +75,12 @@ function active(ctx: Ctx): TableCoin[] {
   return ctx.table.filter((c) => c.landed && !c.destroyed);
 }
 
+/** Two-Faced: the coin's own face-conditioned abilities ignore its face. */
+function anyFace(ctx: Ctx, tc: TableCoin): boolean {
+  const inst = ctx.inst.get(tc.uid);
+  return !!inst?.engraving && !!engravingDef(inst.engraving).anyFace;
+}
+
 /** The races a table coin counts as (a Kinship engraving makes it all three). */
 export function racesOf(ctx: Ctx, tc: TableCoin): Race[] {
   const inst = ctx.inst.get(tc.uid);
@@ -236,7 +242,7 @@ export function execute(
   charmId?: string,
 ) {
   const s = subject ?? self;
-  if (e.when && (!s || s.face !== e.when)) return;
+  if (e.when && (!s || (s.face !== e.when && !(s === self && anyFace(ctx, s))))) return;
   const outer = ctx.subject;
   ctx.subject = subject;
   try {

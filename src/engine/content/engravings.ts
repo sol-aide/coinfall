@@ -29,6 +29,21 @@ export const ENGRAVINGS: EngravingDef[] = [
   },
   { id: 'ironclad', name: 'Ironclad', rarity: 'common', text: 'This coin can’t be destroyed.', sturdy: true },
   { id: 'kinship', name: 'Kinship', rarity: 'rare', text: 'Counts as a Human, an Orc and an Elf for every ability that looks at races.', allRaces: true },
+  { id: 'twofaced', name: 'Two-Faced', rarity: 'rare', text: 'This coin’s “Heads:” and “Tails:” abilities work on either face.', anyFace: true },
+  {
+    id: 'spiked',
+    name: 'Spiked',
+    rarity: 'uncommon',
+    text: 'Whenever this coin flips, it flips a random adjacent coin too.',
+    effects: [{ trigger: 'onFlip', noScale: true, do: { kind: 'flip', target: { scope: 'adjacent', pick: 'random' } } }],
+  },
+  {
+    id: 'hollow',
+    name: 'Hollow',
+    rarity: 'common',
+    text: 'When this coin is destroyed: +5 gold.',
+    effects: [{ trigger: 'onDestroy', noScale: true, do: { kind: 'gold', amount: 5 } }],
+  },
   { id: 'weighted', name: 'Weighted', rarity: 'uncommon', text: 'Tails still scores half its value.', tailsFraction: 0.5 },
 ];
 

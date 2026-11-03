@@ -132,6 +132,8 @@ export interface EngravingDef {
   tailsFraction?: number;
   /** Counts as a Human, an Orc and an Elf for every race check. */
   allRaces?: boolean;
+  /** The coin's own heads-only / tails-only abilities work on either face. */
+  anyFace?: boolean;
   effects?: Effect[];
 }
 

@@ -215,3 +215,29 @@ describe('rule-bending Charms and Kinship', () => {
     expect(set.coins.map((c) => c.temp)).toEqual([3, 3, 3]);
   });
 });
+
+describe('synergy engravings', () => {
+  it('Two-Faced lets a heads-only ability fire on tails', () => {
+    const { ctx, coins } = table([{ defId: 'moneychanger', x: 0.1, y: 0.1, face: 'tails', engraving: 'twofaced' }]);
+    runCoinTrigger(ctx, coins[0], 'onRoundEnd');
+    expect(goldEvents(ctx)).toBe(4);
+    const plain = table([{ defId: 'moneychanger', x: 0.1, y: 0.1, face: 'tails' }]);
+    runCoinTrigger(plain.ctx, plain.coins[0], 'onRoundEnd');
+    expect(goldEvents(plain.ctx)).toBe(0);
+  });
+
+  it('Spiked passes a flip on to a neighbour', () => {
+    const { ctx, coins } = table([
+      { defId: 'copper', x: 0.5, y: 0.5, face: 'heads', engraving: 'spiked' },
+      { defId: 'copper', x: 0.6, y: 0.5, face: 'heads' },
+    ]);
+    setFace(ctx, coins[0], 'tails');
+    expect(coins[1].face).toBe('tails');
+  });
+
+  it('Hollow pays when its coin is destroyed', () => {
+    const { ctx, coins } = table([{ defId: 'copper', x: 0.5, y: 0.5, engraving: 'hollow' }, ...PAD]);
+    destroyCoin(ctx, coins[0]);
+    expect(goldEvents(ctx)).toBe(5);
+  });
+});

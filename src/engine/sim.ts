@@ -170,12 +170,20 @@ function bestCoinFor(run: RunState, engravingId: string): string | undefined {
   const mods = computeMods(run.charms);
   const candidates = run.bag.filter((c) => !c.engraving);
   if (!candidates.length) return undefined;
+  const inBag = (pred: (e: CoinDef['effects'][number]) => boolean) => run.bag.some((c) => coinDef(c.defId).effects.some(pred));
+  const destroyers = inBag((e) => e.do.kind === 'destroy');
+  const flipPayoff = inBag((e) => e.trigger === 'onFlip') || run.charms.some((id) => ['whirlwind', 'spintop'].includes(id));
   const score = (c: (typeof candidates)[number]) => {
     const def = coinDef(c.defId);
     let s = displayValue(c, mods) + (COIN_RATING[c.defId] ?? 1) * c.level;
     if (engravingId === 'lucky' && def.headsChance === 1) s = -1;
     if (engravingId === 'echo' && def.effects.length === 0) s = -1;
     if (engravingId === 'secondwind' && c.defId !== 'firebrand') s *= 0.5;
+    if (engravingId === 'twofaced' && !def.effects.some((e) => e.when)) s = -1;
+    // Hollow goes on cheap fodder, and only when something in the bag destroys coins.
+    if (engravingId === 'hollow') s = destroyers ? 20 - displayValue(c, mods) : -1;
+    // Spiked only helps when the bag pays for flips.
+    if (engravingId === 'spiked' && !flipPayoff) s = -1;
     return s;
   };
   const best = candidates.slice().sort((a, b) => score(b) - score(a))[0];
