@@ -332,6 +332,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 - **Daily bazaar is offline** (milestone 14): the seed is `daily-YYYY-MM-DD` from the device's local date, so it needs no network, accounts or server, in line with the App Store rules above. `RunState.daily` is optional, so older saves still load without a `SAVE_VERSION` bump.
 - **Collection log, not unlocks** (milestone 18): every coin and Charm is available from the first run; the log only records what you have owned (`records.found`). The guide never hides anything, so the rules stay fully readable.
 - **Guild ranks are modifiers, not new rules** (milestone 19): a rank only feeds `Mods` (dues, prices, heads chance) through `runMods(run)`, so every system that reads modifiers picks it up and the engine stays data-driven. `RunState.rank` is optional (missing = 1).
+- **Engine fuzzing** (milestone 24): `fuzz.test.ts` resolves 600 rounds with random bags (every coin, levels 1–3, random engravings, up to 6 random Charms, random rank) and checks that the breakdown sums to the total, gold adds up, the bag never drops below 5, values stay finite and every event names a real coin. A one-off 20,000-round run found no violations; the longest round produced 62 events.
 - **Skipping a reward pays 3 gold** so skipping is a real choice rather than a pure loss.
 - **Reroll tokens also work on round rewards**, not only the shop, to give them more uses.
 - **Starting race Charms** only change their race's coins (they don't add extra coins), keeping the starting bag exactly as specified.
