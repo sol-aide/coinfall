@@ -79,7 +79,7 @@ Apple computes the final rating. With Simulated Gambling = Infrequent/Mild, expe
 
 Use real gameplay, not only the title screen. Draft 6.9" screenshots (1320×2868) generated from the build are in `store/screenshots/`:
 
-1. `3-round-in-play.png` — **lead image**: a mixed table mid-round with the "All three races!" combo callout, value pop-ups and the ability text under the caption.
+1. `3-round-in-play.png` — **lead image**: a mixed table mid-round with the "All three races!" combo callout ringing one coin of each race, value pop-ups and the ability text under the caption.
 2. `4-pick-a-coin.png` — the round result and the "Add a coin to your bag" choice, with synergy tags on each coin.
 3. `5-bazaar.png` — the Bazaar with coins and Charms (each with its own art) for sale.
 4. `2-choose-patron.png` — choosing a starting race Charm.
