@@ -58,3 +58,16 @@ describe('synergy partners', () => {
     expect(partnerNote(coinDef('sentinel'), run)).toBeUndefined();
   });
 });
+
+describe('charm tags', () => {
+  it('read effects and static modifiers', () => {
+    const { CHARMS } = require('../../../engine') as typeof import('../../../engine');
+    const { charmTags } = require('../tags') as typeof import('../tags');
+    const tags = (id: string) => charmTags(CHARMS.find((c) => c.id === id)!).map((t) => t.label);
+    expect(tags('rallyhorn')).toEqual(['Set bonuses']);
+    expect(tags('loupe')).toEqual(['×2']);
+    expect(tags('skullcup')).toEqual(['Orcs', 'Boosts others']);
+    expect(tags('treaty')).toEqual(['Mixed table', 'Gold']);
+    expect(tags('haggler')).toEqual([]);
+  });
+});

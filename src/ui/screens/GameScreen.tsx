@@ -46,6 +46,16 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
   const { state, fx, shake, skip } = usePlayback(showRound, showRound ? roundKey : 'none', settings.speed, reduceMotion, instant);
   const playing = !!state && !state.done && r.screen === 'reward';
 
+  // A haptic tap when a combo callout fires (thud() skips the web and respects the setting).
+  const lastCallout = useRef(0);
+  useEffect(() => {
+    const call = fx.filter((f) => f.kind === 'callout' && f.id > lastCallout.current);
+    if (!call.length) return;
+    lastCallout.current = Math.max(...call.map((f) => f.id));
+    thud(settings.haptics);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fx]);
+
   // After an animated round, show the round card for a moment before the reward sheet.
   useEffect(() => {
     if (playing) {

@@ -12,7 +12,7 @@ import {
   type RunState,
 } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
-import { bagFitNote, partnerNote, synergyTags, type TagId } from '../content/tags';
+import { bagFitNote, partnerNote, synergyTags, type SynergyTag, type TagId } from '../content/tags';
 import { TOUCH, colors, font, raceColors, radius, rarityColors } from '../theme';
 import { Overlay, Stitch, Txt } from './ui';
 
@@ -33,8 +33,8 @@ const TAG_COLOR: Record<TagId, string> = {
 };
 
 /** Small chips naming the synergies a coin plays into (derived from its rules). */
-export function TagChips({ defId }: { defId: string }) {
-  const tags = synergyTags(coinDef(defId));
+export function TagChips({ defId, tags: given }: { defId?: string; tags?: SynergyTag[] }) {
+  const tags = given ?? (defId ? synergyTags(coinDef(defId)) : []);
   if (!tags.length) return null;
   return (
     <View style={styles.tags} accessible accessibilityLabel={`Synergies: ${tags.map((t) => t.label).join(', ')}`}>

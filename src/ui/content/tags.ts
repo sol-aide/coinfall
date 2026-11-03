@@ -1,7 +1,7 @@
 // Synergy tags, derived from a coin's own effect data so they never drift from
 // the rules. Pure TypeScript (no React Native) so it can be unit-tested.
 
-import { coinDef, type Action, type CoinDef, type Count, type Race, type RunState, type Target } from '../../engine';
+import { coinDef, type Action, type CharmDef, type CoinDef, type Count, type Race, type RunState, type Target } from '../../engine';
 
 export type TagId = 'gold' | 'grows' | 'flips' | 'tails' | 'heads' | 'wreck' | 'mult' | 'set' | 'mixed' | 'counts' | 'boost' | 'echo';
 
@@ -181,4 +181,26 @@ export function partnerNote(def: CoinDef, run: RunState, max = 2): string | unde
   if (!names.length) return undefined;
   const more = names.length - max;
   return `Works with: ${names.slice(0, max).join(', ')}${more > 0 ? ` +${more} more` : ''}`;
+}
+
+/**
+ * Tags for a Charm: its effects are read like a coin's, and its static
+ * modifiers add the matching families (sets, ×2, heads, tails, gold…).
+ */
+export function charmTags(def: CharmDef): SynergyTag[] {
+  const fromEffects = synergyTags({ id: def.id, name: def.name, race: def.race ?? 'neutral', rarity: def.rarity, value: 0, text: def.text, effects: def.effects ?? [] });
+  const out = new Map(fromEffects.map((t) => [t.id, t]));
+  const m = def.mods ?? {};
+  const add = (id: TagId, label: string) => {
+    if (!out.has(id)) out.set(id, { id, label });
+  };
+  if (m.setDiscount) add('set', 'Set bonuses');
+  if (m.multBonus) add('mult', '×2');
+  if (m.firstCoinHeads || m.headsBonus) add('heads', 'Heads control');
+  if (m.tailsGold) add('tails', 'Tails');
+  if (m.valueBonus || m.coinValueBonus) add('boost', 'Boosts others');
+  const race = def.race ?? (Object.keys(m.valueBonus ?? {}).find((k) => k !== 'all') as Race | undefined);
+  if (race && race !== 'neutral') add('counts', PLURAL[race]);
+  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold'];
+  return order.filter((id) => out.has(id)).map((id) => out.get(id)!);
 }

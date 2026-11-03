@@ -18,8 +18,9 @@ import {
 } from '../../engine';
 import { CharmArt } from '../art/CharmArt';
 import { Icon, type IconName } from '../art/Icons';
-import { CoinRow } from '../components/CoinInfo';
+import { CoinRow, TagChips } from '../components/CoinInfo';
 import { Hud } from '../components/Hud';
+import { charmTags } from '../content/tags';
 import { Button, Ribbon, Stitch, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
 import { colors, font, radius, rarityColors } from '../theme';
@@ -96,6 +97,7 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
                   {rarity !== 'common' && rarity !== 'starter' ? <Txt style={[styles.rarity, { color: rarityColors[rarity] }]}>  {rarity}</Txt> : null}
                 </Txt>
                 <Txt style={styles.itemText}>{text}</Txt>
+                {item.kind === 'charm' && <TagChips tags={charmTags(charmDef(item.charmId))} />}
               </View>
               {priceButton(item, i)}
             </View>

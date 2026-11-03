@@ -306,6 +306,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 18 | Collection log: How to play shows "6 of 40 coins found" with a tick on each found coin and Charm; the title adds "6/40 coins" to the records line. At 375×667 that line fell below the screen. | Shorter records text; smaller title coin area and top padding on short screens. |
 | 19 | Guild ranks at 375×667: the rank picker sits under the patron cards with its rules listed; "+" is disabled at the highest open rank; the HUD reads "Phase 1/8 · Rank 3" and dues show 23 instead of 22. | — |
 | 22 | Choosing between offers still meant cross-checking your bag by memory. | Offers (rewards, shop) and the coin detail list the bag coins they combo with, e.g. "Works with: Berserker" on a Looter; derived from effect data (flip makers ↔ flip/tails payoffs, destroyers ↔ wreckage, race payoffs ↔ that race, mixed-table ↔ other races). Checked at 375×667. |
+| 23 | Charms had no tags, so their role in a build was only in their text. | Charm tags derived from effects and static modifiers (Rally Horn "Set bonuses", Jeweler's Loupe "×2", Skull Cup "Orcs · Boosts others"); utility Charms stay untagged. Shown in the shop and the Charms list. Combo callouts add a haptic tap on device. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
