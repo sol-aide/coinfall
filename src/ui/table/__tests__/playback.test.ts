@@ -27,3 +27,16 @@ describe('combo callouts', () => {
     expect(comboCallout({ t: 'trigger', uid: 'c1', label: 'Bard retriggers War Drummer' }, 'bard')).toBeNull();
   });
 });
+
+describe('round pacing', () => {
+  it('leaves ordinary rounds alone and compresses long ones, within limits', () => {
+    const { roundPace, ROUND_BUDGET } = require('../playback') as typeof import('../playback');
+    const short = Array.from({ length: 10 }, () => ({ t: 'land' as const, uid: 'a', x: 0, y: 0, face: 'heads' as const, value: 1 }));
+    expect(roundPace(short)).toBe(1);
+    const long = Array.from({ length: 60 }, () => ({ t: 'land' as const, uid: 'a', x: 0, y: 0, face: 'heads' as const, value: 1 }));
+    const p = roundPace(long);
+    expect(p).toBeLessThan(1);
+    expect(p).toBeGreaterThanOrEqual(0.45);
+    expect(60 * 360 * p).toBeLessThanOrEqual(Math.max(ROUND_BUDGET, 60 * 360 * 0.45) + 1);
+  });
+});

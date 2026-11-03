@@ -60,9 +60,22 @@ const DURATION: Record<GameEvent['t'], number> = {
   score: 200,
 };
 
-export function eventDuration(e: GameEvent, speed: number, reduceMotion: boolean): number {
-  const base = DURATION[e.t] * (reduceMotion ? 0.7 : 1);
+export function eventDuration(e: GameEvent, speed: number, reduceMotion: boolean, pace = 1): number {
+  const base = DURATION[e.t] * (reduceMotion ? 0.7 : 1) * pace;
   return Math.max(30, base / speed);
+}
+
+/** Longest a round's playback should take at speed 1 before it is compressed (ms). */
+export const ROUND_BUDGET = 9000;
+
+/**
+ * Time multiplier for a round: 1 for ordinary rounds; below 1 for long
+ * late-game rounds so a big engine never takes more than ROUND_BUDGET to replay
+ * (never faster than 0.45, so each step stays readable).
+ */
+export function roundPace(events: GameEvent[]): number {
+  const total = events.reduce((t, e) => t + DURATION[e.t], 0);
+  return total <= ROUND_BUDGET ? 1 : Math.max(0.45, ROUND_BUDGET / total);
 }
 
 function initial(result: RoundResult): PlaybackState {
@@ -275,6 +288,7 @@ export function usePlayback(result: RoundResult | undefined, key: string, speed:
       return;
     }
     let s = initial(result);
+    const pace = roundPace(result.events);
     setState(s);
     const myKey = key;
     const step = () => {
@@ -295,7 +309,7 @@ export function usePlayback(result: RoundResult | undefined, key: string, speed:
       if (out.shake && !reduceMotion) setShake((v) => ({ n: v.n + 1, power: out.shake }));
       s = next;
       setState(s);
-      timer.current = setTimeout(step, eventDuration(e, speedRef.current, reduceMotion));
+      timer.current = setTimeout(step, eventDuration(e, speedRef.current, reduceMotion, pace));
     };
     timer.current = setTimeout(step, 120);
     return () => {

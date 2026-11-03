@@ -307,6 +307,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 19 | Guild ranks at 375×667: the rank picker sits under the patron cards with its rules listed; "+" is disabled at the highest open rank; the HUD reads "Phase 1/8 · Rank 3" and dues show 23 instead of 22. | — |
 | 22 | Choosing between offers still meant cross-checking your bag by memory. | Offers (rewards, shop) and the coin detail list the bag coins they combo with, e.g. "Works with: Berserker" on a Looter; derived from effect data (flip makers ↔ flip/tails payoffs, destroyers ↔ wreckage, race payoffs ↔ that race, mixed-table ↔ other races). Checked at 375×667. |
 | 23 | Charms had no tags, so their role in a build was only in their text. | Charm tags derived from effects and static modifiers (Rally Horn "Set bonuses", Jeweler's Loupe "×2", Skull Cup "Orcs · Boosts others"); utility Charms stay untagged. Shown in the shop and the Charms list. Combo callouts add a haptic tap on device. |
+| 25 | Fuzzing showed late-game rounds of up to 62 events (~19 s of playback at normal speed). The end screen didn't say what kind of bag won. | Rounds whose playback would exceed 9 s are compressed to fit (never below 45% of normal step time). The end screen lists the build's top tags ("Gold: 3 · Counts Humans: 2"). Checked a winning run at 375×667, which also showed the "Guild rank 2 is now open" note. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions

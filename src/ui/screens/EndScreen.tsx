@@ -8,6 +8,7 @@ import { Button, Panel, Ribbon, Txt } from '../components/ui';
 import { Logo } from '../art/Logo';
 import { useGame } from '../state/GameContext';
 import { colors, font } from '../theme';
+import { bagTagSummary } from '../content/tags';
 import { sortedBag } from './Overlays';
 
 export function EndScreen({ onTitle }: { onTitle: () => void }) {
@@ -53,6 +54,12 @@ export function EndScreen({ onTitle }: { onTitle: () => void }) {
               <CoinArt key={c.uid} defId={c.defId} size={40} level={c.level} engraved={!!c.engraving} />
             ))}
           </View>
+          {bagTagSummary(r).length > 0 && (
+            <>
+              <Txt style={styles.section}>Your build</Txt>
+              <Txt style={styles.charms}>{bagTagSummary(r).map((t) => `${t.label}: ${t.count}`).join(' · ')}</Txt>
+            </>
+          )}
           <Txt style={styles.section}>Charms</Txt>
           <Txt style={styles.charms}>{r.charms.map((c) => charmDef(c).name).join(' · ')}</Txt>
         </Panel>
