@@ -40,9 +40,10 @@ export function synergyTags(def: CoinDef): SynergyTag[] {
     if ((a.kind === 'buff' || a.kind === 'mult') && a.target.scope !== 'self') has.add('boost');
     const all: Count[] = [...counts(a), ...(e.require ? [e.require.per] : [])];
     // Tails payoffs (not coins that merely turn tails coins over to heads).
-    const turnsTails = a.kind === 'reflip' || a.kind === 'setHeads' || (a.kind === 'flip' && a.target.face === 'tails');
+    const turnsTails = a.kind === 'reflip' || a.kind === 'setHeads' || ((a.kind === 'flip' || a.kind === 'bump') && a.target.face === 'tails');
     if (turnsTails) has.add('heads');
-    if (e.when === 'tails' || [...targets(a), ...all.flatMap((c) => ('count' in c ? [c.count] : []))].some((t) => t.face === 'tails' && !turnsTails)) has.add('tails');
+    // Culling tails coins (Bonebreaker) works against a tails build, so it isn't a tails tag either.
+    if (e.when === 'tails' || [...targets(a), ...all.flatMap((c) => ('count' in c ? [c.count] : []))].some((t) => t.face === 'tails' && !turnsTails && a.kind !== 'destroy')) has.add('tails');
     const raceCount = counts(a).find((c) => 'count' in c && c.count.race);
     if (raceCount && 'count' in raceCount && !e.require) {
       has.add('counts');
