@@ -18,8 +18,8 @@ import {
   rollShop,
 } from './economy';
 import { runMods } from './mods';
-import { resolvePhaseTrigger, resolveRound } from './resolve';
-import { seedFrom } from './rng';
+import { drawFromBag, resolvePhaseTrigger, resolveRound } from './resolve';
+import * as R from './rng';
 import type { RunState } from './types';
 
 export const SAVE_VERSION = 1;
@@ -45,7 +45,7 @@ export function localDate(d: Date): string {
 }
 
 export function newRun(seed: number | string): RunState {
-  const s = seedFrom(seed);
+  const s = R.seedFrom(seed);
   const run: RunState = {
     version: SAVE_VERSION,
     seed: s,
@@ -75,10 +75,56 @@ function assertScreen(run: RunState, screen: RunState['screen']) {
   if (run.screen !== screen) throw new ActionError(`Expected screen ${screen}, got ${run.screen}`);
 }
 
+/** Free hand swaps each round. */
+export const FREE_SWAPS = 1;
+
+/** Draws the hand for the round about to be tossed (mutates). */
+function dealHand(run: RunState) {
+  run.hand = drawFromBag(run, runMods(run)).map((c) => c.uid);
+  run.freeSwaps = FREE_SWAPS;
+}
+
 function startPhase(run: RunState) {
   const { events, gold } = resolvePhaseTrigger(run, 'onPhaseStart');
   run.phaseReport = { phase: run.phase, events, gold };
   run.screen = 'ready';
+  dealHand(run);
+}
+
+/** Deals a hand if the ready round has none (e.g. a save from before hands existed). */
+export function ensureHand(prev: RunState): RunState {
+  assertScreen(prev, 'ready');
+  const valid = prev.hand?.length && prev.hand.every((u) => prev.bag.some((c) => c.uid === u));
+  if (valid) return prev;
+  const run = clone(prev);
+  dealHand(run);
+  return run;
+}
+
+/**
+ * Puts one coin of the hand back and draws a random other coin from the bag in
+ * its place. The first swap each round is free; after that each costs a Reroll token.
+ */
+export function swapCoin(prev: RunState, uid: string): RunState {
+  assertScreen(prev, 'ready');
+  const hand = prev.hand ?? [];
+  const at = hand.indexOf(uid);
+  if (at < 0) throw new ActionError('That coin is not in your hand');
+  const free = (prev.freeSwaps ?? 0) > 0;
+  if (!free && prev.rerollTokens < 1) throw new ActionError('No free swaps or Reroll tokens left');
+  const rest = prev.bag.filter((c) => !hand.includes(c.uid));
+  if (!rest.length) throw new ActionError('Every coin in your bag is already in your hand');
+  // Draw a different kind of coin when the bag has one, so a swap is never wasted.
+  const out = prev.bag.find((c) => c.uid === uid)!;
+  const different = rest.filter((c) => c.defId !== out.defId || c.level !== out.level);
+  const pool = different.length ? different : rest;
+  const run = clone(prev);
+  const pick = pool[R.int(run, pool.length)];
+  run.hand = hand.slice();
+  run.hand[at] = pick.uid;
+  if (free) run.freeSwaps = (run.freeSwaps ?? 0) - 1;
+  else run.rerollTokens--;
+  return run;
 }
 
 export function chooseStarter(prev: RunState, charmId: string): RunState {
@@ -96,6 +142,8 @@ export function playRound(prev: RunState): RunState {
   const run = clone(prev);
   run.fusionNotes = [];
   run.lastRound = resolveRound(run);
+  run.hand = undefined;
+  run.freeSwaps = undefined;
   run.rewardChoices = rollRewards(run);
   run.screen = 'reward';
   return run;
@@ -127,6 +175,7 @@ export function chooseReward(prev: RunState, index: number | null): RunState {
   if (run.round < ROUNDS_PER_PHASE) {
     run.round++;
     run.screen = 'ready';
+    dealHand(run);
   } else {
     endPhase(run);
   }
@@ -243,6 +292,12 @@ export function meltCoin(prev: RunState, uid: string): RunState {
   if (!coin) throw new ActionError('No such coin');
   run.bag = run.bag.filter((c) => c.uid !== uid);
   run.meltTokens--;
+  // Melting a coin from the hand redeals it (keeping the swaps already used).
+  if (run.screen === 'ready' && run.hand?.includes(uid)) {
+    const swaps = run.freeSwaps;
+    dealHand(run);
+    run.freeSwaps = swaps;
+  }
   run.log.push(`Melted ${coinDef(coin.defId).name}.`);
   return run;
 }

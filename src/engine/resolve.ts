@@ -474,11 +474,22 @@ function settleDestroyed(ctx: Ctx) {
   }
 }
 
+/** How many coins a round draws. */
+export function drawCount(run: RunState, mods: Mods): number {
+  return Math.min(run.bag.length, BASE_DRAW + mods.drawBonus);
+}
+
+/** Draws a round's coins from the bag at random (the run's RNG). */
+export function drawFromBag(run: RunState, mods: Mods): CoinInstance[] {
+  return R.shuffle(run, run.bag).slice(0, drawCount(run, mods));
+}
+
 /** Plays one full round on `run` (mutated) and returns the animated result. */
 export function resolveRound(run: RunState): RoundResult {
   const ctx = newCtx(run, 'start');
-  const drawN = Math.min(run.bag.length, BASE_DRAW + ctx.mods.drawBonus);
-  const drawn = R.shuffle(run, run.bag).slice(0, drawN);
+  // Toss the hand the player saw (and maybe swapped); draw now only if there is none.
+  const fromHand = run.hand?.map((u) => run.bag.find((c) => c.uid === u));
+  const drawn = fromHand && fromHand.length && fromHand.every(Boolean) ? (fromHand as CoinInstance[]) : drawFromBag(run, ctx.mods);
   ctx.table = drawn.map((inst, i) => ({
     uid: inst.uid,
     defId: inst.defId,

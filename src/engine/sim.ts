@@ -11,6 +11,7 @@ import {
   chooseReward,
   chooseStarter,
   currentDues,
+  ensureHand,
   leaveShop,
   meltCoin,
   newRun,
@@ -19,6 +20,7 @@ import {
   rerollRewards,
   rerollShop,
   shopRerollCost,
+  swapCoin,
 } from './run';
 import type { CoinDef, RunState } from './types';
 
@@ -264,13 +266,26 @@ function botShopBuyOnly(run: RunState, reserve: number): RunState {
   return run;
 }
 
+/** Uses the free swap on the weakest coin in hand when it rates below the bag average. */
+function botHand(run: RunState): RunState {
+  run = ensureHand(run);
+  if (!run.hand || (run.freeSwaps ?? 0) < 1) return run;
+  const rate = (uid: string) => {
+    const c = run.bag.find((b) => b.uid === uid)!;
+    return (COIN_RATING[c.defId] ?? 2) * c.level;
+  };
+  const worst = run.hand.slice().sort((a, b) => rate(a) - rate(b))[0];
+  if (rate(worst) >= bagAverage(run) || run.bag.length <= run.hand.length) return run;
+  return swapCoin(run, worst);
+}
+
 /** Advances a run by one bot decision. */
 export function botStep(run: RunState, strategy: Strategy = 'sensible'): RunState {
   switch (run.screen) {
     case 'pickCharm':
       return chooseStarter(run, run.starterChoices[R.int(rngFor(run), run.starterChoices.length)]);
     case 'ready':
-      return playRound(run);
+      return playRound(strategy === 'random' ? run : botHand(run));
     case 'reward':
       return botReward(run, strategy);
     case 'dues':

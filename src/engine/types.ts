@@ -226,6 +226,10 @@ export interface RunState {
   daily?: string;
   /** Guild rank (difficulty), 1-5. Missing means 1. */
   rank?: number;
+  /** The coins drawn for the round about to be tossed (uids, in toss order). */
+  hand?: string[];
+  /** Free swaps left this round; further swaps cost a Reroll token. */
+  freeSwaps?: number;
   rng: number;
   screen: Screen;
   phase: number; // 1-based

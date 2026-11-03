@@ -22,7 +22,7 @@ Build a bag of Human, Orc and Elf coins, toss them onto your table and earn enou
 ### Description
 You are a moneylender at a crossroads bazaar where Humans, Orcs and Elves gamble at your table. Every five rounds the Lenders' Guild comes to collect its dues. Pay them, or lose your stall.
 
-Each round you draw five coins from your bag and toss them onto the table. Heads pay their value in gold, tails pay nothing — unless a coin's ability says otherwise. Every coin is a character with its own ability:
+Each round you draw five coins from your bag, swap out the one you don't want, and toss them onto the table. Heads pay their value in gold, tails pay nothing — unless a coin's ability says otherwise. Every coin is a character with its own ability:
 
 • Humans run the economy: Merchants earn from their neighbours, Squires grow stronger together, Bards retrigger the coin beside them.
 • Orcs bring big numbers and chaos: Berserkers smash neighbours and grow from them, Chargers ram coins and flip them, Firebrands might blow up for a pile of gold.
@@ -73,7 +73,7 @@ Apple computes the final rating. With Simulated Gambling = Infrequent/Mild, expe
 >
 > Gold, Melt tokens and Reroll tokens are play money. They are earned only by playing, cannot be bought, and cannot be exchanged for money or anything of value. Players do not wager: coins land heads or tails as part of the scoring rules.
 >
-> How to review: tap New run → choose a patron Charm → Begin run → follow the 6-step tutorial → Toss coins. After each round pick a coin (or Skip). After 5 rounds pay the Guild dues and visit the Bazaar. Tap any coin on the table to read its ability. How to play (title screen) includes a full rules page and a guide to every coin, Charm and Engraving. Settings has animation speed, haptics, and "Delete all saved data". The Privacy screen is on the title screen and in Settings. The Daily button starts a run seeded from the device’s date (offline).
+> How to review: tap New run → choose a patron Charm → Begin run → follow the 6-step tutorial → optionally tap a coin in the hand and Swap → Toss coins. After each round pick a coin (or Skip). After 5 rounds pay the Guild dues and visit the Bazaar. Tap any coin on the table to read its ability. How to play (title screen) includes a full rules page and a guide to every coin, Charm and Engraving. Settings has animation speed, haptics, and "Delete all saved data". The Privacy screen is on the title screen and in Settings. The Daily button starts a run seeded from the device’s date (offline).
 
 ## Screenshots
 

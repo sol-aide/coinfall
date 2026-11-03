@@ -358,3 +358,58 @@ function currentDuesOf(run: ReturnType<typeof newRun>) {
   const { currentDues } = require('../run') as typeof import('../run');
   return currentDues(run);
 }
+
+describe('the hand', () => {
+  const { swapCoin, ensureHand, playRound: play, FREE_SWAPS } = require('../run') as typeof import('../run');
+  const ready = () => chooseStarter(newRun('hand'), 'banner');
+
+  it('is dealt when a round becomes ready, and those exact coins are tossed', () => {
+    const run = ready();
+    expect(run.hand).toHaveLength(5);
+    expect(run.freeSwaps).toBe(FREE_SWAPS);
+    const after = play(run);
+    expect(after.lastRound!.table.map((c) => c.uid)).toEqual(run.hand);
+    expect(after.hand).toBeUndefined();
+  });
+
+  it('swaps one coin for a coin from the rest of the bag: free once, then for a Reroll token', () => {
+    let run = ready();
+    const first = run.hand![0];
+    run = swapCoin(run, first);
+    expect(run.hand).toHaveLength(5);
+    expect(run.hand).not.toContain(first);
+    expect(new Set(run.hand).size).toBe(5);
+    expect(run.freeSwaps).toBe(0);
+    const tokens = run.rerollTokens;
+    run = swapCoin(run, run.hand![1]);
+    expect(run.rerollTokens).toBe(tokens - 1);
+    run = { ...run, rerollTokens: 0 };
+    expect(() => swapCoin(run, run.hand![2])).toThrow();
+    expect(() => swapCoin(ready(), 'not-in-hand')).toThrow();
+  });
+
+  it('swaps for a different kind of coin when the bag has one', () => {
+    for (let i = 0; i < 30; i++) {
+      const run = chooseStarter(newRun(`swap-${i}`), 'banner');
+      const out = run.hand!.find((u) => run.bag.find((c) => c.uid === u)!.defId === 'copper');
+      const otherKindLeft = run.bag.some((c) => !run.hand!.includes(c.uid) && c.defId !== 'copper');
+      if (!out || !otherKindLeft) continue;
+      const after = swapCoin(run, out);
+      const added = after.hand!.find((u) => !run.hand!.includes(u))!;
+      expect(after.bag.find((c) => c.uid === added)!.defId).not.toBe('copper');
+    }
+  });
+
+  it('deals a hand for older saves that have none', () => {
+    const run = { ...ready(), hand: undefined, freeSwaps: undefined };
+    const fixed = ensureHand(run);
+    expect(fixed.hand).toHaveLength(5);
+    expect(ensureHand(fixed)).toBe(fixed);
+  });
+
+  it('is replayed identically from the same seed', () => {
+    const a = swapCoin(ready(), ready().hand![0]);
+    const b = swapCoin(ready(), ready().hand![0]);
+    expect(a.hand).toEqual(b.hand);
+  });
+});

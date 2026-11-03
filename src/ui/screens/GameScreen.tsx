@@ -7,13 +7,16 @@ import {
   SKIP_GOLD,
   currentDues,
   chooseReward,
+  ensureHand,
   playRound,
   radius as adjRadius,
   rerollRewards,
   runMods,
+  swapCoin,
   type RunState,
 } from '../../engine';
 import { CoinDetail, CoinRow } from '../components/CoinInfo';
+import { HandStrip } from '../components/HandStrip';
 import { Hud } from '../components/Hud';
 import { Button, Overlay, Txt, thud } from '../components/ui';
 import { useGame } from '../state/GameContext';
@@ -45,6 +48,12 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
   const showRound = r.screen === 'reward' ? r.lastRound : undefined;
   const { state, fx, shake, skip } = usePlayback(showRound, showRound ? roundKey : 'none', settings.speed, reduceMotion, instant);
   const playing = !!state && !state.done && r.screen === 'reward';
+
+  // Older saves reach a ready round without a hand: deal one.
+  useEffect(() => {
+    if (r.screen === 'ready') act(ensureHand);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [r.screen, r.round, r.phase]);
 
   // A haptic tap when a combo callout fires (thud() skips the web and respects the setting).
   const lastCallout = useRef(0);
@@ -126,7 +135,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
               <View style={styles.emptyHint} pointerEvents="none">
                 <Txt style={styles.emptyTitle}>Round {r.round}</Txt>
                 <Txt style={styles.emptyText}>
-                  Draw {Math.min(r.bag.length, BASE_DRAW + mods.drawBonus)} coins from your bag of {r.bag.length} and toss them.
+                  Your hand of {r.hand?.length ?? Math.min(r.bag.length, BASE_DRAW + mods.drawBonus)} coins from a bag of {r.bag.length} is below. Swap one if you like, then toss.
                 </Txt>
                 <Txt style={styles.emptyText}>Heads pay their value in gold.</Txt>
               </View>
@@ -142,7 +151,10 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
 
       <View style={[styles.bottom, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         {r.screen === 'ready' && (
-          <Button big label="Toss coins" icon="play" onPress={toss} testID="toss" a11yHint="Draws coins from your bag and tosses them onto the table" />
+          <>
+            <HandStrip run={r} onSwap={(uid) => act((s) => swapCoin(s, uid))} />
+            <Button big label="Toss coins" icon="play" onPress={toss} testID="toss" a11yHint="Tosses your hand onto the table" />
+          </>
         )}
         {r.screen === 'reward' && state?.done && !cardUp && !sheetOpen && r.lastRound && (
           <View style={styles.playRow}>
