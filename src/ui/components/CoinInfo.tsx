@@ -11,7 +11,7 @@ import {
   type RunState,
 } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
-import { TOUCH, colors, font, raceColors, radius, rarityColors } from '../theme';
+import { colors, font, paperShadow, raceColors, radius, rarityColors, TOUCH } from '../theme';
 import { Overlay, Txt } from './ui';
 
 export function levelNote(level: number) {
@@ -52,7 +52,7 @@ export function CoinRow({
           <Txt style={styles.name} numberOfLines={1}>
             {def.name}
           </Txt>
-          <Txt style={[styles.race, { color: rc.light }]}>{rc.label}</Txt>
+          <Txt style={[styles.race, { color: rc.ink }]}>{rc.label}</Txt>
           {def.rarity === 'rare' && <Txt style={[styles.race, { color: rarityColors.rare }]}>Rare</Txt>}
         </View>
         <Txt style={styles.ability}>{abilityText(def, level)}</Txt>
@@ -108,7 +108,7 @@ export function CoinDetail({ run, uid, defId, onClose }: { run: RunState; uid?: 
       </View>
       <View style={styles.detailMeta}>
         <RaceBadge race={def.race} size={24} />
-        <Txt style={[styles.detailRace, { color: rc.light }]}>{rc.label}</Txt>
+        <Txt style={[styles.detailRace, { color: rc.ink }]}>{rc.label}</Txt>
         <Txt style={[styles.detailRace, { color: rarityColors[def.rarity] }]}>{def.rarity === 'starter' ? 'Starter' : def.rarity[0].toUpperCase() + def.rarity.slice(1)}</Txt>
       </View>
       <Txt style={styles.detailText}>{abilityText(def, probe.level)}</Txt>
@@ -148,34 +148,37 @@ const styles = StyleSheet.create({
     padding: 10,
     minHeight: TOUCH + 20,
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: colors.border,
+    ...paperShadow(2),
   },
-  rowSelected: { borderColor: colors.gold },
+  rowSelected: { borderColor: colors.ink, backgroundColor: '#FFEDBA' },
   rowText: { flex: 1 },
   rowTitle: { flexDirection: 'row', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' },
   name: { fontSize: font.body, fontWeight: '800' },
   race: { fontSize: font.tiny, fontWeight: '700' },
   ability: { fontSize: font.small, color: colors.textDim, marginTop: 2 },
-  eng: { fontSize: font.tiny, color: '#9FE8FF', marginTop: 2 },
+  eng: { fontSize: font.tiny, color: rarityColors.uncommon, fontWeight: '700', marginTop: 2 },
   rowRight: { alignItems: 'flex-end', gap: 6 },
   valueChip: {
     minWidth: 40,
     borderRadius: 10,
-    backgroundColor: colors.bgDeep,
+    backgroundColor: colors.panel,
+    borderWidth: 1.5,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
   valueTxt: { color: colors.text, fontWeight: '900', fontSize: 17, lineHeight: 19 },
-  valueCap: { color: colors.textMuted, fontSize: 11, fontWeight: '700', lineHeight: 13 },
+  valueCap: { color: colors.textMuted, fontSize: font.tiny, fontWeight: '700', lineHeight: 15 },
   detailArt: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 18, marginVertical: 6 },
   detailMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 },
   detailRace: { fontWeight: '800', fontSize: font.small },
   detailText: { fontSize: font.h2, textAlign: 'center', lineHeight: 27, fontWeight: '600' },
-  detailSub: { fontSize: font.small, color: '#9FE8FF', textAlign: 'center', marginTop: 8 },
+  detailSub: { fontSize: font.small, color: rarityColors.uncommon, fontWeight: '700', textAlign: 'center', marginTop: 8 },
   statRow: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginTop: 14, flexWrap: 'wrap' },
-  stat: { backgroundColor: colors.bgDeep, borderRadius: radius.md, paddingVertical: 8, paddingHorizontal: 14, alignItems: 'center' },
-  statValue: { fontSize: font.h2, fontWeight: '900', color: colors.gold },
+  stat: { backgroundColor: colors.panelLight, borderWidth: 1.5, borderColor: colors.border, borderRadius: radius.md, paddingVertical: 8, paddingHorizontal: 14, alignItems: 'center' },
+  statValue: { fontSize: font.h2, fontWeight: '900', color: colors.goldInk },
   statLabel: { fontSize: font.tiny, color: colors.textDim },
 });

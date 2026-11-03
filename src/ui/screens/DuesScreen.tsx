@@ -53,16 +53,16 @@ export function DuesScreen() {
           </Panel>
         )}
         <Panel style={styles.bill}>
-          <Row label="Your gold" value={r.gold} color={colors.gold} />
+          <Row label="Your gold" value={r.gold} color={colors.goldInk} />
           <Row label="Guild dues" value={-dues} color={colors.text} />
           <View style={styles.rule} />
           <Row label={ok ? 'Left to spend' : 'Short by'} value={ok ? r.gold - dues : dues - r.gold} color={ok ? colors.success : colors.danger} />
+          {!ok && (
+            <Txt style={[styles.sub, { color: colors.danger, marginTop: 6 }]}>
+              You can't cover the dues. The Guild takes your stall, and this run ends.
+            </Txt>
+          )}
         </Panel>
-        {!ok && (
-          <Txt style={[styles.sub, { color: colors.danger }]}>
-            You can't cover the dues. The Guild takes your stall, and this run ends.
-          </Txt>
-        )}
       </ScrollView>
       {ok ? (
         <Button
@@ -92,11 +92,11 @@ function Row({ label, value, color }: { label: string; value: number; color: str
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   head: { alignItems: 'center', gap: 6 },
   title: { fontSize: font.h1, fontWeight: '900' },
   sub: { fontSize: font.body, color: colors.textDim, textAlign: 'center' },
-  section: { fontSize: font.small, color: colors.textMuted, fontWeight: '800', marginBottom: 4, textTransform: 'uppercase' },
+  section: { fontSize: font.small, color: colors.textDim, fontWeight: '800', marginBottom: 4, textTransform: 'uppercase' },
   line: { fontSize: font.body, color: colors.text, marginVertical: 2 },
   bill: { gap: 6 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },

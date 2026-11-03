@@ -6,8 +6,8 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
-    "backgroundColor": "#1B2340",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#E9D4AE",
     "platforms": [
       "ios",
       "web"
@@ -54,8 +54,8 @@
       "favicon": "./assets/favicon.png",
       "name": "Coinfall",
       "shortName": "Coinfall",
-      "themeColor": "#1B2340",
-      "backgroundColor": "#1B2340",
+      "themeColor": "#E9D4AE",
+      "backgroundColor": "#E9D4AE",
       "output": "single"
     },
     "experiments": {
@@ -68,7 +68,7 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#1B2340"
+          "backgroundColor": "#E9D4AE"
         }
       ]
     ]

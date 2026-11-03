@@ -128,7 +128,7 @@ export function SettingsScreen({ onBack, onPrivacy }: { onBack: () => void; onPr
                 style={[styles.segBtn, on && styles.segOn]}
                 testID={`speed-${s.value}`}
               >
-                <Txt style={[styles.segTxt, on && { color: '#2A1300' }]}>{s.label}</Txt>
+                <Txt style={[styles.segTxt, on && { color: colors.ink }]}>{s.label}</Txt>
               </Pressable>
             );
           })}
@@ -146,7 +146,7 @@ export function SettingsScreen({ onBack, onPrivacy }: { onBack: () => void; onPr
             value={settings.haptics}
             onValueChange={(v) => updateSettings({ haptics: v })}
             accessibilityLabel="Haptics"
-            trackColor={{ true: colors.accent, false: colors.panelLight }}
+            trackColor={{ true: colors.accentFill, false: colors.border }}
           />
         </View>
       </Panel>
@@ -250,25 +250,25 @@ export function MenuOverlay({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   head: { paddingHorizontal: 16, paddingBottom: 8 },
   title: { fontSize: font.h1, fontWeight: '900' },
   scroll: { padding: 16, gap: 12, paddingTop: 4 },
   footer: { paddingHorizontal: 16, paddingTop: 8 },
   h2: { fontSize: font.h2, fontWeight: '800' },
   p: { fontSize: font.body, color: colors.textDim, lineHeight: 23 },
-  note: { fontSize: font.small, color: colors.textMuted },
+  note: { fontSize: font.small, color: colors.textDim },
   guideRow: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: colors.panelLight, borderRadius: radius.md, padding: 10 },
   guideName: { fontSize: font.body, fontWeight: '800' },
   guideText: { fontSize: font.small, color: colors.textDim },
   coinRow: { flexDirection: 'row', justifyContent: 'center', gap: 10 },
   segment: { flexDirection: 'row', gap: 6, backgroundColor: colors.bgDeep, borderRadius: radius.md, padding: 4 },
   segBtn: { flex: 1, minHeight: TOUCH, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  segOn: { backgroundColor: colors.accent },
+  segOn: { backgroundColor: colors.accentFill, borderWidth: 1.5, borderColor: colors.ink, borderBottomWidth: 4, borderBottomColor: '#C2611D' },
   segTxt: { fontWeight: '800', fontSize: font.body },
   toggleRow: { flexDirection: 'row', alignItems: 'center', minHeight: TOUCH },
   dots: { flexDirection: 'row', gap: 6, justifyContent: 'center', marginVertical: 14 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.panelLight },
-  dotOn: { backgroundColor: colors.gold, width: 20 },
+  dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.border },
+  dotOn: { backgroundColor: colors.gold, width: 24, borderWidth: 1.5, borderColor: colors.ink },
   row: { flexDirection: 'row', gap: 10 },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PHASES, ROUNDS_PER_PHASE, computeMods, currentDues, duesFor, type RunState } from '../../engine';
-import { colors, font } from '../theme';
+import { colors, font, paperShadow } from '../theme';
 import { IconButton, Pill, Txt } from './ui';
 
 export function Hud({
@@ -52,7 +52,7 @@ export function Hud({
         <IconButton icon="gear" label="Menu and settings" onPress={onMenu} size={24} />
       </View>
       <View style={styles.row2}>
-        <Pill icon="gold" value={gold} label="Gold" color={colors.gold} />
+        <Pill icon="gold" value={gold} label="Gold" color={colors.goldInk} />
         <View style={styles.dues} accessible accessibilityLabel={`Guild dues at the end of ${nextPhase ? 'next' : 'this'} phase: ${dues} gold${short ? `, ${short} more needed` : ', covered'}`}>
           <Txt style={styles.duesLabel}>{nextPhase ? 'Next dues' : 'Dues'}</Txt>
           <Txt style={[styles.duesValue, { color: short ? colors.text : colors.success }]}>{dues}</Txt>
@@ -69,21 +69,24 @@ const styles = StyleSheet.create({
   hud: { paddingHorizontal: 12, paddingTop: 4, gap: 6 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 2 },
   row2: { flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'space-between' },
-  phase: { fontSize: font.h2, fontWeight: '900' },
-  phaseOf: { fontSize: font.small, color: colors.textMuted, fontWeight: '700' },
+  phase: { fontSize: font.h2 + 2, fontWeight: '900' },
+  phaseOf: { fontSize: font.small, color: colors.textDim, fontWeight: '800' },
   dots: { flexDirection: 'row', gap: 5, marginTop: 3 },
-  dot: { width: 14, height: 6, borderRadius: 3, backgroundColor: colors.panelLight },
-  dotDone: { backgroundColor: colors.gold },
-  dotNow: { backgroundColor: colors.accent },
+  dot: { width: 16, height: 8, borderRadius: 4, backgroundColor: colors.panel, borderWidth: 1.5, borderColor: colors.border },
+  dotDone: { backgroundColor: colors.gold, borderColor: colors.ink },
+  dotNow: { backgroundColor: colors.accentFill, borderColor: colors.ink },
   dues: {
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 5,
-    backgroundColor: colors.bgDeep,
+    backgroundColor: colors.panel,
     borderRadius: 999,
+    borderWidth: 1.5,
+    borderColor: colors.border,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 4,
     flexShrink: 1,
+    ...paperShadow(2),
   },
   duesLabel: { fontSize: font.tiny, color: colors.textDim, fontWeight: '700' },
   duesValue: { fontSize: font.body, fontWeight: '900' },

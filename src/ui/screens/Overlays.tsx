@@ -51,7 +51,7 @@ export function BagOverlay({
       {!onPick && (
         <View style={styles.counts}>
           {(['human', 'orc', 'elf', 'neutral'] as const).map((r) => (
-            <Txt key={r} style={[styles.count, { color: raceColors[r].light }]}>
+            <Txt key={r} style={[styles.count, { color: raceColors[r].ink }]}>
               {raceColors[r].label}: {counts[r]}
             </Txt>
           ))}

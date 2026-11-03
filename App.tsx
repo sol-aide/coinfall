@@ -8,7 +8,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <GameProvider>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <Root />
       </GameProvider>
     </SafeAreaProvider>

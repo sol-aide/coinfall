@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PHASES } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
+import { Logo } from '../art/Logo';
+import { Bunting } from '../components/Backdrop';
 import { Button, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
-import { colors, font, raceColors, radius } from '../theme';
+import { colors, font, paperShadow, raceColors, radius } from '../theme';
 
 const RACES = [
   { race: 'human' as const, text: 'Economy and teamwork' },
@@ -17,25 +19,28 @@ const RACES = [
 export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowTo: () => void; onSettings: () => void; onPrivacy: () => void; onPlay: () => void }) {
   const { run, startNewRun, records, reduceMotion } = useGame();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const short = height < 720;
   const canContinue = run && run.screen !== 'won' && run.screen !== 'lost';
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 24, paddingBottom: Math.max(insets.bottom, 16) + 8 }]}>
+      <View style={[styles.bunting, { top: insets.top }]} pointerEvents="none">
+        <Bunting width={width} height={56} />
+      </View>
       <View style={styles.hero}>
-        <View style={styles.coins}>
+        <View style={[styles.coins, short && styles.coinsShort]}>
           <FallingCoin defId="squire" delay={0} x={-90} still={reduceMotion} />
           <FallingCoin defId="grunt" delay={500} x={0} still={reduceMotion} />
           <FallingCoin defId="archer" delay={1000} x={90} still={reduceMotion} />
         </View>
-        <Txt style={styles.title} accessibilityRole="header">
-          Coinfall
-        </Txt>
+        <Logo width={Math.min(width - 40, 400)} />
         <Txt style={styles.tag}>Toss coins. Pay the Guild. Survive {PHASES} phases.</Txt>
       </View>
       <View style={styles.races} accessible accessibilityLabel="Humans: economy and teamwork. Orcs: big values and chaos. Elves: precision and control.">
         {RACES.map((r) => (
           <View key={r.race} style={styles.raceRow}>
             <RaceBadge race={r.race} size={34} />
-            <Txt style={[styles.raceName, { color: raceColors[r.race].light }]}>{raceColors[r.race].plural}</Txt>
+            <Txt style={[styles.raceName, { color: raceColors[r.race].ink }]}>{raceColors[r.race].plural}</Txt>
             <Txt style={styles.raceText}>{r.text}</Txt>
           </View>
         ))}
@@ -87,25 +92,18 @@ function FallingCoin({ defId, delay, x, still }: { defId: string; delay: number;
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 20, justifyContent: 'space-between' },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 20, justifyContent: 'space-between' },
   hero: { alignItems: 'center', marginTop: 0 },
-  coins: { height: 130, width: '100%', alignItems: 'center', justifyContent: 'center' },
+  coins: { height: 150, marginTop: 20, width: '100%', alignItems: 'center', justifyContent: 'center' },
+  coinsShort: { height: 110, marginTop: 34 },
   coin: { position: 'absolute' },
-  title: {
-    fontSize: 58,
-    fontWeight: '900',
-    color: colors.gold,
-    letterSpacing: 1,
-    textShadowColor: '#7A4E00',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 0,
-  },
-  tag: { fontSize: font.body, color: colors.textDim, textAlign: 'center', marginTop: 6 },
-  races: { backgroundColor: colors.panel, borderRadius: radius.lg, padding: 14, gap: 10, borderWidth: 1, borderColor: colors.border },
+  bunting: { position: 'absolute', left: 0, right: 0 },
+  tag: { fontSize: font.body, color: colors.textDim, textAlign: 'center', marginTop: 2, fontWeight: '700' },
+  races: { backgroundColor: colors.panel, borderRadius: radius.lg, padding: 14, gap: 10, borderWidth: 1.5, borderColor: colors.border, ...paperShadow(3) },
   raceRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   raceName: { fontSize: font.body, fontWeight: '900', minWidth: 78 },
   raceText: { fontSize: font.body, color: colors.textDim, flex: 1 },
   buttons: { gap: 10 },
   row: { flexDirection: 'row', gap: 10 },
-  records: { textAlign: 'center', color: colors.textMuted, fontSize: font.small },
+  records: { textAlign: 'center', color: colors.textDim, fontSize: font.small },
 });

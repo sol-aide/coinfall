@@ -210,6 +210,12 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 4 | Glyphs were small at 54px. | Glyph scale increased. |
 | 4 | Toss animation felt slow (~0.43s per coin). | Event durations trimmed ~15%; Fast/Turbo speeds available; Skip button. |
 | 4 | Reduce Motion (emulated): coins fade in place, no arcs/spins, and the game is fully playable. | — |
+| 6 | Papercraft restyle, first pass (web, 390×844, 375×667, Reduce Motion emulated; frames captured every 120 ms through a round with a bump, flips and a destruction): sticker numbers fell back to a serif font on the web. | Numbers and logo set an explicit font family. |
+| 6 | The title logo rendered as plain black text: on the web an `Svg` given `accessibilityRole` is output as an `<h1>`, not an `<svg>`. | Role and label moved to a wrapping View. |
+| 6 | The ability glow painted *over* the coin on the web (absolute elements stack above a bare `<svg>`), washing the coin out. This predates the restyle. | Coin art wrapped in a View so it stacks above the glow. |
+| 6 | The bump star appeared in empty table halfway between distant coins; the first coin flew ~0.9 s after tapping Toss. | Star sits on the struck coin's rim, facing the hit; draw steps shortened (120→60 ms). |
+| 6 | Table bottom corners clipped (shadow drawn outside the SVG); 375×667: title crowded, playback caption cut off at one line. | Shadow kept inside the table art; smaller title coin area on short screens; caption wraps to two lines. |
+| 6 | Reduce Motion: coins appear in place, numbers fade in place, no flight, particles, tear or table shake. | — |
 
 ## Decisions
 
@@ -230,3 +236,11 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 - **Play money only**: no purchases, ads, accounts or network calls. A Settings option deletes all saved data on the device.
 - **The table is wood, not felt**, and coins are characters, not chips, to read as a fantasy bazaar rather than a casino.
 - **Web build** is used for automated playtesting and GitHub Pages; the base URL is `/coinfall` (from the git remote).
+- **Papercraft look (milestone 6).** The visual style takes its *inspiration* from the cut-paper, sticker-like look of tabletop toy-battler games; nothing is copied, traced or extracted from any game. Every shape is original SVG drawn in code. The reference game could not be studied first-hand (no access to the PC it is installed on), so the style was built from its public descriptions and judged against the rules below rather than against side-by-side screenshots. The rules:
+  - **Ground:** warm kraft paper (`#E9D4AE`) with a few fibre flecks; cream card stock (`#FFF8EA`) for panels. Light interface, so `userInterfaceStyle` is now `light`.
+  - **Stickers:** coins, buttons, badges, numbers and bunting have a white die-cut rim and a hard, unblurred brown shadow (`paperShadow()`), so they read as cut paper lifted off the page. Pressed buttons sink onto their shadow.
+  - **Line and shading:** thin warm-brown ink lines (about 2px at coin size), never heavy black outlines. Flat fills with one hard-edged darker crescent or bottom lip (cel shading) and one white highlight stroke; no gradients.
+  - **Table:** a cut-paper diorama of separate plank strips (lit top edge, shaded bottom edge, nail heads) inside a frame strip and a die-cut border; adjacency is drawn as a stitched cream line.
+  - **Motion:** coins arc toward the viewer with a moving shadow, stretch as they fall and squash hard on impact (0.72) before springing back. Bumps hop, squash and skid, with a cut-paper star on the struck rim and a 2-4px table jolt. Destruction tears the coin sticker in two along a zig-zag and drops the halves with paper confetti. Numbers are slapped down as tilted stickers (overshoot to 1.35, settle) and then peel away. All effects are cosmetic, derived from engine events in `playback.ts` (`fxFor`), and every one has a Reduce Motion path.
+  - **Text contrast:** coloured text only sits on cream paper (all ≥4.5:1); on bare kraft only ink (`#3B2516`) and dim ink are used. Gold text uses `goldInk`, race names use each race's `ink` shade.
+  - **No comic word bursts or thick black outlines:** the earlier `toy-style-wip` attempt used them and read as noisy. Only its effect plumbing (fx layer, shake hook) was kept.

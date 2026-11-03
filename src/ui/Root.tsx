@@ -9,11 +9,21 @@ import { ShopScreen } from './screens/ShopScreen';
 import { TitleScreen } from './screens/TitleScreen';
 import { useGame } from './state/GameContext';
 import { colors } from './theme';
+import { Backdrop } from './components/Backdrop';
 
 type Route = 'title' | 'game' | 'howto' | 'settings' | 'privacy';
 
 /** Top-level navigation: a tiny state machine. In-run screens follow the run's own screen. */
 export function Root() {
+  return (
+    <View style={styles.fill}>
+      <Backdrop />
+      <Screens />
+    </View>
+  );
+}
+
+function Screens() {
   const { loaded, run, abandonRun } = useGame();
   const [route, setRoute] = useState<Route>('title');
   const [back, setBack] = useState<Route>('title');
@@ -28,7 +38,7 @@ export function Root() {
   if (!loaded) {
     return (
       <View style={[styles.fill, styles.center]}>
-        <ActivityIndicator color={colors.gold} />
+        <ActivityIndicator color={colors.ink} />
       </View>
     );
   }
@@ -84,5 +94,6 @@ export function Root() {
 
 const styles = StyleSheet.create({
   fill: { flex: 1, backgroundColor: colors.bg },
+  screens: { flex: 1 },
   center: { alignItems: 'center', justifyContent: 'center' },
 });

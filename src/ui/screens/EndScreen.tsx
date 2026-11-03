@@ -27,7 +27,7 @@ export function EndScreen({ onTitle }: { onTitle: () => void }) {
       <ScrollView contentContainerStyle={{ gap: 14, paddingBottom: 12 }}>
         <View style={styles.head}>
           <Icon name={won ? 'gold' : 'seal'} size={84} />
-          <Txt style={[styles.title, { color: won ? colors.gold : colors.text }]} accessibilityRole="header">
+          <Txt style={[styles.title, { color: won ? colors.goldInk : colors.text }]} accessibilityRole="header">
             {won ? 'Guild master!' : 'Run over'}
           </Txt>
           <Txt style={styles.sub}>
@@ -64,15 +64,15 @@ export function EndScreen({ onTitle }: { onTitle: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   head: { alignItems: 'center', gap: 6 },
   title: { fontSize: 36, fontWeight: '900' },
   sub: { fontSize: font.body, color: colors.textDim, textAlign: 'center' },
   stats: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
   stat: { width: '48%', alignItems: 'center' },
-  statV: { fontSize: font.h1, fontWeight: '900', color: colors.gold },
+  statV: { fontSize: font.h1, fontWeight: '900', color: colors.goldInk },
   statK: { fontSize: font.small, color: colors.textDim },
-  section: { fontSize: font.small, color: colors.textMuted, fontWeight: '800', textTransform: 'uppercase' },
+  section: { fontSize: font.small, color: colors.textDim, fontWeight: '800', textTransform: 'uppercase' },
   bag: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
   charms: { fontSize: font.body },
   row: { flexDirection: 'row', gap: 10, paddingTop: 8 },

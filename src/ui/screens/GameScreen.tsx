@@ -19,7 +19,7 @@ import { Button, Overlay, Txt, thud } from '../components/ui';
 import { useGame } from '../state/GameContext';
 import { Table } from '../table/Table';
 import { usePlayback } from '../table/playback';
-import { colors, font, radius } from '../theme';
+import { colors, font, paperShadow, radius } from '../theme';
 import { Tutorial } from './InfoScreens';
 import { BagOverlay, CharmsOverlay } from './Overlays';
 
@@ -40,7 +40,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
   const mountKey = useRef(roundKey);
   const instant = roundKey === mountKey.current;
   const showRound = r.screen === 'reward' ? r.lastRound : undefined;
-  const { state, popups, skip } = usePlayback(showRound, showRound ? roundKey : 'none', settings.speed, reduceMotion, instant);
+  const { state, fx, shake, skip } = usePlayback(showRound, showRound ? roundKey : 'none', settings.speed, reduceMotion, instant);
   const playing = !!state && !state.done && r.screen === 'reward';
 
   useEffect(() => {
@@ -83,7 +83,8 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
           <Table
             width={tableW}
             coins={coins}
-            popups={popups}
+            fx={fx}
+            shake={shake}
             adjacency={adjRadius(mods)}
             speed={settings.speed}
             reduceMotion={reduceMotion}
@@ -92,11 +93,14 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
           >
             {r.screen === 'ready' && (
               <View style={styles.emptyHint} pointerEvents="none">
-                <Txt style={styles.emptyTitle}>Round {r.round}</Txt>
-                <Txt style={styles.emptyText}>
-                  Draw {Math.min(r.bag.length, BASE_DRAW + mods.drawBonus)} coins from your bag of {r.bag.length} and toss them.
-                </Txt>
-                <Txt style={styles.emptyText}>Heads pay their value in gold.</Txt>
+                <View style={styles.note}>
+                  <View style={styles.tape} />
+                  <Txt style={styles.emptyTitle}>Round {r.round}</Txt>
+                  <Txt style={styles.emptyText}>
+                    Draw {Math.min(r.bag.length, BASE_DRAW + mods.drawBonus)} coins from your bag of {r.bag.length} and toss them.
+                  </Txt>
+                  <Txt style={styles.emptyText}>Heads pay their value in gold.</Txt>
+                </View>
               </View>
             )}
           </Table>
@@ -120,7 +124,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
           <View style={styles.playRow}>
             <View style={{ flex: 1 }} accessibilityLiveRegion="polite">
               <Txt style={styles.stage}>{state.stage ?? ''}</Txt>
-              <Txt style={styles.caption} numberOfLines={1}>
+              <Txt style={styles.caption} numberOfLines={2}>
                 {state.caption}
               </Txt>
               {!!state.detail && (
@@ -232,7 +236,7 @@ function DuesBar({ gold, dues, roundsLeft }: { gold: number; dues: number; round
       accessibilityLabel={`Guild dues: ${gold} of ${dues} gold, ${roundsLeft} round${roundsLeft === 1 ? '' : 's'} left this phase`}
     >
       <View style={styles.duesTrack}>
-        <View style={[styles.duesFill, { width: `${pct * 100}%`, backgroundColor: done ? colors.success : colors.gold }]} />
+        <View style={[styles.duesFill, { width: `${pct * 100}%`, backgroundColor: done ? colors.successFill : colors.gold }]} />
       </View>
       <Txt style={styles.duesTxt}>
         {done ? 'Dues covered' : `${gold} / ${dues} for the Guild`} · {roundsLeft} round{roundsLeft === 1 ? '' : 's'} left
@@ -265,40 +269,73 @@ function Breakdown({ run }: { run: RunState }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   duesBar: { paddingHorizontal: 12, marginTop: 8, gap: 3 },
-  duesTrack: { height: 8, borderRadius: 4, backgroundColor: colors.bgDeep, overflow: 'hidden' },
-  duesFill: { height: 8, borderRadius: 4 },
-  duesTxt: { fontSize: font.tiny, color: colors.textDim, textAlign: 'center' },
+  duesTrack: { height: 12, borderRadius: 6, backgroundColor: colors.panel, borderWidth: 1.5, borderColor: colors.border, overflow: 'hidden' },
+  duesFill: { height: 9, borderRadius: 4.5, borderRightWidth: 1.5, borderRightColor: colors.ink },
+  duesTxt: { fontSize: font.tiny, color: colors.textDim, textAlign: 'center', fontWeight: '700' },
   tableArea: { flex: 1, alignItems: 'center', justifyContent: 'center', marginVertical: 6 },
   emptyHint: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 6 },
-  emptyTitle: { fontSize: font.h1, fontWeight: '900', color: '#FFF3DD' },
-  emptyText: { fontSize: font.body, color: '#FFE9C9', textAlign: 'center' },
+  note: {
+    backgroundColor: colors.panel,
+    borderRadius: 6,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 14,
+    gap: 4,
+    alignItems: 'center',
+    maxWidth: 280,
+    transform: [{ rotate: '-2deg' }],
+    ...paperShadow(4),
+  },
+  tape: {
+    position: 'absolute',
+    top: -9,
+    width: 64,
+    height: 20,
+    backgroundColor: 'rgba(246, 190, 58, 0.75)',
+    transform: [{ rotate: '4deg' }],
+  },
+  emptyTitle: { fontSize: font.h1, fontWeight: '900' },
+  emptyText: { fontSize: font.body, color: colors.textDim, textAlign: 'center' },
   bottom: { paddingHorizontal: 12, minHeight: 86, justifyContent: 'center' },
-  playRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  stage: { fontSize: font.tiny, color: colors.textMuted, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
+  playRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: colors.panel,
+    borderRadius: radius.lg,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    paddingVertical: 8,
+    paddingLeft: 14,
+    paddingRight: 8,
+    ...paperShadow(3),
+  },
+  stage: { fontSize: font.tiny, color: colors.textDim, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
   caption: { fontSize: font.body, fontWeight: '700' },
   detail: { fontSize: font.tiny, color: colors.textDim, marginTop: 1 },
   totalBox: { alignItems: 'center', minWidth: 58 },
   totalSmall: { fontSize: font.tiny, color: colors.textDim },
-  total: { fontSize: font.h2, fontWeight: '900', color: colors.gold },
+  total: { fontSize: font.h2, fontWeight: '900', color: colors.goldInk },
   sumRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   sumTitle: { fontSize: font.h2, fontWeight: '800' },
-  sumValue: { fontSize: font.h1, fontWeight: '900', color: colors.gold },
+  sumValue: { fontSize: font.h1, fontWeight: '900', color: colors.goldInk },
   pickTitle: { fontSize: font.body, fontWeight: '800', color: colors.textDim, marginTop: 2 },
   sheetTools: { flexDirection: 'row', gap: 8 },
   rewardButtons: { flexDirection: 'row', gap: 8, marginTop: 10 },
-  breakdown: { backgroundColor: colors.bgDeep, borderRadius: radius.md, padding: 10, gap: 3 },
+  breakdown: { backgroundColor: colors.panelLight, borderRadius: radius.md, padding: 10, gap: 3 },
   bdRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   bdLine: { fontSize: font.small, color: colors.textDim },
-  bdAmt: { fontSize: font.small, color: colors.gold, fontWeight: '800' },
+  bdAmt: { fontSize: font.small, color: colors.goldInk, fontWeight: '900' },
   toast: {
     position: 'absolute',
     left: 20,
     right: 20,
-    backgroundColor: '#3B2A6E',
-    borderColor: colors.gold,
-    borderWidth: 2,
+    backgroundColor: colors.gold,
+    borderColor: colors.sticker,
+    borderWidth: 3,
+    ...paperShadow(4),
     borderRadius: radius.md,
     padding: 12,
     zIndex: 60,

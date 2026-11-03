@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   MIN_BAG,
@@ -18,16 +18,18 @@ import {
 } from '../../engine';
 import { Icon, type IconName } from '../art/Icons';
 import { CoinRow } from '../components/CoinInfo';
+import { Bunting } from '../components/Backdrop';
 import { Hud } from '../components/Hud';
 import { Button, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
-import { colors, font, radius, rarityColors } from '../theme';
+import { colors, font, paperShadow, radius, rarityColors } from '../theme';
 import { BagOverlay, CharmsOverlay } from './Overlays';
 
 export function ShopScreen({ onMenu }: { onMenu: () => void }) {
   const { run, act } = useGame();
   const r = run as RunState;
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const [engraveIdx, setEngraveIdx] = useState<number | null>(null);
   const [melting, setMelting] = useState(false);
   const [bagOpen, setBagOpen] = useState(false);
@@ -108,11 +110,12 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
       <Hud run={r} onBag={() => setBagOpen(true)} onCharms={() => setCharmsOpen(true)} onMenu={onMenu} showRound={false} nextPhase />
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.banner}>
+          <Bunting width={Math.min(width - 24, 420)} height={44} />
           <Txt style={styles.title} accessibilityRole="header">
             Bazaar
           </Txt>
           <Txt style={styles.sub}>
-            Dues paid. Next phase's dues: <Txt style={{ color: colors.gold, fontWeight: '900' }}>{nextDues}</Txt> gold.
+            Dues paid. Next phase's dues: <Txt style={{ color: colors.text, fontWeight: '900' }}>{nextDues}</Txt> gold.
           </Txt>
         </View>
         <View style={styles.tools}>
@@ -192,24 +195,27 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   scroll: { padding: 12, gap: 14, paddingBottom: 24 },
   banner: { alignItems: 'center', gap: 2 },
-  title: { fontSize: font.h1, fontWeight: '900' },
+  title: { fontSize: font.h1 + 4, fontWeight: '900' },
   sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center' },
   tools: { flexDirection: 'row', gap: 8 },
-  section: { fontSize: font.small, color: colors.textMuted, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
+  section: { fontSize: font.small, color: colors.textDim, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     backgroundColor: colors.panelLight,
     borderRadius: radius.md,
+    borderWidth: 2,
+    borderColor: colors.border,
     padding: 10,
+    ...paperShadow(2),
   },
   itemName: { fontSize: font.body, fontWeight: '800' },
   rarity: { fontSize: font.tiny, fontWeight: '800', textTransform: 'capitalize' },
   itemText: { fontSize: font.small, color: colors.textDim, marginTop: 2 },
   priceBtn: { minWidth: 76, paddingHorizontal: 10 },
-  footer: { paddingHorizontal: 12, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.panelLight, backgroundColor: colors.bg },
+  footer: { paddingHorizontal: 12, paddingTop: 10, borderTopWidth: 1.5, borderTopColor: colors.border, backgroundColor: colors.bg },
 });

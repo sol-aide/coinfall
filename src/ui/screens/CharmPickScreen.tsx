@@ -5,7 +5,7 @@ import { STARTING_BAG, charmDef, chooseStarter, coinDef, type Race, type RunStat
 import { CoinArt, RaceBadge } from '../art/CoinArt';
 import { Button, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
-import { colors, font, raceColors, radius } from '../theme';
+import { colors, font, paperShadow, raceColors, radius } from '../theme';
 
 const RACE_BLURB: Record<string, string> = {
   human: 'Economy and teamwork. Humans earn extra gold and get stronger together.',
@@ -43,11 +43,11 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
               accessibilityRole="button"
               accessibilityState={{ selected: sel }}
               accessibilityLabel={`${c.name}, ${rc.label} charm. ${c.text} ${RACE_BLURB[race]}`}
-              style={({ pressed }) => [styles.card, { borderColor: sel ? colors.gold : rc.dark }, pressed && { opacity: 0.9 }]}
+              style={({ pressed }) => [styles.card, { borderColor: sel ? colors.ink : rc.main }, sel && styles.cardSel, pressed && { transform: [{ translateY: 2 }] }]}
             >
               <RaceBadge race={race} size={56} />
               <View style={{ flex: 1 }}>
-                <Txt style={[styles.race, { color: rc.light }]}>{rc.plural}</Txt>
+                <Txt style={[styles.race, { color: rc.ink }]}>{rc.plural}</Txt>
                 <Txt style={styles.name}>{c.name}</Txt>
                 <Txt style={styles.text}>{c.text}</Txt>
                 <Txt style={styles.blurb}>{RACE_BLURB[race]}</Txt>
@@ -72,7 +72,7 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 },
+  screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   title: { fontSize: font.h1, fontWeight: '900', textAlign: 'center' },
   sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center' },
   bag: { flexDirection: 'row', justifyContent: 'center', gap: 4, flexWrap: 'wrap' },
@@ -84,7 +84,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 3,
     padding: 14,
+    ...paperShadow(3),
   },
+  cardSel: { backgroundColor: '#FFEDBA', ...paperShadow(6), transform: [{ rotate: '-0.8deg' }] },
   race: { fontSize: font.tiny, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
   name: { fontSize: font.h2, fontWeight: '900' },
   text: { fontSize: font.body, color: colors.text, marginTop: 2 },
