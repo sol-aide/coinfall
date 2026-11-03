@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { abilityText, coinDef, type RunState } from '../../engine';
 import { CoinArt } from '../art/CoinArt';
+import { handComboNotes } from '../content/tags';
 import { colors, font, radius } from '../theme';
 import { Button, Stitch, Txt, tap } from './ui';
 
@@ -23,6 +24,7 @@ export function HandStrip({ run, onSwap }: { run: RunState; onSwap: (uid: string
   const sel = selected ? run.bag.find((c) => c.uid === selected) : undefined;
   const selDef = sel ? coinDef(sel.defId) : undefined;
   const cost = free ? 'free' : `1 Reroll token (${run.rerollTokens} left)`;
+  const combos = handComboNotes(run);
 
   return (
     <View style={styles.wrap}>
@@ -52,6 +54,16 @@ export function HandStrip({ run, onSwap }: { run: RunState; onSwap: (uid: string
           );
         })}
       </View>
+      {combos.length > 0 && (
+        <View style={styles.combos} accessible accessibilityLabel={`Combos in this hand: ${combos.map((c) => `${c.text}${c.ready ? ', ready' : ''}`).join('; ')}`}>
+          {combos.map((c) => (
+            <Txt key={c.text} style={[styles.combo, c.ready && styles.comboOn]}>
+              {c.ready ? '✓ ' : ''}
+              {c.text}
+            </Txt>
+          ))}
+        </View>
+      )}
       <View style={styles.row}>
         <Txt style={styles.info} numberOfLines={2}>
           {selDef && sel ? (
@@ -89,4 +101,7 @@ const styles = StyleSheet.create({
   info: { flex: 1, fontSize: font.tiny, color: colors.textDim },
   name: { fontSize: font.tiny, fontWeight: '800', color: colors.text },
   swap: { minWidth: 84 },
+  combos: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: 10, rowGap: 2 },
+  combo: { fontSize: font.tiny, color: colors.textMuted, fontWeight: '700' },
+  comboOn: { color: colors.success },
 });

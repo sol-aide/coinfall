@@ -320,6 +320,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 26 | Soak test: two full runs driven through the web UI (35 rounds, 7 dues, both endings) with no console errors. All 12 Engravings still shared one icon. | Each Engraving has its own symbol on a faceted gem sticker (colour by rarity), in the shop and How to play. |
 | 28 | A combo callout didn't show which coins formed the combo. First pass: thin pale rings on each member, too faint and quick to read (420 ms, pale on the cloth). | Members get a thick ring in their race colour, held ~750 ms: every Orc for "Orc set bonus!", one coin per race for "All three races!". Skipped under Reduce Motion (the callout still fades in place). |
 | 30 | Hand and swap at 390×844 and 375×667: the hand strip sits above Toss; tapping a coin shows its ability; Swap reads "free", then "1 token". The tossed coins matched the final hand. A Copper was first swapped for another Copper (wasted swap). | Swaps draw a different kind of coin whenever the bag has one. |
+| 31 | Whether to swap depended on combos you had to work out yourself. | The hand shows its gated combos ("War Drummer: 2/3 Orcs", "Envoy: 3/3 races ✓"), counting Rally Horn and Kinship. A first pass printed "5/3 Orcs"; counts are now capped at the target. Checked at 375×667, including a save from before hands existed (a hand is dealt on load). |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions

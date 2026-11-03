@@ -1,7 +1,7 @@
 // Synergy tags, derived from a coin's own effect data so they never drift from
 // the rules. Pure TypeScript (no React Native) so it can be unit-tested.
 
-import { coinDef, type Action, type CharmDef, type CoinDef, type Count, type Race, type RunState, type Target } from '../../engine';
+import { CHARM_MAP, ENGRAVING_MAP, coinDef, runMods, type Action, type CharmDef, type CoinDef, type Count, type Race, type RunState, type Target } from '../../engine';
 
 export type TagId = 'gold' | 'grows' | 'flips' | 'tails' | 'heads' | 'wreck' | 'mult' | 'set' | 'mixed' | 'counts' | 'boost' | 'echo' | 'tokens';
 
@@ -207,4 +207,38 @@ export function charmTags(def: CharmDef): SynergyTag[] {
   if (race && race !== 'neutral') add('counts', PLURAL[race]);
   const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold', 'tokens'];
   return order.filter((id) => out.has(id)).map((id) => out.get(id)!);
+}
+
+/**
+ * Progress of the hand's gated combos (set bonuses, all-three-races), since
+ * every coin in the hand lands on the table: "War Drummer: 2/3 Orcs". Counts a
+ * Kinship coin as every race and applies Rally Horn's lower threshold.
+ */
+export function handComboNotes(run: RunState): { text: string; ready: boolean }[] {
+  const hand = (run.hand ?? []).map((u) => run.bag.find((c) => c.uid === u)).filter((c): c is NonNullable<typeof c> => !!c);
+  const racesOf = (c: (typeof hand)[number]): Race[] =>
+    c.engraving && ENGRAVING_MAP[c.engraving]?.allRaces ? ['human', 'orc', 'elf'] : [coinDef(c.defId).race];
+  const discount = runMods(run).setDiscount;
+  const out: { text: string; ready: boolean }[] = [];
+  const seen = new Set<string>();
+  const sources: { name: string; effects: CoinDef['effects'] }[] = [
+    ...hand.map((c) => ({ name: coinDef(c.defId).name, effects: coinDef(c.defId).effects })),
+    ...run.charms.map((id) => ({ name: CHARM_MAP[id].name, effects: CHARM_MAP[id].effects ?? [] })),
+  ];
+  for (const src of sources) {
+    const req = src.effects.find((e) => e.require)?.require;
+    if (!req || seen.has(src.name)) continue;
+    seen.add(src.name);
+    if ('races' in req.per) {
+      const n = new Set(hand.flatMap(racesOf).filter((r) => r !== 'neutral')).size;
+      out.push({ text: `${src.name}: ${Math.min(n, 3)}/3 races`, ready: n >= req.min });
+    } else if ('count' in req.per && req.per.count.race) {
+      const race = req.per.count.race;
+      const min = Math.max(1, req.min - discount);
+      const n = hand.filter((c) => racesOf(c).includes(race)).length;
+      const heads = req.per.count.face === 'heads' ? ' (if heads)' : '';
+      out.push({ text: `${src.name}: ${Math.min(n, min)}/${min} ${PLURAL[race]}${heads}`, ready: n >= min });
+    }
+  }
+  return out;
 }

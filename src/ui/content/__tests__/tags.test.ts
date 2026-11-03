@@ -1,7 +1,7 @@
 import { COINS, coinDef } from '../../../engine';
 import { newInstance } from '../../../engine/economy';
 import { newRun } from '../../../engine/run';
-import { bagFitNote, bagTagSummary, partnerNote, synergyPartners, synergyTags } from '../tags';
+import { bagFitNote, bagTagSummary, handComboNotes, partnerNote, synergyPartners, synergyTags } from '../tags';
 
 const labels = (id: string) => synergyTags(coinDef(id)).map((t) => t.label);
 
@@ -71,5 +71,22 @@ describe('charm tags', () => {
     expect(tags('skullcup')).toEqual(['Orcs', 'Boosts others']);
     expect(tags('treaty')).toEqual(['Mixed table', 'Gold']);
     expect(tags('haggler')).toEqual([]);
+  });
+});
+
+describe('hand combo notes', () => {
+  it('track set and mixed-table progress in the hand, with Rally Horn and Kinship', () => {
+    const run = newRun(3);
+    run.bag = ['wardrummer', 'grunt', 'squire', 'archer', 'copper', 'copper'].map((id) => newInstance(run, id));
+    run.hand = run.bag.slice(0, 5).map((c) => c.uid);
+    expect(handComboNotes(run)).toEqual([{ text: 'War Drummer: 2/3 Orcs', ready: false }]);
+    run.charms = ['rallyhorn', 'treaty'];
+    expect(handComboNotes(run)).toEqual([
+      { text: 'War Drummer: 2/2 Orcs', ready: true },
+      { text: 'Treaty Seal: 3/3 races', ready: true },
+    ]);
+    run.charms = [];
+    run.bag[2].engraving = 'kinship';
+    expect(handComboNotes(run)[0]).toEqual({ text: 'War Drummer: 3/3 Orcs', ready: true });
   });
 });
