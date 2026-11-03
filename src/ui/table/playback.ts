@@ -175,7 +175,18 @@ export function fxFor(e: GameEvent, prev: PlaybackState, next: PlaybackState, ne
       const c = at(next, e.uid);
       if (!c) return none;
       return {
-        fx: [{ id: nextId(), kind: 'number', x: c.x, y: c.y, text: `${e.delta > 0 ? '+' : ''}${e.delta}`, tone: e.delta >= 0 ? 'value' : 'loss' }],
+        fx: [
+          {
+            id: nextId(),
+            kind: 'number',
+            x: c.x,
+            y: c.y,
+            // Multipliers read as ×2, ordinary buffs as +n.
+            text: e.factor ? `×${e.factor}` : `${e.delta > 0 ? '+' : ''}${e.delta}`,
+            tone: e.delta >= 0 ? 'value' : 'loss',
+            big: !!e.factor,
+          },
+        ],
         shake: 0,
       };
     }

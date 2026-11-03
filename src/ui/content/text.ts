@@ -49,9 +49,18 @@ export const HOW_TO_PLAY: HelpSection[] = [
     ],
   },
   {
+    title: 'Combos',
+    body: [
+      'The strongest bags mix races. Caravan Master, Envoy and the Treaty Seal pay off when Humans, Orcs and Elves share the table; a Mercenary Orc earns gold for every Human beside it.',
+      'Some coins wake up with friends: 3 Humans for the Town Crier, 3 Orcs for the War Drummer, 3 heads Elves for the Grove Elder.',
+      'Tails is not always bad: Cutpurse and Night Raider pay for tails, and Wrecker or Charger can flip coins over to feed them. Juggler and Brawler love every flip.',
+      'Gem Cutter and Grove Elder double values (×2) after every other bonus, so stack buffs first.',
+    ],
+  },
+  {
     title: 'Growing your bag',
     body: [
-      'After each round, add one of three coins to your bag, or skip for 3 gold. A bigger bag means each coin is drawn less often, so choose carefully.',
+      'After each round, add one of three coins to your bag, or skip for 3 gold. A bigger bag means each coin is drawn less often, so choose carefully. Coins you already own turn up more often.',
       'Three identical coins of the same level fuse automatically into one stronger coin (up to level 3). Fused coins have doubled or tripled values and ability numbers. Plain Copper never fuses.',
     ],
   },

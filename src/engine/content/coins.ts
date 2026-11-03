@@ -144,6 +144,54 @@ export const COINS: CoinDef[] = [
     ],
   },
 
+  // Cross-race and set-bonus Humans.
+  {
+    id: 'caravan',
+    name: 'Caravan Master',
+    race: 'human',
+    rarity: 'uncommon',
+    value: 2,
+    text: 'Round end: +{2} gold for each race on the table (Humans, Orcs, Elves).',
+    effects: [
+      { trigger: 'onRoundEnd', do: { kind: 'gold', amount: 2, per: { races: { scope: 'table', includeSelf: true } } } },
+    ],
+  },
+  {
+    id: 'juggler',
+    name: 'Juggler',
+    race: 'human',
+    rarity: 'common',
+    value: 2,
+    text: 'Whenever another coin on the table flips: +{1} gold.',
+    effects: [{ trigger: 'onFlip', any: true, do: { kind: 'gold', amount: 1 } }],
+  },
+  {
+    id: 'towncrier',
+    name: 'Town Crier',
+    race: 'human',
+    rarity: 'uncommon',
+    value: 2,
+    text: 'Round end: if 3 or more Humans are on the table, +{8} gold.',
+    effects: [
+      {
+        trigger: 'onRoundEnd',
+        require: { per: { count: { scope: 'table', race: 'human', includeSelf: true } }, min: 3 },
+        do: { kind: 'gold', amount: 8 },
+      },
+    ],
+  },
+  {
+    id: 'gemcutter',
+    name: 'Gem Cutter',
+    race: 'human',
+    rarity: 'rare',
+    value: 2,
+    text: 'Round end: doubles the value of the highest-value adjacent heads coin.',
+    effects: [
+      { trigger: 'onRoundEnd', do: { kind: 'mult', target: { scope: 'adjacent', face: 'heads', pick: 'highest' }, factor: 2 } },
+    ],
+  },
+
   // ---------------------------------------------------------------- Orcs
   {
     id: 'grunt',
@@ -242,6 +290,66 @@ export const COINS: CoinDef[] = [
       {
         trigger: 'onRoundEnd',
         do: { kind: 'buff', target: { scope: 'self' }, amount: 3, per: { count: { scope: 'table', race: 'orc' } } },
+      },
+    ],
+  },
+
+  // Cross-race, tails and set-bonus Orcs.
+  {
+    id: 'cutpurse',
+    name: 'Cutpurse',
+    race: 'orc',
+    rarity: 'common',
+    value: 2,
+    text: 'Tails: +{6} gold.',
+    effects: [{ trigger: 'onRoundEnd', when: 'tails', do: { kind: 'gold', amount: 6 } }],
+  },
+  {
+    id: 'raider',
+    name: 'Night Raider',
+    race: 'orc',
+    rarity: 'uncommon',
+    value: 2,
+    text: 'Round end: +{2} gold for each tails coin on the table (itself included).',
+    effects: [
+      { trigger: 'onRoundEnd', do: { kind: 'gold', amount: 2, per: { count: { scope: 'table', face: 'tails', includeSelf: true } } } },
+    ],
+  },
+  {
+    id: 'mercenary',
+    name: 'Mercenary',
+    race: 'orc',
+    rarity: 'common',
+    value: 3,
+    text: 'Round end: +{2} gold for each Human on the table.',
+    effects: [
+      { trigger: 'onRoundEnd', do: { kind: 'gold', amount: 2, per: { count: { scope: 'table', race: 'human' } } } },
+    ],
+  },
+  {
+    id: 'powderkeg',
+    name: 'Powder Keg',
+    race: 'orc',
+    rarity: 'uncommon',
+    value: 2,
+    text: 'When destroyed: +{8} gold and flips every adjacent coin.',
+    effects: [
+      { trigger: 'onDestroy', do: { kind: 'gold', amount: 8 } },
+      { trigger: 'onDestroy', do: { kind: 'flip', target: { scope: 'adjacent' } } },
+    ],
+  },
+  {
+    id: 'wardrummer',
+    name: 'War Drummer',
+    race: 'orc',
+    rarity: 'uncommon',
+    value: 2,
+    text: 'Round end: if 3 or more Orcs are on the table, every Orc gets +{3} value.',
+    effects: [
+      {
+        trigger: 'onRoundEnd',
+        require: { per: { count: { scope: 'table', race: 'orc', includeSelf: true } }, min: 3 },
+        do: { kind: 'buff', target: { scope: 'table', race: 'orc', includeSelf: true }, amount: 3 },
       },
     ],
   },
@@ -361,6 +469,46 @@ export const COINS: CoinDef[] = [
         trigger: 'onRoundEnd',
         noScale: true,
         do: { kind: 'reflip', target: { scope: 'table', face: 'tails', includeSelf: true } },
+      },
+    ],
+  },
+  // Cross-race, control and set-bonus Elves.
+  {
+    id: 'envoy',
+    name: 'Envoy',
+    race: 'elf',
+    rarity: 'rare',
+    value: 2,
+    text: 'Round end: if Humans, Orcs and Elves are all on the table, every heads coin gets +{3} value.',
+    effects: [
+      {
+        trigger: 'onRoundEnd',
+        require: { per: { races: { scope: 'table', includeSelf: true } }, min: 3 },
+        do: { kind: 'buff', target: { scope: 'table', face: 'heads', includeSelf: true }, amount: 3 },
+      },
+    ],
+  },
+  {
+    id: 'wisp',
+    name: 'Wisp',
+    race: 'elf',
+    rarity: 'common',
+    value: 2,
+    text: 'On land: turns the highest-value adjacent tails coin to heads.',
+    effects: [{ trigger: 'onLand', do: { kind: 'setHeads', target: { scope: 'adjacent', face: 'tails', pick: 'highest' } } }],
+  },
+  {
+    id: 'grovelder',
+    name: 'Grove Elder',
+    race: 'elf',
+    rarity: 'rare',
+    value: 3,
+    text: 'Round end: if 3 or more heads Elves are on the table, they all get ×2 value.',
+    effects: [
+      {
+        trigger: 'onRoundEnd',
+        require: { per: { count: { scope: 'table', race: 'elf', face: 'heads', includeSelf: true } }, min: 3 },
+        do: { kind: 'mult', target: { scope: 'table', race: 'elf', face: 'heads', includeSelf: true }, factor: 2 },
       },
     ],
   },

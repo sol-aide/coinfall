@@ -144,6 +144,20 @@ export const CHARMS: CharmDef[] = [
     ],
   },
   {
+    id: 'treaty',
+    name: 'Treaty Seal',
+    rarity: 'uncommon',
+    text: 'Round end: +5 gold if Humans, Orcs and Elves are all on the table.',
+    effects: [
+      {
+        trigger: 'onRoundEnd',
+        noScale: true,
+        require: { per: { races: { scope: 'table', includeSelf: true } }, min: 3 },
+        do: { kind: 'gold', amount: 5 },
+      },
+    ],
+  },
+  {
     id: 'skullcup',
     name: 'Skull Cup',
     rarity: 'uncommon',

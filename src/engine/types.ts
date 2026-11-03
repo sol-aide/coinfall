@@ -28,8 +28,11 @@ export interface Target {
   includeSelf?: boolean;
 }
 
-/** What an amount is multiplied by. */
-export type Count = { count: Target } | { bagRace: Race };
+/**
+ * What an amount is multiplied by: matching coins, coins of a race in the bag,
+ * or the number of different races (Humans, Orcs, Elves) among matching coins.
+ */
+export type Count = { count: Target } | { bagRace: Race } | { races: Target };
 
 export type Action =
   | { kind: 'gold'; amount: number; per?: Count }
@@ -57,6 +60,8 @@ export interface Effect {
   any?: boolean;
   /** Amounts do not scale with fusion level. */
   noScale?: boolean;
+  /** Only resolves when the count is at least `min` (set bonuses, e.g. 3+ Orcs on the table). */
+  require?: { per: Count; min: number };
   do: Action;
 }
 
@@ -156,7 +161,7 @@ export type GameEvent =
   | { t: 'flip'; uid: string; face: Face }
   | { t: 'reflip'; uid: string; face: Face }
   | { t: 'move'; uid: string; x: number; y: number; by: string }
-  | { t: 'value'; uid: string; delta: number; permanent: boolean; value: number }
+  | { t: 'value'; uid: string; delta: number; permanent: boolean; value: number; /** Set when a multiplier caused the change. */ factor?: number }
   | { t: 'gold'; amount: number; uid?: string; charmId?: string; label: string }
   | { t: 'destroy'; uid: string; by?: string }
   | { t: 'revive'; uid: string }

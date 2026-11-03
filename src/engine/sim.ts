@@ -37,6 +37,10 @@ export const COIN_RATING: Record<string, number> = {
   innkeeper: 3,
   tinker: 2.6,
   guildmaster: 4.4,
+  caravan: 3,
+  juggler: 2.4,
+  towncrier: 3,
+  gemcutter: 4.2,
   grunt: 2.4,
   berserker: 3,
   charger: 2.4,
@@ -46,6 +50,11 @@ export const COIN_RATING: Record<string, number> = {
   looter: 2.6,
   brawler: 2.6,
   warlord: 4.4,
+  cutpurse: 2.6,
+  raider: 2.8,
+  mercenary: 2.6,
+  powderkeg: 2.6,
+  wardrummer: 3,
   archer: 2.6,
   moonpriestess: 3,
   sentinel: 2.6,
@@ -55,6 +64,9 @@ export const COIN_RATING: Record<string, number> = {
   longbow: 3,
   druid: 2.6,
   starweaver: 4.2,
+  envoy: 4,
+  wisp: 2.6,
+  grovelder: 4.2,
 };
 
 export const CHARM_RATING: Record<string, number> = {
@@ -77,6 +89,7 @@ export const CHARM_RATING: Record<string, number> = {
   moonwell: 3,
   lantern: 2,
   anvil: 3.5,
+  treaty: 3,
 };
 
 function starterRace(run: RunState) {

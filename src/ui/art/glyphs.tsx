@@ -247,6 +247,117 @@ export const GLYPHS: Record<string, GlyphFn> = {
       <Circle cx={50} cy={52} r={7} fill={accent} />
     </G>
   ),
+  // ---------------------------------------------------------- Synergy expansion
+  caravan: (ink, accent, o) => (
+    <G>
+      <Path d="M24 60 L24 44 Q24 26 50 26 Q76 26 76 44 L76 60 Z" fill={ink} />
+      <Path d="M34 58 L34 42 M50 58 L50 34 M66 58 L66 42" stroke={accent} strokeWidth={2.5 + o} strokeLinecap="round" />
+      <Rect x={18} y={58} width={64} height={8} rx={3} fill={ink} />
+      <Circle cx={32} cy={72} r={7} fill={ink} />
+      <Circle cx={68} cy={72} r={7} fill={ink} />
+      <Circle cx={32} cy={72} r={2.5} fill={accent} />
+      <Circle cx={68} cy={72} r={2.5} fill={accent} />
+    </G>
+  ),
+  juggler: (ink, accent, o) => (
+    <G>
+      <Path d="M24 66 Q50 10 76 66" stroke={ink} strokeWidth={2.5 + o} strokeDasharray="5 6" fill="none" strokeLinecap="round" />
+      <Circle cx={28} cy={62} r={9} fill={ink} />
+      <Circle cx={50} cy={32} r={9} fill={ink} />
+      <Circle cx={72} cy={62} r={9} fill={ink} />
+      <Circle cx={47} cy={29} r={3} fill={accent} />
+      <Path d="M36 80 Q50 72 64 80" stroke={ink} {...sw(o)} />
+    </G>
+  ),
+  towncrier: (ink, accent, o) => (
+    <G>
+      <Path d="M30 66 Q30 30 50 28 Q70 30 70 66 Z" fill={ink} />
+      <Rect x={24} y={64} width={52} height={7} rx={3} fill={ink} />
+      <Circle cx={50} cy={76} r={6} fill={ink} />
+      <Line x1={50} y1={28} x2={50} y2={18} stroke={ink} {...sw(o)} />
+      <Path d="M38 42 Q40 36 46 34" stroke={accent} strokeWidth={3 + o} strokeLinecap="round" fill="none" />
+      <Path d="M80 40 Q86 50 80 60 M18 40 Q12 50 18 60" stroke={ink} strokeWidth={3 + o} strokeLinecap="round" fill="none" />
+    </G>
+  ),
+  gemcutter: (ink, accent, o) => (
+    <G>
+      <Polygon points="30,38 40,26 60,26 70,38 50,76" fill={ink} stroke={ink} strokeWidth={2 + o} strokeLinejoin="round" />
+      <Polygon points="40,26 50,38 60,26" fill={accent} />
+      <Path d="M30 38 L70 38 M50 38 L50 76 M40 38 L50 76 M60 38 L50 76" stroke={accent} strokeWidth={1.5 + o * 0.5} fill="none" />
+      <Path d="M76 20 L78 26 L84 28 L78 30 L76 36 L74 30 L68 28 L74 26 Z" fill={ink} />
+    </G>
+  ),
+  cutpurse: (ink, accent, o) => (
+    <G>
+      <Path d="M36 40 Q22 52 26 66 Q30 78 50 78 Q70 78 72 64 Q74 52 62 40 Z" fill={ink} />
+      <Path d="M38 40 L34 30 L64 30 L60 40" fill={ink} stroke={ink} strokeWidth={2 + o} strokeLinejoin="round" />
+      <Path d="M40 52 L56 70" stroke={accent} strokeWidth={4 + o} strokeLinecap="round" />
+      <Path d="M70 20 L82 32" stroke={ink} {...sw(o)} />
+      <Path d="M66 30 L74 22" stroke={ink} strokeWidth={4 + o} strokeLinecap="round" />
+    </G>
+  ),
+  mercenary: (ink, accent, o) => (
+    <G>
+      <Line x1={30} y1={74} x2={70} y2={26} stroke={ink} {...sw(o)} />
+      <Line x1={70} y1={74} x2={30} y2={26} stroke={ink} {...sw(o)} />
+      <Line x1={34} y1={58} x2={44} y2={68} stroke={ink} strokeWidth={4 + o} strokeLinecap="round" />
+      <Line x1={66} y1={58} x2={56} y2={68} stroke={ink} strokeWidth={4 + o} strokeLinecap="round" />
+      <Circle cx={50} cy={50} r={11} fill={ink} />
+      <Circle cx={50} cy={50} r={5} fill={accent} />
+    </G>
+  ),
+  powderkeg: (ink, accent, o) => (
+    <G>
+      <Path d="M32 36 Q28 54 32 74 L68 74 Q72 54 68 36 Z" fill={ink} />
+      <Path d="M30 46 L70 46 M30 64 L70 64" stroke={accent} strokeWidth={3 + o} />
+      <Path d="M50 36 Q52 24 62 22" stroke={ink} strokeWidth={3 + o} fill="none" strokeLinecap="round" />
+      <Path d="M66 14 L68 20 L74 22 L68 24 L66 30 L64 24 L58 22 L64 20 Z" fill={ink} />
+    </G>
+  ),
+  wardrummer: (ink, accent, o) => (
+    <G>
+      <Ellipse cx={50} cy={44} rx={24} ry={8} fill={ink} />
+      <Path d="M26 44 L26 66 Q50 78 74 66 L74 44 Q50 56 26 44 Z" fill={ink} />
+      <Path d="M30 52 L40 68 L50 54 L60 68 L70 52" stroke={accent} strokeWidth={2.5 + o} fill="none" strokeLinejoin="round" />
+      <Line x1={36} y1={20} x2={46} y2={40} stroke={ink} strokeWidth={4 + o} strokeLinecap="round" />
+      <Line x1={66} y1={20} x2={56} y2={40} stroke={ink} strokeWidth={4 + o} strokeLinecap="round" />
+    </G>
+  ),
+  envoy: (ink, accent, o) => (
+    <G>
+      <Rect x={26} y={30} width={44} height={40} rx={4} fill={ink} />
+      <Circle cx={26} cy={30} r={6} fill={ink} />
+      <Circle cx={70} cy={70} r={6} fill={ink} />
+      <Path d="M34 40 L60 40 M34 48 L56 48" stroke={accent} strokeWidth={2.5 + o} strokeLinecap="round" />
+      <Circle cx={60} cy={60} r={9} fill={accent} stroke={ink} strokeWidth={2.5 + o} />
+      <Path d="M56 68 L52 80 M64 68 L68 80" stroke={ink} strokeWidth={3 + o} strokeLinecap="round" />
+    </G>
+  ),
+  raider: (ink, accent) => (
+    <G>
+      <Path d="M50 18 Q76 26 74 54 Q72 76 76 82 L24 82 Q28 76 26 54 Q24 26 50 18 Z" fill={ink} />
+      <Path d="M36 46 Q50 34 64 46 Q60 62 50 64 Q40 62 36 46 Z" fill={accent} opacity={0.35} />
+      <Ellipse cx={43} cy={50} rx={3.5} ry={2.5} fill={accent} />
+      <Ellipse cx={57} cy={50} rx={3.5} ry={2.5} fill={accent} />
+    </G>
+  ),
+  wisp: (ink, accent) => (
+    <G>
+      <Path d="M50 82 Q28 76 30 56 Q32 42 44 34 Q40 46 48 50 Q46 34 56 18 Q58 34 66 44 Q74 56 68 70 Q62 82 50 82 Z" fill={ink} />
+      <Path d="M50 74 Q40 70 42 60 Q44 54 50 50 Q50 58 56 62 Q58 70 50 74 Z" fill={accent} />
+    </G>
+  ),
+  grovelder: (ink, accent, o) => (
+    <G>
+      <Circle cx={36} cy={42} r={14} fill={ink} />
+      <Circle cx={64} cy={42} r={14} fill={ink} />
+      <Circle cx={50} cy={32} r={16} fill={ink} />
+      <Path d="M44 80 L46 52 L54 52 L56 80 Z" fill={ink} />
+      <Path d="M46 60 L38 54 M54 58 L62 52" stroke={ink} strokeWidth={4 + o} strokeLinecap="round" />
+      <Circle cx={44} cy={30} r={3} fill={accent} />
+      <Circle cx={60} cy={40} r={2.5} fill={accent} />
+    </G>
+  ),
 };
 
 /** Race emblem used on tails faces and labels. */

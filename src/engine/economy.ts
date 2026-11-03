@@ -57,12 +57,21 @@ function rarityWeight(r: Rarity, phase: number, mods: Mods): number {
 
 const BUYABLE_COINS = COINS.filter((c) => !c.unbuyable);
 
-/** Picks `n` distinct coin ids weighted by rarity. */
+/** Offer weight bonus for a coin the player already owns below max level. */
+export const OWNED_WEIGHT = 2;
+
+/**
+ * Picks `n` distinct coin ids weighted by rarity. Coins you already own (and
+ * could still fuse) turn up twice as often, so builds and fusions stay
+ * reachable as the coin pool grows.
+ */
 export function rollCoins(run: RunState, n: number, mods: Mods): string[] {
   const out: string[] = [];
   let pool = BUYABLE_COINS.slice();
+  const owned = new Set(run.bag.filter((c) => c.level < MAX_LEVEL).map((c) => c.defId));
+  const weight = (d: (typeof pool)[number]) => rarityWeight(d.rarity, run.phase, mods) * (owned.has(d.id) ? OWNED_WEIGHT : 1);
   for (let i = 0; i < n && pool.length; i++) {
-    const c = R.weightedPick(run, pool, (d) => rarityWeight(d.rarity, run.phase, mods));
+    const c = R.weightedPick(run, pool, weight);
     out.push(c.id);
     pool = pool.filter((d) => d.id !== c.id);
   }

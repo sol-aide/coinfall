@@ -110,6 +110,10 @@ export function resolveTargets(ctx: Ctx, self: TableCoin | undefined, t: Target,
 
 function countOf(ctx: Ctx, self: TableCoin | undefined, per: Count): number {
   if ('bagRace' in per) return ctx.run.bag.filter((c) => coinDef(c.defId).race === per.bagRace).length;
+  if ('races' in per) {
+    const races = resolveTargets(ctx, self, per.races).map((c) => coinDef(c.defId).race);
+    return new Set(races.filter((r) => r !== 'neutral')).size;
+  }
   return resolveTargets(ctx, self, per.count).length;
 }
 
@@ -222,6 +226,7 @@ export function execute(
 ) {
   const s = subject ?? self;
   if (e.when && (!s || s.face !== e.when)) return;
+  if (e.require && countOf(ctx, self, e.require.per) < e.require.min) return;
   if (e.chance !== undefined && !R.chance(ctx.run, e.chance)) return;
   const a: Action = e.do;
   const uid = self?.uid;
@@ -260,7 +265,7 @@ export function execute(
       for (const t of targets) {
         const before = valueOf(ctx, t);
         t.mult *= a.factor;
-        ctx.events.push({ t: 'value', uid: t.uid, delta: valueOf(ctx, t) - before, permanent: false, value: valueOf(ctx, t) });
+        ctx.events.push({ t: 'value', uid: t.uid, delta: valueOf(ctx, t) - before, permanent: false, value: valueOf(ctx, t), factor: a.factor });
       }
       return;
     }
