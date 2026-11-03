@@ -23,7 +23,7 @@ export type Fx =
   | { id: number; kind: 'poof'; x: number; y: number; delay: number; big?: boolean; dust?: boolean }
   | { id: number; kind: 'hit'; x: number; y: number }
   | { id: number; kind: 'shards'; x: number; y: number; color: string }
-  | { id: number; kind: 'ring'; x: number; y: number; color: string }
+  | { id: number; kind: 'ring'; x: number; y: number; color: string; strong?: boolean }
   | { id: number; kind: 'callout'; x: number; y: number; text: string };
 
 const ms = (base: number, speed: number) => Math.max(40, base / speed);
@@ -53,7 +53,7 @@ export function FxLayer({ items, proj, speed, reduceMotion, ground = false }: { 
           case 'shards':
             return reduceMotion ? null : <Shards key={fx.id} px={px} py={py} color={fx.color} speed={speed} />;
           case 'ring':
-            return reduceMotion ? null : <Ring key={fx.id} px={px} py={py} color={fx.color} speed={speed} />;
+            return reduceMotion ? null : <Ring key={fx.id} px={px} py={py} color={fx.color} speed={speed} strong={fx.strong} />;
           case 'callout':
             return <Callout key={fx.id} text={fx.text} px={Math.min(Math.max(px, 130), width - 130)} py={Math.max(py, 30)} speed={speed} still={reduceMotion} />;
         }
@@ -338,19 +338,21 @@ function Shards({ px, py, color, speed }: { px: number; py: number; color: strin
 }
 
 /** Soft ring when a coin's ability fires. */
-function Ring({ px, py, color, speed }: { px: number; py: number; color: string; speed: number }) {
-  const s = useSharedValue(0.7);
-  const op = useSharedValue(0.9);
+/** `strong`: a combo member's ring, thicker and held longer so the whole combo reads at once. */
+function Ring({ px, py, color, speed, strong }: { px: number; py: number; color: string; speed: number; strong?: boolean }) {
+  const s = useSharedValue(strong ? 0.85 : 0.7);
+  const op = useSharedValue(strong ? 1 : 0.9);
   useEffect(() => {
-    s.value = withTiming(1.6, { duration: ms(420, speed), easing: Easing.out(Easing.quad) });
-    op.value = withTiming(0, { duration: ms(420, speed) });
+    const d = ms(strong ? 750 : 420, speed);
+    s.value = withTiming(strong ? 1.35 : 1.6, { duration: d, easing: Easing.out(Easing.quad) });
+    op.value = strong ? withDelay(d * 0.45, withTiming(0, { duration: d * 0.55 })) : withTiming(0, { duration: d });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const style = useAnimatedStyle(() => ({ opacity: op.value, transform: [{ scale: s.value }] }));
   const size = 72;
   return (
     <Animated.View
-      style={[styles.abs, { left: px - size / 2, top: py - size / 2, width: size, height: size, borderRadius: size / 2, borderWidth: 4, borderColor: color }, style]}
+      style={[styles.abs, { left: px - size / 2, top: py - size / 2, width: size, height: size, borderRadius: size / 2, borderWidth: strong ? 6 : 4, borderColor: color }, style]}
     />
   );
 }

@@ -78,7 +78,7 @@ export function roundPace(events: GameEvent[]): number {
   return total <= ROUND_BUDGET ? 1 : Math.max(0.45, ROUND_BUDGET / total);
 }
 
-function initial(result: RoundResult): PlaybackState {
+export function initial(result: RoundResult): PlaybackState {
   const coins: Record<string, DisplayCoin> = {};
   for (const c of result.table) {
     coins[c.uid] = {
@@ -213,6 +213,8 @@ export function fxFor(e: GameEvent, prev: PlaybackState, next: PlaybackState, ne
       if (c) fx.push({ id: nextId(), kind: 'ring', x: c.x, y: c.y, color: '#FFF3C4' });
       // Announced in one fixed spot near the top of the table, clear of the coins' own numbers.
       if (call) fx.push({ id: nextId(), kind: 'callout', x: 0.5, y: 0.12, text: call });
+      // Ring every coin that makes up the combo, in its race colour.
+      if (call) for (const m of comboMembers(e, next, c?.defId)) fx.push({ id: nextId(), kind: 'ring', x: m.x, y: m.y, color: raceColors[coinDef(m.defId).race].main, strong: true });
       return fx.length ? { fx, shake: 0 } : none;
     }
     case 'move': {
@@ -250,6 +252,26 @@ export function comboCallout(e: GameEvent, defId?: string): string | null {
   // Only a coin's own trigger, not "X retriggers Y" / "X copies Y" (those name another coin).
   if (!defId || / (retriggers|copies) /.test(e.label)) return null;
   return calloutFor(coinDef(defId).effects);
+}
+
+/** The coins on the table that form a called-out combo: that race for a set, one of each race for a mixed table. */
+export function comboMembers(e: GameEvent, st: PlaybackState, defId?: string): DisplayCoin[] {
+  if (e.t !== 'trigger') return [];
+  const effects = e.charmId ? (charmDef(e.charmId).effects ?? []) : defId ? coinDef(defId).effects : [];
+  const gated = effects.find((x) => x.require)?.require;
+  if (!gated) return [];
+  const live = st.order.map((u) => st.coins[u]).filter((c) => c && c.landed && !c.destroyed);
+  if ('races' in gated.per) {
+    const byRace = new Map<string, DisplayCoin>();
+    for (const c of live) {
+      const race = coinDef(c.defId).race;
+      if (race !== 'neutral' && !byRace.has(race)) byRace.set(race, c);
+    }
+    return [...byRace.values()];
+  }
+  const want = 'count' in gated.per ? gated.per.count : undefined;
+  if (!want?.race) return [];
+  return live.filter((c) => coinDef(c.defId).race === want.race && (!want.face || c.face === want.face));
 }
 
 function calloutFor(effects: Effect[]): string | null {

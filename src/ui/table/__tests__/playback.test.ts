@@ -40,3 +40,16 @@ describe('round pacing', () => {
     expect(60 * 360 * p).toBeLessThanOrEqual(Math.max(ROUND_BUDGET, 60 * 360 * 0.45) + 1);
   });
 });
+
+describe('combo members', () => {
+  it('ring the coins that formed the combo', () => {
+    const { comboMembers } = require('../playback') as typeof import('../playback');
+    const coin = (uid: string, defId: string, face: 'heads' | 'tails' = 'heads') => ({ uid, defId, level: 1, x: 0.5, y: 0.5, face, value: 2, landed: true, destroyed: false, pulse: 0, flash: 0, scored: 0 });
+    const st = {
+      coins: { a: coin('a', 'wardrummer'), b: coin('b', 'grunt'), c: coin('c', 'shaman'), d: coin('d', 'squire'), e: coin('e', 'archer', 'tails') },
+      order: ['a', 'b', 'c', 'd', 'e'], stage: null, caption: '', detail: '', total: 0, index: 0, done: false,
+    };
+    expect(comboMembers({ t: 'trigger', uid: 'a', label: 'War Drummer' }, st, 'wardrummer').map((c) => c.uid)).toEqual(['a', 'b', 'c']);
+    expect(comboMembers({ t: 'trigger', charmId: 'treaty', label: 'Treaty Seal' }, st).map((c) => c.uid)).toEqual(['a', 'd', 'e']);
+  });
+});
