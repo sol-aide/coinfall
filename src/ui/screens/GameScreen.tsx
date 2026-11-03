@@ -294,7 +294,8 @@ const styles = StyleSheet.create({
   duesTrack: { height: 14, borderRadius: 7, backgroundColor: colors.panel, overflow: 'hidden', borderWidth: 1.5, borderStyle: 'dashed', borderColor: 'rgba(158,168,200,0.6)', padding: 2 },
   duesFill: { height: '100%', borderRadius: 4 },
   duesTxt: { fontSize: font.tiny, color: colors.textDim, textAlign: 'center', alignSelf: 'center', backgroundColor: 'rgba(23,19,29,0.8)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 2, overflow: 'hidden' },
-  haul: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
+  // Above the table's own stacking context, so lingering numbers never cover the card.
+  haul: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', zIndex: 20 },
   tableArea: { flex: 1, alignItems: 'center', justifyContent: 'center', marginVertical: 6 },
   emptyHint: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 6 },
   emptyTitle: { fontSize: 30, fontWeight: '700', color: colors.paper, textShadowColor: 'rgba(10,6,12,0.6)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },

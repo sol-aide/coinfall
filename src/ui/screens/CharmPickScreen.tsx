@@ -24,11 +24,14 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
         <View style={{ alignItems: 'center' }}>
           <Ribbon title="Choose your patron" width={230} />
         </View>
-        <Txt style={styles.sub}>Your starting Charm lasts the whole run. Every run starts with this bag:</Txt>
-        <View style={styles.bag} accessible accessibilityLabel={`Starting bag: ${STARTING_BAG.map((d) => coinDef(d).name).join(', ')}`}>
-          {STARTING_BAG.map((d, i) => (
-            <CoinArt key={i} defId={d} size={36} />
-          ))}
+        {/* On its own dark plate so it reads clearly over the busy backdrop. */}
+        <View style={styles.intro}>
+          <Txt style={styles.sub}>Your starting Charm lasts the whole run. Every run starts with this bag:</Txt>
+          <View style={styles.bag} accessible accessibilityLabel={`Starting bag: ${STARTING_BAG.map((d) => coinDef(d).name).join(', ')}`}>
+            {STARTING_BAG.map((d, i) => (
+              <CoinArt key={i} defId={d} size={36} />
+            ))}
+          </View>
         </View>
         {r.starterChoices.map((id) => {
           const c = charmDef(id);
@@ -77,6 +80,7 @@ const styles = StyleSheet.create({
   title: { fontSize: font.h1, fontWeight: '900', textAlign: 'center' },
   sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center', textShadowColor: 'rgba(10,6,12,0.9)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   bag: { flexDirection: 'row', justifyContent: 'center', gap: 4, flexWrap: 'wrap' },
+  intro: { backgroundColor: 'rgba(20, 13, 22, 0.78)', borderRadius: radius.lg, paddingVertical: 10, paddingHorizontal: 12, gap: 8 },
   card: {
     flexDirection: 'row',
     gap: 12,

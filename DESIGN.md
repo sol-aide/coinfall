@@ -272,6 +272,9 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 7 | Synergy expansion, web playtest with injected bags (all 5 coins drawn, frames every 150 ms): a mixed table (Envoy, Caravan Master, Mercenary, Gem Cutter, Warlord) scored +50 in phase 3, and a heads-Elf table with Grove Elder +54. Breakdowns matched the rules. New glyphs read at table size. | — |
 | 7 | Gem Cutter's and Grove Elder's doubling popped as "+6", which hid that it was a multiplier. | Value events carry the factor; multipliers pop as a large "×2". |
 | 7 | Players had no in-game hint that mixing races or flipping to tails is a strategy. | New "Combos" section in How to play. |
+| 9 | Title coins frame by frame: edge-on, the 3D rim broke into separate thin lines with gaps; at the lamp-glint angle the whole face washed out pale. | Rim slices never thinner than their spacing (solid reeded band edge-on); glint 65% → 35%. |
+| 9 | Patron screen: the intro text and starting bag sat directly on the busy backdrop (window, moon, a lantern behind the Archer coin). | Intro on its own dark plate. Checked at 375×667 and 440×956. |
+| 9 | End of round: a lingering "+11" score number drew over the round-total card on the web (the table's transform makes its own stacking context). | The card's layer sits above the table (`zIndex`). |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions

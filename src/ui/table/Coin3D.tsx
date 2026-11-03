@@ -65,7 +65,7 @@ export const Coin3D = React.memo(function Coin3D({ defId, level, engraved, size,
     const facing = Math.cos(a - (Math.sign(c || 1) * 25 * Math.PI) / 180);
     const g = Math.pow(Math.max(0, Math.abs(facing)), 60);
     return {
-      opacity: g * 0.65 + flash.value,
+      opacity: g * 0.35 + flash.value,
       transform: [{ translateY: (-s * thick) / 2 }, { scaleY: Math.max(0.02, Math.abs(c)) }],
     };
   });
@@ -94,7 +94,9 @@ function Slice({ index, angle, thick, size, disc, color }: { index: number; angl
     const c = Math.cos(a);
     const s = Math.sin(a);
     const f = (index + 1) / SLICES; // 0 = top face, 1 = bottom face
-    return { transform: [{ translateY: s * thick * (f - 0.5) }, { scaleY: Math.max(0.02, Math.abs(c)) }] };
+    // Never thinner than the gap to the next slice, so edge-on the rim reads as one solid band.
+    const minScale = ((thick / SLICES) * 1.8) / disc;
+    return { transform: [{ translateY: s * thick * (f - 0.5) }, { scaleY: Math.max(minScale, Math.abs(c)) }] };
   });
   return (
     <Animated.View
