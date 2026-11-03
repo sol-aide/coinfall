@@ -17,6 +17,7 @@ import type {
   GameEvent,
   Mods,
   RoundResult,
+  Race,
   RunState,
   TableCoin,
   Target,
@@ -47,6 +48,8 @@ export interface Ctx {
   stage: Stage;
   /** Phase-trigger mode: gold goes straight to the purse. */
   phaseMode: boolean;
+  /** The coin that set off the reactive trigger currently resolving. */
+  subject?: TableCoin;
 }
 
 export function radius(mods: Mods): number {
@@ -72,13 +75,21 @@ function active(ctx: Ctx): TableCoin[] {
   return ctx.table.filter((c) => c.landed && !c.destroyed);
 }
 
+/** The races a table coin counts as (a Kinship engraving makes it all three). */
+export function racesOf(ctx: Ctx, tc: TableCoin): Race[] {
+  const inst = ctx.inst.get(tc.uid);
+  if (inst?.engraving && engravingDef(inst.engraving).allRaces) return ['human', 'orc', 'elf'];
+  return [coinDef(tc.defId).race];
+}
+
 export function resolveTargets(ctx: Ctx, self: TableCoin | undefined, t: Target, count = 1): TableCoin[] {
   if (t.scope === 'self') return self && !self.destroyed ? [self] : [];
+  if (t.scope === 'subject') return ctx.subject && !ctx.subject.destroyed ? [ctx.subject] : [];
   let pool = active(ctx);
   const includeSelf = t.includeSelf ?? false;
   if (self && !includeSelf) pool = pool.filter((c) => c !== self);
-  if (t.race) pool = pool.filter((c) => coinDef(c.defId).race === t.race);
-  if (t.notRace) pool = pool.filter((c) => coinDef(c.defId).race !== t.notRace);
+  if (t.race) pool = pool.filter((c) => racesOf(ctx, c).includes(t.race!));
+  if (t.notRace) pool = pool.filter((c) => !racesOf(ctx, c).includes(t.notRace!));
   if (t.face) pool = pool.filter((c) => c.face === t.face);
   if (t.hasAbility) pool = pool.filter((c) => hasTableAbility(coinDef(c.defId)));
 
@@ -111,7 +122,7 @@ export function resolveTargets(ctx: Ctx, self: TableCoin | undefined, t: Target,
 function countOf(ctx: Ctx, self: TableCoin | undefined, per: Count): number {
   if ('bagRace' in per) return ctx.run.bag.filter((c) => coinDef(c.defId).race === per.bagRace).length;
   if ('races' in per) {
-    const races = resolveTargets(ctx, self, per.races).map((c) => coinDef(c.defId).race);
+    const races = resolveTargets(ctx, self, per.races).flatMap((c) => racesOf(ctx, c));
     return new Set(races.filter((r) => r !== 'neutral')).size;
   }
   return resolveTargets(ctx, self, per.count).length;
@@ -226,7 +237,22 @@ export function execute(
 ) {
   const s = subject ?? self;
   if (e.when && (!s || s.face !== e.when)) return;
-  if (e.require && countOf(ctx, self, e.require.per) < e.require.min) return;
+  const outer = ctx.subject;
+  ctx.subject = subject;
+  try {
+    run(ctx, e, self, level, label, subject, charmId);
+  } finally {
+    ctx.subject = outer;
+  }
+}
+
+function run(ctx: Ctx, e: Effect, self: TableCoin | undefined, level: number, label: string, subject?: TableCoin, charmId?: string) {
+  if (e.require) {
+    // Rally Horn: set bonuses (a race count) need fewer coins.
+    const isSet = 'count' in e.require.per && !!e.require.per.count.race;
+    const min = Math.max(1, e.require.min - (isSet ? ctx.mods.setDiscount : 0));
+    if (countOf(ctx, self, e.require.per) < min) return;
+  }
   if (e.chance !== undefined && !R.chance(ctx.run, e.chance)) return;
   const a: Action = e.do;
   const uid = self?.uid;
@@ -264,8 +290,9 @@ export function execute(
       trig();
       for (const t of targets) {
         const before = valueOf(ctx, t);
-        t.mult *= a.factor;
-        ctx.events.push({ t: 'value', uid: t.uid, delta: valueOf(ctx, t) - before, permanent: false, value: valueOf(ctx, t), factor: a.factor });
+        const factor = a.factor + ctx.mods.multBonus;
+        t.mult *= factor;
+        ctx.events.push({ t: 'value', uid: t.uid, delta: valueOf(ctx, t) - before, permanent: false, value: valueOf(ctx, t), factor });
       }
       return;
     }

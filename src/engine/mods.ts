@@ -19,6 +19,8 @@ export function emptyMods(): Mods {
     rerollPerPhase: 0,
     firstCoinHeads: false,
     rareBoost: 0,
+    setDiscount: 0,
+    multBonus: 0,
   };
 }
 
@@ -47,6 +49,8 @@ export function computeMods(charmIds: readonly string[]): Mods {
     m.rerollPerPhase += c.rerollPerPhase ?? 0;
     m.firstCoinHeads = m.firstCoinHeads || !!c.firstCoinHeads;
     m.rareBoost += c.rareBoost ?? 0;
+    m.setDiscount += c.setDiscount ?? 0;
+    m.multBonus += c.multBonus ?? 0;
   }
   return m;
 }

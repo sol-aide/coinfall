@@ -158,6 +158,27 @@ export const CHARMS: CharmDef[] = [
     ],
   },
   {
+    id: 'rallyhorn',
+    name: 'Rally Horn',
+    rarity: 'rare',
+    text: 'Set bonuses need one coin fewer (2 Humans, 2 Orcs or 2 heads Elves instead of 3).',
+    mods: { setDiscount: 1 },
+  },
+  {
+    id: 'loupe',
+    name: "Jeweler's Loupe",
+    rarity: 'rare',
+    text: 'Multipliers are one higher: ×2 becomes ×3.',
+    mods: { multBonus: 1 },
+  },
+  {
+    id: 'spintop',
+    name: 'Spinning Top',
+    rarity: 'uncommon',
+    text: 'Whenever a coin on the table flips, it gets +1 value this round.',
+    effects: [{ trigger: 'onFlip', noScale: true, do: { kind: 'buff', target: { scope: 'subject' }, amount: 1 } }],
+  },
+  {
     id: 'skullcup',
     name: 'Skull Cup',
     rarity: 'uncommon',

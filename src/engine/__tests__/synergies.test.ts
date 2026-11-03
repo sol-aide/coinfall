@@ -158,3 +158,60 @@ describe('destruction and multipliers', () => {
     expect(valueOf(ctx, coins[1])).toBe((4 + 2) * 2);
   });
 });
+
+describe('rule-bending Charms and Kinship', () => {
+  it('Rally Horn lets a set bonus fire with one coin fewer', () => {
+    const { ctx, coins } = table(
+      [
+        { defId: 'towncrier', x: 0.1, y: 0.1 },
+        { defId: 'squire', x: 0.9, y: 0.1 },
+        { defId: 'grunt', x: 0.5, y: 0.9 },
+      ],
+      ['rallyhorn'],
+    );
+    runCoinTrigger(ctx, coins[0], 'onRoundEnd');
+    expect(goldEvents(ctx)).toBe(8);
+  });
+
+  it("Jeweler's Loupe turns ×2 into ×3", () => {
+    const { ctx, coins } = table(
+      [
+        { defId: 'gemcutter', x: 0.5, y: 0.5 },
+        { defId: 'grunt', x: 0.6, y: 0.5, face: 'heads' },
+      ],
+      ['loupe'],
+    );
+    runCoinTrigger(ctx, coins[0], 'onRoundEnd');
+    expect(coins[1].mult).toBe(3);
+    expect(valueOf(ctx, coins[1])).toBe(12);
+  });
+
+  it('Spinning Top buffs the coin that flipped', () => {
+    const { ctx, coins } = table(
+      [
+        { defId: 'copper', x: 0.1, y: 0.1, face: 'heads' },
+        { defId: 'copper', x: 0.9, y: 0.1, face: 'heads' },
+      ],
+      ['spintop'],
+    );
+    setFace(ctx, coins[1], 'tails');
+    expect(coins.map((c) => c.temp)).toEqual([0, 1]);
+  });
+
+  it('a Kinship coin counts as every race', () => {
+    const { ctx, coins } = table([
+      { defId: 'caravan', x: 0.1, y: 0.1 },
+      { defId: 'copper', x: 0.9, y: 0.1, engraving: 'kinship' },
+    ]);
+    runCoinTrigger(ctx, coins[0], 'onRoundEnd');
+    expect(goldEvents(ctx)).toBe(6); // Human + (Human, Orc, Elf) = 3 races
+
+    const set = table([
+      { defId: 'wardrummer', x: 0.1, y: 0.1 },
+      { defId: 'grunt', x: 0.9, y: 0.1 },
+      { defId: 'squire', x: 0.5, y: 0.9, engraving: 'kinship' },
+    ]);
+    runCoinTrigger(set.ctx, set.coins[0], 'onRoundEnd');
+    expect(set.coins.map((c) => c.temp)).toEqual([3, 3, 3]);
+  });
+});

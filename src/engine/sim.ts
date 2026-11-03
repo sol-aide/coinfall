@@ -20,7 +20,7 @@ import {
   rerollShop,
   shopRerollCost,
 } from './run';
-import type { RunState } from './types';
+import type { CoinDef, RunState } from './types';
 
 export type Strategy = 'sensible' | 'random' | 'greedy';
 
@@ -90,7 +90,19 @@ export const CHARM_RATING: Record<string, number> = {
   lantern: 2,
   anvil: 3.5,
   treaty: 3,
+  rallyhorn: 3,
+  loupe: 2.5,
+  spintop: 2,
 };
+
+/** Build-around Charms are only worth their rating when the bag has coins they improve. */
+function charmRating(run: RunState, id: string): number {
+  const base = CHARM_RATING[id] ?? 2;
+  const has = (pred: (e: CoinDef['effects'][number]) => boolean) => run.bag.some((c) => coinDef(c.defId).effects.some(pred));
+  if (id === 'loupe') return has((e) => e.do.kind === 'mult') ? base + 1 : 0.5;
+  if (id === 'rallyhorn') return has((e) => !!e.require && 'count' in e.require.per && !!e.require.per.count.race) ? base + 1 : 0.5;
+  return base;
+}
 
 function starterRace(run: RunState) {
   const c = run.charms.map(charmDef).find((d) => d.starter);
@@ -198,7 +210,7 @@ function botShop(run: RunState, strategy: Strategy): RunState {
     } else {
       const rate = (o: (typeof options)[number]) => {
         const it = o.item;
-        if (it.kind === 'charm') return run.charms.length >= MAX_CHARMS ? -1 : (CHARM_RATING[it.charmId] ?? 2) * 1.2;
+        if (it.kind === 'charm') return run.charms.length >= MAX_CHARMS ? -1 : charmRating(run, it.charmId) * 1.2;
         if (it.kind === 'coin') return rateCoin(run, it.defId) - bagAverage(run);
         if (it.kind === 'engraving') return bestCoinFor(run, it.engravingId) ? 2.5 : -1;
         return run.bag.length > 10 ? 0.8 : -1;
@@ -228,7 +240,7 @@ function botShop(run: RunState, strategy: Strategy): RunState {
 
 function botShopBuyOnly(run: RunState, reserve: number): RunState {
   for (let pass = 0; pass < 2; pass++) {
-    const charm = run.shop.findIndex((it) => it.kind === 'charm' && run.charms.length < MAX_CHARMS && !it.sold && it.price <= run.gold - reserve && (CHARM_RATING[it.charmId] ?? 0) >= 3);
+    const charm = run.shop.findIndex((it) => it.kind === 'charm' && run.charms.length < MAX_CHARMS && !it.sold && it.price <= run.gold - reserve && charmRating(run, it.charmId) >= 3);
     if (charm >= 0) {
       run = buyItem(run, charm);
       continue;

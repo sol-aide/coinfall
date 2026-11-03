@@ -28,6 +28,7 @@ export const ENGRAVINGS: EngravingDef[] = [
     effects: [{ trigger: 'onRoundEnd', when: 'heads', noScale: true, do: { kind: 'gold', amount: 2 } }],
   },
   { id: 'ironclad', name: 'Ironclad', rarity: 'common', text: 'This coin can’t be destroyed.', sturdy: true },
+  { id: 'kinship', name: 'Kinship', rarity: 'rare', text: 'Counts as a Human, an Orc and an Elf for every ability that looks at races.', allRaces: true },
   { id: 'weighted', name: 'Weighted', rarity: 'uncommon', text: 'Tails still scores half its value.', tailsFraction: 0.5 },
 ];
 

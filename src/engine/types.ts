@@ -16,7 +16,8 @@ export type Trigger =
 
 /** Selects coins on the table relative to the acting coin. */
 export interface Target {
-  scope: 'self' | 'adjacent' | 'table' | 'nearest' | 'farthest';
+  /** `subject`: the coin that set off a reactive trigger (the flipped or destroyed coin). */
+  scope: 'self' | 'adjacent' | 'table' | 'nearest' | 'farthest' | 'subject';
   race?: Race;
   notRace?: Race;
   face?: Face;
@@ -97,6 +98,10 @@ export interface Mods {
   rerollPerPhase: number;
   firstCoinHeads: boolean;
   rareBoost: number;
+  /** Set bonuses (Effect.require on a race count) need this many fewer coins. */
+  setDiscount: number;
+  /** Added to every multiplier factor (×2 becomes ×3). */
+  multBonus: number;
 }
 
 export interface CharmDef {
@@ -125,6 +130,8 @@ export interface EngravingDef {
   sturdy?: boolean;
   /** Tails still scores this fraction of value. */
   tailsFraction?: number;
+  /** Counts as a Human, an Orc and an Elf for every race check. */
+  allRaces?: boolean;
   effects?: Effect[];
 }
 

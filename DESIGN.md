@@ -61,13 +61,13 @@ Most strong builds pair two races, or lean on one of these cross-cutting engines
 
 | Engine | Enablers | Payoffs |
 |---|---|---|
-| **Flip chaos** | Charger, Wrecker, Powder Keg (when destroyed), Moon Priestess/Starweaver re-flips | Brawler (grows per flip), Juggler (+gold per flip), Whirlwind Feather |
+| **Flip chaos** | Charger, Wrecker, Powder Keg (when destroyed), Moon Priestess/Starweaver re-flips | Brawler (grows per flip), Juggler (+gold per flip), Whirlwind Feather, Spinning Top (+1 value to each coin that flips) |
 | **Tails market** | Wrecker and Charger turn heads to tails; low-heads coins | Cutpurse (tails +6), Night Raider (per tails coin), Tailwind Sash, Weighted engraving |
 | **Heads control** | Sentinel, Seer, Wisp, Moon Priestess, Starweaver, First Light, Silverleaf Brooch | Guildmaster, Ranger, Archer, Longbow, Grove Elder, Gem Cutter |
 | **Wreckage** | Berserker, Firebrand | Looter, Powder Keg, Gravedigger's Spade, Tusk Warhorn |
-| **Set bonuses** (3+ of a race on the table) | Race Charms (Commons Banner, Skull Cup, Moonwell Vial), extra draws (Deep Pockets) | Town Crier (3+ Humans), War Drummer (3+ Orcs), Grove Elder (3+ heads Elves: ×2) |
-| **Mixed table** (all three races) | A bag that holds every race | Caravan Master (per race), Envoy (+3 to heads coins), Treaty Seal, Mercenary (Orc paid per Human) |
-| **Multipliers** | Big coins: Warlord, Berserker, buffed Squires | Gem Cutter (×2 the best adjacent heads coin), Grove Elder; Bard can retrigger either for ×4 |
+| **Set bonuses** (3+ of a race on the table) | Race Charms (Commons Banner, Skull Cup, Moonwell Vial), extra draws (Deep Pockets), Rally Horn (sets need 2), Kinship engraving (counts as every race) | Town Crier (3+ Humans), War Drummer (3+ Orcs), Grove Elder (3+ heads Elves: ×2) |
+| **Mixed table** (all three races) | A bag that holds every race, Kinship engraving | Caravan Master (per race), Envoy (+3 to heads coins), Treaty Seal, Mercenary (Orc paid per Human) |
+| **Multipliers** | Big coins: Warlord, Berserker, buffed Squires | Gem Cutter (×2 the best adjacent heads coin), Grove Elder; Bard can retrigger either for ×4; Jeweler's Loupe makes every ×2 a ×3 |
 
 The two engines that pull against each other are deliberate: **tails market** wants coins to land tails, **heads control** wants them heads, and Wrecker feeds one while starving the other.
 
@@ -159,6 +159,9 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | First Light | uncommon | The first coin tossed each round always lands heads. |
 | Guild Charter | uncommon | Round end: +1 gold for each heads Human on the table. |
 | Treaty Seal | uncommon | Round end: +5 gold if Humans, Orcs and Elves are all on the table. |
+| Rally Horn | rare | Set bonuses need one coin fewer (2 Humans, 2 Orcs or 2 heads Elves instead of 3). |
+| Jeweler's Loupe | rare | Multipliers are one higher: ×2 becomes ×3. |
+| Spinning Top | uncommon | Whenever a coin on the table flips, it gets +1 value this round. |
 | Skull Cup | uncommon | Orcs get +2 value. |
 | Moonwell Vial | uncommon | Elves get +1 value and are 5% more likely to land heads. |
 | Seeker's Lantern | common | Rare coins show up much more often. |
@@ -175,6 +178,7 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | Growth | uncommon | Round end: heads gives +1 value permanently. |
 | Gilded | common | Heads: +2 gold. |
 | Ironclad | common | This coin can’t be destroyed. |
+| Kinship | rare | Counts as a Human, an Orc and an Elf for every ability that looks at races. |
 | Weighted | uncommon | Tails still scores half its value. |
 
 ## Balance
@@ -190,22 +194,22 @@ Balance is tuned with `npm run simulate -- 1000 --detail`, which plays 1,000 see
 ```
 Dues: 22, 40, 65, 100, 150, 210, 285, 375
 
-sensible: 327/1000 wins (32.7%), avg best round 73.7
-  lost in phase: 1:14 2:10 3:10 4:43 5:102 6:176 7:156 8:162
-  by starter: warhorn 32.7%, silverleaf 32.8%, banner 32.5%
-  median gold at dues: 1:44/22 2:80/40 3:118/65 4:166/100 5:223/150 6:283/210 7:366/285 8:431/375
-  win% when coin in final bag: druid(148) 38.5%, berserker(194) 38.1%, tinker(149) 36.9%, wardrummer(168) 35.7%, patron(150) 35.3%, towncrier(256) 34.8%, grovelder(197) 34.5%, gemcutter(198) 32.8%, moonpriestess(162) 32.7%, raider(86) 32.6%, starweaver(193) 32.1%, bladedancer(160) 30.6%, warlord(258) 30.6%, caravan(458) 30.3%, innkeeper(203) 29.1%, envoy(273) 28.9%, longbow(179) 28.5%, moneychanger(164) 28.0%, guildmaster(232) 28.0%, looter(126) 27.8%, ranger(156) 26.9%, mercenary(124) 26.6%, seer(64) 26.6%, archer(710) 26.1%, squire(701) 26.0%, merchant(306) 25.5%, cutpurse(123) 25.2%, shaman(88) 25.0%, grunt(611) 23.9%, sentinel(149) 22.1%, captain(176) 21.6%, wrecker(56) 21.4%, firebrand(89) 21.3%, wisp(155) 21.3%, brawler(113) 20.4%, apprentice(55) 20.0%, powderkeg(59) 18.6%, bard(76) 17.1%, charger(49) 16.3%, juggler(89) 15.7%, copper(214) 11.2%
-  win% when charm owned: pockets(91) 83.5%, scales(87) 72.4%, anvil(73) 52.1%, firstlight(267) 47.6%, clover(266) 46.2%, tailwind(270) 44.1%, moonwell(251) 43.4%, crucible(67) 43.3%, lantern(58) 43.1%, crown(402) 42.8%, collector(68) 41.2%, haggler(340) 39.7%, longtable(284) 39.1%, skullcup(265) 38.9%, charter(281) 38.8%, ledger(297) 38.4%, treaty(272) 36.4%, whirlwind(61) 34.4%, silverleaf(344) 32.8%, warhorn(321) 32.7%, banner(335) 32.5%, spade(56) 30.4%, dice(8) 12.5%
+sensible: 312/1000 wins (31.2%), avg best round 74.0
+  lost in phase: 1:14 2:9 3:12 4:41 5:100 6:181 7:166 8:165
+  by starter: warhorn 31.8%, silverleaf 31.7%, banner 30.1%
+  median gold at dues: 1:44/22 2:80/40 3:119/65 4:163/100 5:218/150 6:283/210 7:363/285 8:435/375
+  win% when coin in final bag: grovelder(184) 42.9%, druid(140) 40.7%, patron(142) 36.6%, berserker(191) 35.1%, wardrummer(180) 34.4%, towncrier(251) 33.1%, gemcutter(211) 31.8%, mercenary(120) 30.8%, caravan(460) 30.4%, tinker(153) 30.1%, starweaver(210) 30.0%, guildmaster(233) 28.3%, moonpriestess(158) 27.8%, raider(94) 27.7%, envoy(269) 26.8%, ranger(165) 26.7%, warlord(233) 26.2%, longbow(176) 26.1%, wrecker(54) 25.9%, innkeeper(197) 24.9%, archer(709) 24.5%, firebrand(102) 24.5%, squire(710) 24.2%, moneychanger(145) 23.4%, bladedancer(158) 23.4%, merchant(308) 23.4%, looter(125) 23.2%, sentinel(147) 21.8%, seer(69) 21.7%, grunt(604) 21.5%, brawler(113) 21.2%, captain(175) 21.1%, shaman(95) 21.1%, wisp(162) 20.4%, cutpurse(120) 19.2%, juggler(87) 18.4%, apprentice(48) 16.7%, bard(75) 14.7%, charger(44) 13.6%, copper(202) 12.9%, powderkeg(64) 12.5%
+  win% when charm owned: pockets(83) 73.5%, scales(85) 62.4%, loupe(15) 60.0%, crucible(70) 52.9%, rallyhorn(32) 50.0%, firstlight(234) 49.1%, clover(248) 46.4%, anvil(69) 44.9%, collector(61) 42.6%, spintop(40) 42.5%, ledger(274) 41.2%, moonwell(244) 41.0%, longtable(250) 39.6%, skullcup(266) 39.5%, treaty(265) 38.9%, tailwind(275) 37.8%, crown(413) 37.8%, charter(252) 37.7%, whirlwind(77) 37.7%, lantern(62) 35.5%, haggler(326) 33.7%, spade(62) 32.3%, warhorn(321) 31.8%, silverleaf(344) 31.7%, banner(335) 30.1%, dice(8) 25.0%
 
-greedy: 61/1000 wins (6.1%), avg best round 51.1
-  lost in phase: 1:14 2:11 3:17 4:89 5:193 6:283 7:227 8:105
-  by starter: warhorn 9.3%, silverleaf 2.0%, banner 7.2%
-  median gold at dues: 1:44/22 2:79/40 3:115/65 4:151/100 5:187/150 6:225/210 7:262/285 8:314/375
+greedy: 63/1000 wins (6.3%), avg best round 52.7
+  lost in phase: 1:14 2:12 3:17 4:90 5:184 6:292 7:220 8:108
+  by starter: warhorn 10.9%, silverleaf 2.6%, banner 5.7%
+  median gold at dues: 1:44/22 2:79/40 3:114/65 4:150/100 5:187/150 6:220/210 7:266/285 8:327/375
 
-random: 0/1000 wins (0.0%), avg best round 21.4
-  lost in phase: 1:10 2:44 3:235 4:504 5:194 6:12 7:1 8:0
+random: 0/1000 wins (0.0%), avg best round 21.3
+  lost in phase: 1:10 2:44 3:235 4:503 5:194 6:13 7:1 8:0
   by starter: warhorn 0.0%, silverleaf 0.0%, banner 0.0%
-  median gold at dues: 1:43/22 2:66/40 3:79/65 4:85/100 5:96/150 6:121/210 7:119/285 8:NaN/375
+  median gold at dues: 1:43/22 2:65/40 3:79/65 4:84/100 5:96/150 6:145/210 7:119/285 8:NaN/375
 ```
 
 ### What changed during tuning
@@ -217,8 +221,9 @@ random: 0/1000 wins (0.0%), avg best round 21.4
 6. **Curve**: dues softened early (22/40/65) so ~2% of sensible runs die in phase 1, and raised late (150/210/285/375) so runs are decided in phases 5–8.
 7. **Synergy expansion** (12 coins, 1 Charm; 29 → 41 coins). The first pass dropped the sensible bot from 28.8% to 19.5% (Silverleaf 12.8%): with a bigger pool, duplicate offers and three-of-a-kind fusions became rare, and the tails coin in the Elf pool worked against Elf heads-control. Fixes: owned coins are offered twice as often; the tails-counting coin moved from Elves to Orcs as Night Raider and pays whatever its own face; Cutpurse tails +4 → +6; Powder Keg +6 → +8 gold and value 1 → 2.
 8. **Berserker and bot synergy sense** (milestone 8). Berserker runs still won 47% against a 27% average: it thins Copper out of the bag for free *and* grows by the full value of what it eats. It now gains **half** the victim's value. That pulled Tusk Warhorn to 23%, so the Orc starter became Orcs +3 value and +3 gold per destruction (was +2/+2). The sensible bot now reads set-bonus and mixed-table conditions from coin data (more of a race in the bag makes a set coin worth more; three races make a mixed-table coin worth more). Juggler +1 → +2 gold per flip. Starters now win within one point of each other.
+9. **Rule-bending items** (milestone 11): Rally Horn, Jeweler's Loupe, Spinning Top and the Kinship engraving. The bot first bought Jeweler's Loupe with no ×2 coins (14% win rate when owned); it now rates Loupe and Rally Horn by whether the bag holds coins they improve, and buys them only then.
 
-Result: a sensible strategy wins about **33%** of runs, the greedy bot about **6%**, and random play essentially never. The three starters are within one point of each other. Runs usually end in phases 4–8, so most runs reach the interesting mid-game.
+Result: a sensible strategy wins about **31%** of runs, the greedy bot about **6%**, and random play essentially never. The three starters are within one point of each other. Runs usually end in phases 4–8, so most runs reach the interesting mid-game.
 
 ### Known strengths to watch
 - **Druid, Berserker and Tinker** lead the final-bag win rates (~37–39% against a ~33% average); no coin is far out on its own any more. Deep Pockets and Golden Scales remain the strongest Charms (rare, 15 gold).
@@ -297,6 +302,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 - **Owned coins are offered twice as often.** With 41 coins, three-of-a-kind fusions had become rare and the sensible bot fell to 19.5%. Weighting offers toward coins you already own (below level 3) restored fusions and focused builds without trimming the pool.
 - **Multipliers apply to the final value** (`(base + bonuses) × mult`), so a ×2 placed early still doubles buffs that land later in the same round. Bard can retrigger a ×2 for ×4, a rare high-roll the sim shows is not dominant.
 - **Synergy tags are derived, not authored** (`src/ui/content/tags.ts`): they are computed from each coin's effects, so a rules change can never leave a stale tag, and a test checks that every coin with an ability has at least one.
+- **Rule-bending items over more coins (milestone 11).** With 41 coins the pool is wide enough; depth now comes from Charms and engravings that change how synergies work (Rally Horn lowers set thresholds, Jeweler's Loupe raises multipliers, Spinning Top rewards flips, Kinship makes one coin every race). Two engine hooks support them: `Mods.setDiscount` / `Mods.multBonus`, and a `subject` target for reactive Charm effects (the coin that flipped or was destroyed).
 - **Skipping a reward pays 3 gold** so skipping is a real choice rather than a pure loss.
 - **Reroll tokens also work on round rewards**, not only the shop, to give them more uses.
 - **Starting race Charms** only change their race's coins (they don't add extra coins), keeping the starting bag exactly as specified.
