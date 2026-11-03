@@ -292,6 +292,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 13 | Set bonuses and mixed-table effects fired silently: only numbers changed, so the moment a combo came together went unnoticed. | A sticker callout ("Orc set bonus!", "All three races!") when a gated effect fires. A first pass drew it over the triggering coin, where it collided with that coin's numbers; it now sits in one fixed spot at the top of the table. Reduce Motion: fades in place. |
 | 14 | Daily bazaar: title layout at 390×844 and 375×667 with the new New run / Daily row; a retry of the daily run offers the same three starters in the same order. | — |
 | 16 | Recapturing store screenshots frame by frame: when a round ended, the reward sheet started popping in for one frame before the round-total card covered it (the card is switched on in an effect, one render late). | The sheet waits while the card is pending. Store set (6.9", 1320×2868, RGB) retaken with the new features; App Store text counts updated (40 coins, 26 Charms, 12 Engravings) and the Daily bazaar added. |
+| 18 | Collection log: How to play shows "6 of 40 coins found" with a tick on each found coin and Charm; the title adds "6/40 coins" to the records line. At 375×667 that line fell below the screen. | Shorter records text; smaller title coin area and top padding on short screens. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
@@ -315,6 +316,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 - **Synergy tags are derived, not authored** (`src/ui/content/tags.ts`): they are computed from each coin's effects, so a rules change can never leave a stale tag, and a test checks that every coin with an ability has at least one.
 - **Rule-bending items over more coins (milestone 11).** With 41 coins the pool is wide enough; depth now comes from Charms and engravings that change how synergies work (Rally Horn lowers set thresholds, Jeweler's Loupe raises multipliers, Spinning Top rewards flips, Kinship makes one coin every race). Two engine hooks support them: `Mods.setDiscount` / `Mods.multBonus`, and a `subject` target for reactive Charm effects (the coin that flipped or was destroyed).
 - **Daily bazaar is offline** (milestone 14): the seed is `daily-YYYY-MM-DD` from the device's local date, so it needs no network, accounts or server, in line with the App Store rules above. `RunState.daily` is optional, so older saves still load without a `SAVE_VERSION` bump.
+- **Collection log, not unlocks** (milestone 18): every coin and Charm is available from the first run; the log only records what you have owned (`records.found`). The guide never hides anything, so the rules stay fully readable.
 - **Skipping a reward pays 3 gold** so skipping is a real choice rather than a pure loss.
 - **Reroll tokens also work on round rewards**, not only the shop, to give them more uses.
 - **Starting race Charms** only change their race's coins (they don't add extra coins), keeping the starting bag exactly as specified.

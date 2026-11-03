@@ -28,6 +28,12 @@ function Page({ title, onBack, children }: { title: string; onBack: () => void; 
 }
 
 export function HowToScreen({ onBack }: { onBack: () => void }) {
+  const { records } = useGame();
+  const found = new Set(records.found ?? []);
+  const collectible = COINS.filter((c) => !c.unbuyable);
+  const coinsFound = collectible.filter((c) => found.has(c.id)).length;
+  const charmsFound = CHARMS.filter((c) => found.has(c.id)).length;
+  const tick = <Txt style={styles.found} accessibilityLabel="Found">✓ Found</Txt>;
   return (
     <Page title="How to play" onBack={onBack}>
       <View style={styles.coinRow}>
@@ -51,11 +57,17 @@ export function HowToScreen({ onBack }: { onBack: () => void }) {
       <Txt style={[styles.h2, { marginTop: 8 }]} accessibilityRole="header">
         Coin guide
       </Txt>
+      <Txt style={styles.note}>
+        Your collection: {coinsFound} of {collectible.length} coins found. A coin counts once it has been in your bag.
+      </Txt>
       {COINS.map((c) => (
-        <CoinRow key={c.id} defId={c.id} />
+        <CoinRow key={c.id} defId={c.id} right={found.has(c.id) && !c.unbuyable ? tick : undefined} />
       ))}
       <Txt style={[styles.h2, { marginTop: 8 }]} accessibilityRole="header">
         Charms
+      </Txt>
+      <Txt style={styles.note}>
+        {charmsFound} of {CHARMS.length} Charms found.
       </Txt>
       {CHARMS.map((c) => (
         <View key={c.id} style={styles.guideRow} accessible accessibilityLabel={`${c.name}. ${c.text}`}>
@@ -65,6 +77,7 @@ export function HowToScreen({ onBack }: { onBack: () => void }) {
             <Txt style={styles.guideName}>
               {c.name}
               {c.starter ? <Txt style={styles.note}>  starting charm</Txt> : null}
+              {found.has(c.id) ? <Txt style={styles.found}>  ✓</Txt> : null}
             </Txt>
             <Txt style={styles.guideText}>{c.text}</Txt>
           </View>
@@ -251,6 +264,7 @@ export function MenuOverlay({
 }
 
 const styles = StyleSheet.create({
+  found: { fontSize: font.tiny, color: colors.success, fontWeight: '700' },
   screen: { flex: 1, backgroundColor: 'transparent' },
   head: { paddingHorizontal: 16, paddingBottom: 4, alignItems: 'center' },
   title: { fontSize: font.h1, fontWeight: '900' },

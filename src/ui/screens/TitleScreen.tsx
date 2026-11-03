@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PHASES, localDate } from '../../engine';
+import { COINS, PHASES, localDate } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
 import { Logo } from '../art/Logo';
 import { Coin3D } from '../table/Coin3D';
@@ -19,14 +19,18 @@ const RACES = [
 export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowTo: () => void; onSettings: () => void; onPrivacy: () => void; onPlay: () => void }) {
   const { run, startNewRun, records, reduceMotion } = useGame();
   const insets = useSafeAreaInsets();
+  // Short screens (iPhone SE size) get a smaller coin area so the records line fits.
+  const short = useWindowDimensions().height < 720;
   const canContinue = run && run.screen !== 'won' && run.screen !== 'lost';
+  const collectible = COINS.filter((c) => !c.unbuyable).length;
+  const coinsFound = new Set((records.found ?? []).filter((id) => COINS.some((c) => c.id === id && !c.unbuyable))).size;
   const today = localDate(new Date());
   const d = records.daily?.date === today ? records.daily : undefined;
   const dailyNote = !d ? 'Same run for all' : d.won ? 'Won today!' : `Best: phase ${d.bestPhase}`;
   return (
-    <View style={[styles.screen, { paddingTop: insets.top + 24, paddingBottom: Math.max(insets.bottom, 16) + 8 }]}>
+    <View style={[styles.screen, { paddingTop: insets.top + (short ? 8 : 24), paddingBottom: Math.max(insets.bottom, 16) + 8 }]}>
       <View style={styles.hero}>
-        <View style={styles.coins}>
+        <View style={[styles.coins, short && styles.coinsShort]}>
           <FallingCoin defId="squire" delay={0} x={-90} still={reduceMotion} />
           <FallingCoin defId="grunt" delay={500} x={0} still={reduceMotion} />
           <FallingCoin defId="archer" delay={1000} x={90} still={reduceMotion} />
@@ -82,7 +86,7 @@ export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowT
         <Button label="Privacy" variant="ghost" onPress={onPrivacy} testID="privacy" />
         {records.runs > 0 && (
           <Txt style={styles.records}>
-            Runs {records.runs} · Wins {records.wins} · Best phase {records.bestPhase}
+            {records.runs} runs · {records.wins} wins · best phase {records.bestPhase} · {coinsFound}/{collectible} coins
           </Txt>
         )}
       </View>
@@ -113,6 +117,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 20, justifyContent: 'space-between' },
   hero: { alignItems: 'center', marginTop: 0 },
   coins: { height: 130, width: '100%', alignItems: 'center', justifyContent: 'center' },
+  coinsShort: { height: 92 },
   coin: { position: 'absolute' },
   title: {
     fontSize: 58,

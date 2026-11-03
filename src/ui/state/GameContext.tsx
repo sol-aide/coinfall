@@ -28,6 +28,8 @@ export interface Records {
   bestPhase: number;
   /** Today's Daily bazaar result (only the latest date is kept). */
   daily?: DailyRecord;
+  /** Every coin and Charm id the player has ever owned (the collection log). */
+  found?: string[];
 }
 
 const DEFAULT_SETTINGS: Settings = { speed: 1, tutorialSeen: false, haptics: true };
@@ -110,10 +112,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     setRecords((prev) => {
       const won = next.screen === 'won';
       const rec: Records = {
+        ...prev,
         runs: prev.runs + 1,
         wins: prev.wins + (won ? 1 : 0),
         bestPhase: Math.max(prev.bestPhase, next.phase),
-        daily: prev.daily,
       };
       if (next.daily) {
         const same = prev.daily?.date === next.daily ? prev.daily : undefined;
@@ -129,6 +131,19 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  /** Adds newly owned coins and Charms to the collection log. */
+  const noteFound = useCallback((next: RunState) => {
+    const ids = [...next.bag.map((c) => c.defId), ...next.charms];
+    setRecords((prev) => {
+      const have = new Set(prev.found ?? []);
+      const fresh = ids.filter((id) => !have.has(id));
+      if (!fresh.length) return prev;
+      const rec = { ...prev, found: [...have, ...new Set(fresh)] };
+      writeJson(RECORDS_KEY, rec);
+      return rec;
+    });
+  }, []);
+
   const act = useCallback(
     (fn: (r: RunState) => RunState) => {
       const cur = runRef.current;
@@ -138,6 +153,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         runRef.current = next;
         setRun(next);
         saveRun(next);
+        noteFound(next);
         const ended = (s: RunState) => s.screen === 'won' || s.screen === 'lost';
         if (ended(next) && !ended(cur)) recordEnd(next);
         return true;
@@ -146,7 +162,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         throw e;
       }
     },
-    [saveRun, recordEnd],
+    [saveRun, recordEnd, noteFound],
   );
 
   const startNewRun = useCallback((daily = false) => {
