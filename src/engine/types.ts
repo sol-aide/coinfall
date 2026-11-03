@@ -220,6 +220,8 @@ export interface RunStats {
 export interface RunState {
   version: number;
   seed: number;
+  /** Set for a Daily bazaar run: the local date (YYYY-MM-DD) whose seed it uses. */
+  daily?: string;
   rng: number;
   screen: Screen;
   phase: number; // 1-based

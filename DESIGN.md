@@ -10,6 +10,9 @@ Coinfall is an original roguelike coin-toss bag builder. You are a moneylender a
 - A run starts with **0 gold**, **1 Reroll token** and the starting bag: **5 Copper, 1 Squire (Human), 1 Grunt (Orc), 1 Archer (Elf)**.
 - Before the first round you choose one of three **starting race Charms** (Commons Banner, Tusk Warhorn, Silverleaf Brooch).
 
+### Daily bazaar
+- The title screen's **Daily** button starts a run seeded from the local date: everyone playing on the same day gets the same starters, offers and tosses, and a retry replays it exactly. The title shows the day's best result ("Best: phase 5", "Won today!") and the end screen offers **Retry daily**. Only the latest day is kept in the records; there is no network or leaderboard.
+
 ### A round
 1. **Draw**: 5 coins (6 with Deep Pockets) are drawn at random from the bag. The whole bag is available every round.
 2. **Round start** abilities fire (coins in hand, then Charms).
@@ -283,6 +286,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 10 | Rewards and shop showed only rules text, so spotting which coins combine meant reading every line. | Synergy tags derived from each coin's data (e.g. "Set: 3 Humans", "Mixed table", "Counts Humans", "Flips", "Tails", "×2") as coloured chips; set and mixed-table offers say how well they fit the bag ("Your bag: 3 Humans"); the bag view summarises the build. Checked at 390×844 and 375×667. |
 | 12 | All 26 Charms shared one generic gem icon, so owned Charms and shop offers were hard to tell apart. | Each Charm has its own symbol on a hanging-tag sticker (tag colour = rarity, race colour for starters), used in the shop, the Charms list and How to play. Symbols enlarged after a first pass read too small at 38px. |
 | 13 | Set bonuses and mixed-table effects fired silently: only numbers changed, so the moment a combo came together went unnoticed. | A sticker callout ("Orc set bonus!", "All three races!") when a gated effect fires. A first pass drew it over the triggering coin, where it collided with that coin's numbers; it now sits in one fixed spot at the top of the table. Reduce Motion: fades in place. |
+| 14 | Daily bazaar: title layout at 390×844 and 375×667 with the new New run / Daily row; a retry of the daily run offers the same three starters in the same order. | — |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
@@ -305,6 +309,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 - **Multipliers apply to the final value** (`(base + bonuses) × mult`), so a ×2 placed early still doubles buffs that land later in the same round. Bard can retrigger a ×2 for ×4, a rare high-roll the sim shows is not dominant.
 - **Synergy tags are derived, not authored** (`src/ui/content/tags.ts`): they are computed from each coin's effects, so a rules change can never leave a stale tag, and a test checks that every coin with an ability has at least one.
 - **Rule-bending items over more coins (milestone 11).** With 41 coins the pool is wide enough; depth now comes from Charms and engravings that change how synergies work (Rally Horn lowers set thresholds, Jeweler's Loupe raises multipliers, Spinning Top rewards flips, Kinship makes one coin every race). Two engine hooks support them: `Mods.setDiscount` / `Mods.multBonus`, and a `subject` target for reactive Charm effects (the coin that flipped or was destroyed).
+- **Daily bazaar is offline** (milestone 14): the seed is `daily-YYYY-MM-DD` from the device's local date, so it needs no network, accounts or server, in line with the App Store rules above. `RunState.daily` is optional, so older saves still load without a `SAVE_VERSION` bump.
 - **Skipping a reward pays 3 gold** so skipping is a real choice rather than a pure loss.
 - **Reroll tokens also work on round rewards**, not only the shop, to give them more uses.
 - **Starting race Charms** only change their race's coins (they don't add extra coins), keeping the starting bag exactly as specified.

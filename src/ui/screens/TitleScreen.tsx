@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PHASES } from '../../engine';
+import { PHASES, localDate } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
 import { Logo } from '../art/Logo';
 import { Coin3D } from '../table/Coin3D';
@@ -20,6 +20,9 @@ export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowT
   const { run, startNewRun, records, reduceMotion } = useGame();
   const insets = useSafeAreaInsets();
   const canContinue = run && run.screen !== 'won' && run.screen !== 'lost';
+  const today = localDate(new Date());
+  const d = records.daily?.date === today ? records.daily : undefined;
+  const dailyNote = !d ? 'Same run for all' : d.won ? 'Won today!' : `Best: phase ${d.bestPhase}`;
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 24, paddingBottom: Math.max(insets.bottom, 16) + 8 }]}>
       <View style={styles.hero}>
@@ -43,18 +46,35 @@ export function TitleScreen({ onHowTo, onSettings, onPrivacy, onPlay }: { onHowT
       </View>
       <View style={styles.buttons}>
         {canContinue && <Button big label="Continue run" icon="play" variant="gold" onPress={onPlay} testID="continue" />}
-        <Button
-          big={!canContinue}
-          label="New run"
-          variant={canContinue ? 'secondary' : 'gold'}
-          icon={canContinue ? undefined : 'play'}
-          onPress={() => {
-            startNewRun();
-            onPlay();
-          }}
-          testID="new-run"
-          a11yHint={canContinue ? 'Abandons the current run and starts a new one' : undefined}
-        />
+        <View style={styles.row}>
+          <Button
+            big={!canContinue}
+            label="New run"
+            variant={canContinue ? 'secondary' : 'gold'}
+            icon={canContinue ? undefined : 'play'}
+            onPress={() => {
+              startNewRun();
+              onPlay();
+            }}
+            style={{ flex: 3 }}
+            testID="new-run"
+            a11yHint={canContinue ? 'Abandons the current run and starts a new one' : undefined}
+          />
+          <Button
+            big={!canContinue}
+            label="Daily"
+            sub={dailyNote}
+            variant="secondary"
+            onPress={() => {
+              startNewRun(true);
+              onPlay();
+            }}
+            style={{ flex: 2 }}
+            testID="daily"
+            a11yLabel={`Daily bazaar, ${dailyNote}`}
+            a11yHint={`Everyone gets the same run today.${canContinue ? ' Abandons the current run.' : ''}`}
+          />
+        </View>
         <View style={styles.row}>
           <Button label="How to play" variant="secondary" onPress={onHowTo} style={{ flex: 1 }} testID="howto" />
           <Button label="Settings" variant="secondary" onPress={onSettings} style={{ flex: 1 }} testID="settings" />

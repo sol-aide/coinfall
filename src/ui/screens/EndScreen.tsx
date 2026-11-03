@@ -34,6 +34,7 @@ export function EndScreen({ onTitle }: { onTitle: () => void }) {
               ? `You paid all ${PHASES} Guild dues. The bazaar will tell stories about your table.`
               : `You couldn't pay ${currentDues(r)} gold in phase ${r.phase}. The Guild takes your stall, for now.`}
           </Txt>
+          {r.daily && <Txt style={styles.daily}>Daily bazaar · {r.daily}. Everyone gets this same run today.</Txt>}
         </View>
         <Panel style={styles.stats}>
           {stats.map(([k, v]) => (
@@ -56,7 +57,11 @@ export function EndScreen({ onTitle }: { onTitle: () => void }) {
       </ScrollView>
       <View style={styles.row}>
         <Button label="Title" variant="secondary" onPress={onTitle} style={{ flex: 1 }} testID="end-title" />
-        <Button label="New run" variant="gold" onPress={startNewRun} style={{ flex: 2 }} testID="end-new" />
+        {r.daily ? (
+          <Button label="Retry daily" variant="gold" onPress={() => startNewRun(true)} style={{ flex: 2 }} testID="end-daily" a11yHint="Plays today's Daily bazaar run again from the start" />
+        ) : (
+          <Button label="New run" variant="gold" onPress={() => startNewRun()} style={{ flex: 2 }} testID="end-new" />
+        )}
       </View>
     </View>
   );
@@ -66,6 +71,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   head: { alignItems: 'center', gap: 6 },
   title: { fontSize: 36, fontWeight: '900' },
+  daily: { fontSize: font.small, color: colors.gold, textAlign: 'center' },
   sub: { fontSize: font.body, color: colors.textDim, textAlign: 'center', textShadowColor: 'rgba(10,6,12,0.9)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   stats: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
   stat: { width: '48%', alignItems: 'center' },

@@ -33,6 +33,17 @@ function clone(s: RunState): RunState {
   return JSON.parse(JSON.stringify(s)) as RunState;
 }
 
+/** Everyone playing the Daily bazaar on the same date gets the same run. */
+export function dailySeed(date: string): string {
+  return `daily-${date}`;
+}
+
+/** A local calendar date as YYYY-MM-DD. */
+export function localDate(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 export function newRun(seed: number | string): RunState {
   const s = seedFrom(seed);
   const run: RunState = {

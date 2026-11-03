@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo } from 'react-native';
-import { ActionError, SAVE_VERSION, newRun, type RunState } from '../../engine';
+import { ActionError, SAVE_VERSION, newRun, type RunState, dailySeed, localDate } from '../../engine';
 
 const RUN_KEY = 'coinfall.run.v1';
 const SETTINGS_KEY = 'coinfall.settings.v1';
@@ -15,10 +15,19 @@ export interface Settings {
   haptics: boolean;
 }
 
+export interface DailyRecord {
+  date: string;
+  attempts: number;
+  bestPhase: number;
+  won: boolean;
+}
+
 export interface Records {
   runs: number;
   wins: number;
   bestPhase: number;
+  /** Today's Daily bazaar result (only the latest date is kept). */
+  daily?: DailyRecord;
 }
 
 const DEFAULT_SETTINGS: Settings = { speed: 1, tutorialSeen: false, haptics: true };
@@ -33,7 +42,7 @@ interface GameApi {
   records: Records;
   reduceMotion: boolean;
   act: (fn: (run: RunState) => RunState) => boolean;
-  startNewRun: () => void;
+  startNewRun: (daily?: boolean) => void;
   abandonRun: () => void;
   updateSettings: (patch: Partial<Settings>) => void;
   deleteAllData: () => void;
@@ -99,11 +108,22 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const recordEnd = useCallback((next: RunState) => {
     setRecords((prev) => {
+      const won = next.screen === 'won';
       const rec: Records = {
         runs: prev.runs + 1,
-        wins: prev.wins + (next.screen === 'won' ? 1 : 0),
+        wins: prev.wins + (won ? 1 : 0),
         bestPhase: Math.max(prev.bestPhase, next.phase),
+        daily: prev.daily,
       };
+      if (next.daily) {
+        const same = prev.daily?.date === next.daily ? prev.daily : undefined;
+        rec.daily = {
+          date: next.daily,
+          attempts: (same?.attempts ?? 0) + 1,
+          bestPhase: Math.max(same?.bestPhase ?? 0, next.phase),
+          won: !!same?.won || won,
+        };
+      }
       writeJson(RECORDS_KEY, rec);
       return rec;
     });
@@ -129,9 +149,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     [saveRun, recordEnd],
   );
 
-  const startNewRun = useCallback(() => {
-    const seed = `${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
-    const r = newRun(seed);
+  const startNewRun = useCallback((daily = false) => {
+    const today = localDate(new Date());
+    const r = daily ? newRun(dailySeed(today)) : newRun(`${Date.now()}-${Math.floor(Math.random() * 1e9)}`);
+    if (daily) r.daily = today;
     runRef.current = r;
     setRun(r);
     saveRun(r);

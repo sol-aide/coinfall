@@ -324,3 +324,16 @@ describe('full simulated runs', () => {
     expect(chooseReward(restored, 0)).toEqual(chooseReward(run, 0));
   });
 });
+
+describe('Daily bazaar', () => {
+  it('gives everyone the same run on the same date, and a different one the next day', () => {
+    const { dailySeed, localDate } = require('../run') as typeof import('../run');
+    const a = newRun(dailySeed('2026-11-03'));
+    const b = newRun(dailySeed('2026-11-03'));
+    const c = newRun(dailySeed('2026-11-04'));
+    expect(a.seed).toBe(b.seed);
+    expect(a.starterChoices).toEqual(b.starterChoices);
+    expect(a.seed).not.toBe(c.seed);
+    expect(localDate(new Date(2026, 0, 5))).toBe('2026-01-05');
+  });
+});
