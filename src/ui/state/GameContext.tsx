@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo } from 'react-native';
-import { ActionError, SAVE_VERSION, newRun, type RunState, dailySeed, localDate } from '../../engine';
+import { MAX_RANK, ActionError, SAVE_VERSION, newRun, type RunState, dailySeed, localDate } from '../../engine';
 
 const RUN_KEY = 'coinfall.run.v1';
 const SETTINGS_KEY = 'coinfall.settings.v1';
@@ -30,6 +30,8 @@ export interface Records {
   daily?: DailyRecord;
   /** Every coin and Charm id the player has ever owned (the collection log). */
   found?: string[];
+  /** Highest Guild rank open to play (winning at rank N opens N+1). Missing means 1. */
+  rankUnlocked?: number;
 }
 
 const DEFAULT_SETTINGS: Settings = { speed: 1, tutorialSeen: false, haptics: true };
@@ -117,6 +119,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         wins: prev.wins + (won ? 1 : 0),
         bestPhase: Math.max(prev.bestPhase, next.phase),
       };
+      if (won) rec.rankUnlocked = Math.max(prev.rankUnlocked ?? 1, Math.min(MAX_RANK, (next.rank ?? 1) + 1));
       if (next.daily) {
         const same = prev.daily?.date === next.daily ? prev.daily : undefined;
         rec.daily = {

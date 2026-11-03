@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PHASES, ROUNDS_PER_PHASE, computeMods, currentDues, duesFor, type RunState } from '../../engine';
+import { currentDues, duesFor, PHASES, ROUNDS_PER_PHASE, runMods, type RunState } from '../../engine';
 import { colors, font } from '../theme';
 import { IconButton, Pill, Stitch, Txt } from './ui';
 
@@ -21,17 +21,18 @@ export function Hud({
   onMenu: () => void;
   showRound?: boolean;
 }) {
-  const dues = nextPhase ? duesFor(Math.min(run.phase + 1, PHASES), computeMods(run.charms)) : currentDues(run);
+  const dues = nextPhase ? duesFor(Math.min(run.phase + 1, PHASES), runMods(run)) : currentDues(run);
   const gold = goldOverride ?? run.gold;
   const short = Math.max(0, dues - gold);
   return (
     <View style={styles.hud}>
       <Stitch r={16} inset={5} opacity={0.4} />
       <View style={styles.row}>
-        <View style={{ flex: 1 }} accessible accessibilityRole="header" accessibilityLabel={`Phase ${run.phase} of ${PHASES}${showRound ? `, round ${run.round} of ${ROUNDS_PER_PHASE}` : ''}`}>
+        <View style={{ flex: 1 }} accessible accessibilityRole="header" accessibilityLabel={`Phase ${run.phase} of ${PHASES}${(run.rank ?? 1) > 1 ? `, Guild rank ${run.rank}` : ''}${showRound ? `, round ${run.round} of ${ROUNDS_PER_PHASE}` : ''}`}>
           <Txt style={styles.phase}>
             Phase {run.phase}
             <Txt style={styles.phaseOf}>/{PHASES}</Txt>
+            {(run.rank ?? 1) > 1 ? <Txt style={styles.phaseOf}>  · Rank {run.rank}</Txt> : null}
           </Txt>
           {showRound && (
             <View style={styles.dots}>

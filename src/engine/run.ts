@@ -17,7 +17,7 @@ import {
   rollRewards,
   rollShop,
 } from './economy';
-import { computeMods } from './mods';
+import { runMods } from './mods';
 import { resolvePhaseTrigger, resolveRound } from './resolve';
 import { seedFrom } from './rng';
 import type { RunState } from './types';
@@ -135,7 +135,7 @@ export function chooseReward(prev: RunState, index: number | null): RunState {
 
 function endPhase(run: RunState) {
   const { events, gold } = resolvePhaseTrigger(run, 'onPhaseEnd');
-  const mods = computeMods(run.charms);
+  const mods = runMods(run);
   const melt = BASE_MELT_PER_PHASE + mods.meltPerPhase;
   const reroll = BASE_REROLL_PER_PHASE + mods.rerollPerPhase;
   run.meltTokens += melt;
@@ -147,7 +147,7 @@ function endPhase(run: RunState) {
 }
 
 export function currentDues(run: RunState): number {
-  return duesFor(run.phase, computeMods(run.charms));
+  return duesFor(run.phase, runMods(run));
 }
 
 export function canPayDues(run: RunState): boolean {
@@ -177,7 +177,7 @@ export function payDues(prev: RunState): RunState {
 }
 
 export function shopRerollCost(run: RunState): number {
-  return rerollCost(run.shopRerolls, computeMods(run.charms));
+  return rerollCost(run.shopRerolls, runMods(run));
 }
 
 export function rerollShop(prev: RunState, useToken = false): RunState {

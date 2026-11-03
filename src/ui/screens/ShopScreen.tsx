@@ -6,12 +6,12 @@ import {
   buyItem,
   canMelt,
   charmDef,
-  computeMods,
   duesFor,
   engravingDef,
   leaveShop,
   meltCoin,
   rerollShop,
+  runMods,
   shopRerollCost,
   type RunState,
   type ShopItem,
@@ -33,7 +33,7 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
   const [melting, setMelting] = useState(false);
   const [bagOpen, setBagOpen] = useState(false);
   const [charmsOpen, setCharmsOpen] = useState(false);
-  const mods = computeMods(r.charms);
+  const mods = runMods(r);
   const nextDues = duesFor(r.phase + 1, mods);
   const rerollCost = shopRerollCost(r);
 

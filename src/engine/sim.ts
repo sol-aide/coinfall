@@ -3,7 +3,7 @@
 import { charmDef } from './content/charms';
 import { coinDef } from './content/coins';
 import { MAX_CHARMS, duesFor } from './economy';
-import { computeMods, displayValue } from './mods';
+import { displayValue, runMods } from './mods';
 import * as R from './rng';
 import {
   buyItem,
@@ -140,7 +140,7 @@ function rateCoin(run: RunState, defId: string): number {
 }
 
 function bagAverage(run: RunState): number {
-  const mods = computeMods(run.charms);
+  const mods = runMods(run);
   const vals = run.bag.map((c) => (COIN_RATING[c.defId] ?? 2) * c.level + displayValue(c, mods) * 0.15);
   return vals.reduce((a, b) => a + b, 0) / Math.max(1, vals.length);
 }
@@ -167,7 +167,7 @@ function botReward(run: RunState, strategy: Strategy): RunState {
 }
 
 function bestCoinFor(run: RunState, engravingId: string): string | undefined {
-  const mods = computeMods(run.charms);
+  const mods = runMods(run);
   const candidates = run.bag.filter((c) => !c.engraving);
   if (!candidates.length) return undefined;
   const inBag = (pred: (e: CoinDef['effects'][number]) => boolean) => run.bag.some((c) => coinDef(c.defId).effects.some(pred));
@@ -192,7 +192,7 @@ function bestCoinFor(run: RunState, engravingId: string): string | undefined {
 
 function botShop(run: RunState, strategy: Strategy): RunState {
   const h = rngFor(run);
-  const mods = computeMods(run.charms);
+  const mods = runMods(run);
   const nextDues = duesFor(Math.min(run.phase + 1, 8), mods);
   const reserve = strategy === 'random' ? 0 : Math.round(nextDues * 0.2);
 
@@ -290,11 +290,12 @@ export interface SimResult {
   charms: string[];
 }
 
-export function simulateRun(seed: number | string, strategy: Strategy = 'sensible', starterIndex?: number): SimResult {
+export function simulateRun(seed: number | string, strategy: Strategy = 'sensible', starterIndex?: number, rank = 1): SimResult {
   let run = newRun(seed);
   const h = rngFor(run);
   const starter = run.starterChoices[starterIndex ?? R.int(h, run.starterChoices.length)];
   run = chooseStarter(run, starter);
+  if (rank > 1) run.rank = rank;
   let guard = 0;
   const goldAtDues: number[] = [];
   while (run.screen !== 'won' && run.screen !== 'lost' && guard++ < 1000) {

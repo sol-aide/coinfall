@@ -224,6 +224,8 @@ export interface RunState {
   seed: number;
   /** Set for a Daily bazaar run: the local date (YYYY-MM-DD) whose seed it uses. */
   daily?: string;
+  /** Guild rank (difficulty), 1-5. Missing means 1. */
+  rank?: number;
   rng: number;
   screen: Screen;
   phase: number; // 1-based

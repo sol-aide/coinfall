@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PHASES, charmDef, currentDues, type RunState } from '../../engine';
+import { MAX_RANK, PHASES, charmDef, currentDues, type RunState } from '../../engine';
 import { CoinArt } from '../art/CoinArt';
 import { Icon } from '../art/Icons';
 import { Button, Panel, Ribbon, Txt } from '../components/ui';
@@ -35,6 +35,8 @@ export function EndScreen({ onTitle }: { onTitle: () => void }) {
               : `You couldn't pay ${currentDues(r)} gold in phase ${r.phase}. The Guild takes your stall, for now.`}
           </Txt>
           {r.daily && <Txt style={styles.daily}>Daily bazaar · {r.daily}. Everyone gets this same run today.</Txt>}
+          {won && (r.rank ?? 1) < MAX_RANK && <Txt style={styles.daily}>Guild rank {(r.rank ?? 1) + 1} is now open. Pick it when you choose your patron.</Txt>}
+          {(r.rank ?? 1) > 1 && <Txt style={styles.sub}>Played at Guild rank {r.rank}.</Txt>}
         </View>
         <Panel style={styles.stats}>
           {stats.map(([k, v]) => (

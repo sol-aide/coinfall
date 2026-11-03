@@ -5,7 +5,7 @@ import { charmDef } from './content/charms';
 import { MIN_BAG } from './economy';
 import { coinDef } from './content/coins';
 import { engravingDef } from './content/engravings';
-import { ABILITY_TRIGGERS, computeMods, hasTableAbility, headsChance, tableValue } from './mods';
+import { ABILITY_TRIGGERS, hasTableAbility, headsChance, runMods, tableValue } from './mods';
 import * as R from './rng';
 import type {
   Action,
@@ -430,7 +430,7 @@ function clamp(v: number, lo: number, hi: number) {
 export function newCtx(run: RunState, stage: Stage, phaseMode = false): Ctx {
   return {
     run,
-    mods: computeMods(run.charms),
+    mods: runMods(run),
     table: [],
     inst: new Map(run.bag.map((c) => [c.uid, c])),
     events: [],

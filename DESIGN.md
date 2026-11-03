@@ -13,6 +13,9 @@ Coinfall is an original roguelike coin-toss bag builder. You are a moneylender a
 ### Daily bazaar
 - The title screen's **Daily** button starts a run seeded from the local date: everyone playing on the same day gets the same starters, offers and tosses, and a retry replays it exactly. The title shows the day's best result ("Best: phase 5", "Won today!") and the end screen offers **Retry daily**. Only the latest day is kept in the records; there is no network or leaderboard.
 
+### Guild ranks
+- Winning a run opens the next **Guild rank** (up to 5), chosen on the patron screen. Each rank adds to the ones below: **2** dues +4%; **3** bazaar prices +10%; **4** dues +9% in total; **5** coins 2% less likely to land heads. Daily bazaar runs are always rank 1.
+
 ### A round
 1. **Draw**: 5 coins (6 with Deep Pockets) are drawn at random from the bag. The whole bag is available every round.
 2. **Round start** abilities fire (coins in hand, then Charms).
@@ -218,6 +221,13 @@ random: 0/1000 wins (0.0%), avg best round 21.3
   median gold at dues: 1:43/22 2:65/40 3:78/65 4:85/100 5:96/150 6:132/210 7:144/285 8:NaN/375
 ```
 
+### Guild ranks (1,000 sensible runs each)
+| Rank | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|
+| Win rate | 30.0% | 21.3% | 17.7% | 13.1% | 10.6% |
+
+A first pass (dues +10% per step, prices +15%, heads −4%) fell off a cliff: 30% → 13.5% at rank 2 and 2.6% at rank 5. The steps were softened so each rank is a noticeable but fair step.
+
 ### What changed during tuning
 1. **First pass** (dues 25/45/70/105/150/205/270/350, original numbers): sensible bot won ~7%; Orcs dominated (Warhorn 12.6% vs Banner 3%).
 2. **Degenerate Berserker**: a Berserker could eat the whole bag and win with a single 60+ value coin. Fix: the bag can't drop below 5 coins through destruction (same floor as melting). Win rate fell to 3.6%, which showed how much the exploit carried.
@@ -293,6 +303,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 14 | Daily bazaar: title layout at 390×844 and 375×667 with the new New run / Daily row; a retry of the daily run offers the same three starters in the same order. | — |
 | 16 | Recapturing store screenshots frame by frame: when a round ended, the reward sheet started popping in for one frame before the round-total card covered it (the card is switched on in an effect, one render late). | The sheet waits while the card is pending. Store set (6.9", 1320×2868, RGB) retaken with the new features; App Store text counts updated (40 coins, 26 Charms, 12 Engravings) and the Daily bazaar added. |
 | 18 | Collection log: How to play shows "6 of 40 coins found" with a tick on each found coin and Charm; the title adds "6/40 coins" to the records line. At 375×667 that line fell below the screen. | Shorter records text; smaller title coin area and top padding on short screens. |
+| 19 | Guild ranks at 375×667: the rank picker sits under the patron cards with its rules listed; "+" is disabled at the highest open rank; the HUD reads "Phase 1/8 · Rank 3" and dues show 23 instead of 22. | — |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
@@ -317,6 +328,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 - **Rule-bending items over more coins (milestone 11).** With 41 coins the pool is wide enough; depth now comes from Charms and engravings that change how synergies work (Rally Horn lowers set thresholds, Jeweler's Loupe raises multipliers, Spinning Top rewards flips, Kinship makes one coin every race). Two engine hooks support them: `Mods.setDiscount` / `Mods.multBonus`, and a `subject` target for reactive Charm effects (the coin that flipped or was destroyed).
 - **Daily bazaar is offline** (milestone 14): the seed is `daily-YYYY-MM-DD` from the device's local date, so it needs no network, accounts or server, in line with the App Store rules above. `RunState.daily` is optional, so older saves still load without a `SAVE_VERSION` bump.
 - **Collection log, not unlocks** (milestone 18): every coin and Charm is available from the first run; the log only records what you have owned (`records.found`). The guide never hides anything, so the rules stay fully readable.
+- **Guild ranks are modifiers, not new rules** (milestone 19): a rank only feeds `Mods` (dues, prices, heads chance) through `runMods(run)`, so every system that reads modifiers picks it up and the engine stays data-driven. `RunState.rank` is optional (missing = 1).
 - **Skipping a reward pays 3 gold** so skipping is a real choice rather than a pure loss.
 - **Reroll tokens also work on round rewards**, not only the shop, to give them more uses.
 - **Starting race Charms** only change their race's coins (they don't add extra coins), keeping the starting bag exactly as specified.

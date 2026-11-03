@@ -1,7 +1,7 @@
 import { charmDef } from './content/charms';
 import { coinDef } from './content/coins';
 import { engravingDef } from './content/engravings';
-import type { CoinDef, CoinInstance, Mods, Race, TableCoin } from './types';
+import type { CoinDef, CoinInstance, Mods, Race, RunState, TableCoin } from './types';
 
 export function emptyMods(): Mods {
   return {
@@ -29,9 +29,23 @@ function addRecord<K extends string>(into: Partial<Record<K, number>>, from?: Pa
   for (const k of Object.keys(from) as K[]) into[k] = (into[k] ?? 0) + (from[k] ?? 0);
 }
 
-/** Folds every owned Charm's static modifiers into one Mods object. */
-export function computeMods(charmIds: readonly string[]): Mods {
+export const MAX_RANK = 5;
+
+/** What each Guild rank adds, cumulatively (rank 1 is the base game). */
+export const RANK_RULES: { rank: number; text: string }[] = [
+  { rank: 2, text: 'Guild dues +4%.' },
+  { rank: 3, text: 'Bazaar prices +10%.' },
+  { rank: 4, text: 'Guild dues +9% in total.' },
+  { rank: 5, text: 'Coins are 2% less likely to land heads.' },
+];
+
+/** Folds every owned Charm's static modifiers (and the Guild rank) into one Mods object. */
+export function computeMods(charmIds: readonly string[], rank = 1): Mods {
   const m = emptyMods();
+  if (rank >= 2) m.duesMult += 0.04;
+  if (rank >= 3) m.shopDiscount -= 0.1;
+  if (rank >= 4) m.duesMult += 0.05;
+  if (rank >= 5) m.headsBonus.all = (m.headsBonus.all ?? 0) - 0.02;
   for (const id of charmIds) {
     const c = charmDef(id).mods;
     if (!c) continue;
@@ -95,4 +109,9 @@ export function hasTableAbility(def: CoinDef): boolean {
   return def.effects.some(
     (e) => (ABILITY_TRIGGERS as readonly string[]).includes(e.trigger) && e.do.kind !== 'retrigger' && e.do.kind !== 'copy',
   );
+}
+
+/** The modifiers in force for a run: its Charms plus its Guild rank. */
+export function runMods(run: Pick<RunState, 'charms' | 'rank'>): Mods {
+  return computeMods(run.charms, run.rank ?? 1);
 }

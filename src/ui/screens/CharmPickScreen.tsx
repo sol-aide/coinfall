@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { STARTING_BAG, charmDef, chooseStarter, coinDef, type Race, type RunState } from '../../engine';
+import { RANK_RULES, STARTING_BAG, charmDef, chooseStarter, coinDef, type Race, type RunState } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
 import { Button, Ribbon, Stitch, Txt } from '../components/ui';
 import { useGame } from '../state/GameContext';
@@ -14,10 +14,14 @@ const RACE_BLURB: Record<string, string> = {
 };
 
 export function CharmPickScreen({ onBack }: { onBack: () => void }) {
-  const { run, act } = useGame();
+  const { run, act, records } = useGame();
   const r = run as RunState;
   const insets = useSafeAreaInsets();
   const [chosen, setChosen] = useState<string | null>(null);
+  // Daily runs are always rank 1, so everyone plays the same run.
+  const maxRank = r.daily ? 1 : (records.rankUnlocked ?? 1);
+  const [rank, setRank] = useState(maxRank);
+  const rules = RANK_RULES.filter((x) => x.rank <= rank).map((x) => x.text);
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 12, paddingBottom: Math.max(insets.bottom, 12) }]}>
       <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: 12 }}>
@@ -59,6 +63,18 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
             </Pressable>
           );
         })}
+        {maxRank > 1 && (
+          <View style={styles.rankBox}>
+            <View style={styles.rankRow}>
+              <Button label="−" variant="secondary" onPress={() => setRank((v) => Math.max(1, v - 1))} disabled={rank <= 1} a11yLabel="Lower Guild rank" style={styles.rankBtn} testID="rank-down" />
+              <Txt style={styles.rankTxt} accessibilityLiveRegion="polite" accessibilityLabel={`Guild rank ${rank} of ${maxRank}`}>
+                Guild rank {rank}
+              </Txt>
+              <Button label="+" variant="secondary" onPress={() => setRank((v) => Math.min(maxRank, v + 1))} disabled={rank >= maxRank} a11yLabel="Raise Guild rank" style={styles.rankBtn} testID="rank-up" />
+            </View>
+            <Txt style={styles.rankRules}>{rules.length ? rules.join(' ') : 'The standard Guild. Win to open a harder rank.'}</Txt>
+          </View>
+        )}
       </ScrollView>
       <View style={styles.row}>
         <Button label="Back" variant="secondary" onPress={onBack} style={{ flex: 1 }} />
@@ -66,7 +82,7 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
           label="Begin run"
           variant="gold"
           disabled={!chosen}
-          onPress={() => chosen && act((s) => chooseStarter(s, chosen))}
+          onPress={() => chosen && act((s) => ({ ...chooseStarter(s, chosen), rank }))}
           style={{ flex: 2 }}
           testID="begin"
         />
@@ -76,6 +92,11 @@ export function CharmPickScreen({ onBack }: { onBack: () => void }) {
 }
 
 const styles = StyleSheet.create({
+  rankBox: { backgroundColor: 'rgba(20, 13, 22, 0.78)', borderRadius: radius.lg, padding: 12, gap: 6 },
+  rankRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  rankBtn: { width: 64 },
+  rankTxt: { fontSize: font.h2, fontWeight: '800', flex: 1, textAlign: 'center' },
+  rankRules: { fontSize: font.small, color: colors.textDim, textAlign: 'center' },
   screen: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 16 },
   title: { fontSize: font.h1, fontWeight: '900', textAlign: 'center' },
   sub: { fontSize: font.small, color: colors.textDim, textAlign: 'center', textShadowColor: 'rgba(10,6,12,0.9)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },

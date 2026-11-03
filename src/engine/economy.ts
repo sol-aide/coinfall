@@ -3,7 +3,7 @@
 import { CHARMS, charmDef } from './content/charms';
 import { COINS, coinDef } from './content/coins';
 import { ENGRAVINGS } from './content/engravings';
-import { computeMods } from './mods';
+import { runMods } from './mods';
 import * as R from './rng';
 import type { CoinInstance, Mods, Rarity, RunState, ShopItem } from './types';
 
@@ -79,12 +79,12 @@ export function rollCoins(run: RunState, n: number, mods: Mods): string[] {
 }
 
 export function rollRewards(run: RunState): string[] {
-  const mods = computeMods(run.charms);
+  const mods = runMods(run);
   return rollCoins(run, 3 + mods.rewardChoices, mods);
 }
 
 export function rollShop(run: RunState): ShopItem[] {
-  const mods = computeMods(run.charms);
+  const mods = runMods(run);
   const items: ShopItem[] = [];
   for (const id of rollCoins(run, 3, mods)) items.push({ kind: 'coin', defId: id, price: coinPrice(id, run.phase, mods) });
 

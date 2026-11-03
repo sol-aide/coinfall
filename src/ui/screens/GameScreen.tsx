@@ -7,10 +7,10 @@ import {
   SKIP_GOLD,
   currentDues,
   chooseReward,
-  computeMods,
   playRound,
   radius as adjRadius,
   rerollRewards,
+  runMods,
   type RunState,
 } from '../../engine';
 import { CoinDetail, CoinRow } from '../components/CoinInfo';
@@ -78,7 +78,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
   // The round card is switched on in an effect, one render after playback ends;
   // treat it as already showing in that render so the reward sheet never flashes first.
   const cardUp = haul !== null || (!!state?.done && sawPlaying.current && !!r.lastRound);
-  const mods = useMemo(() => computeMods(r.charms), [r.charms]);
+  const mods = useMemo(() => runMods(r), [r.charms, r.rank]);
   const tableW = Math.max(0, Math.min(area.w - 16, area.h / (tableHeightFor(100) / 100)));
   const coins = state ? state.order.map((u) => state.coins[u]) : [];
 

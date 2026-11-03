@@ -337,3 +337,24 @@ describe('Daily bazaar', () => {
     expect(localDate(new Date(2026, 0, 5))).toBe('2026-01-05');
   });
 });
+
+describe('Guild ranks', () => {
+  it('stack harder rules and leave rank 1 unchanged', () => {
+    const { computeMods, runMods } = require('../mods') as typeof import('../mods');
+    const base = computeMods([]);
+    expect(runMods({ charms: [] })).toEqual(base);
+    const r3 = runMods({ charms: [], rank: 3 });
+    expect(r3.duesMult).toBeCloseTo(0.04);
+    expect(r3.shopDiscount).toBeCloseTo(-0.1);
+    const r5 = runMods({ charms: [], rank: 5 });
+    expect(r5.duesMult).toBeCloseTo(0.09);
+    expect(r5.headsBonus.all).toBeCloseTo(-0.02);
+    const run = { ...newRun('rank'), phase: 4 };
+    expect(currentDuesOf({ ...run, rank: 4 })).toBeGreaterThan(currentDuesOf(run));
+  });
+});
+
+function currentDuesOf(run: ReturnType<typeof newRun>) {
+  const { currentDues } = require('../run') as typeof import('../run');
+  return currentDues(run);
+}

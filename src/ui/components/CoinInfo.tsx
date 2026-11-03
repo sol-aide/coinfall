@@ -7,6 +7,7 @@ import {
   displayValue,
   engravingDef,
   headsChance,
+  runMods,
   type CoinInstance,
   type RunState,
 } from '../../engine';
@@ -72,7 +73,7 @@ export function CoinRow({
 }) {
   const def = coinDef(defId);
   const rc = raceColors[def.race];
-  const mods = computeMods(run?.charms ?? []);
+  const mods = run ? runMods(run) : computeMods([]);
   const value = inst ? displayValue(inst, mods) : def.value;
   const level = inst?.level ?? 1;
   const eng = inst?.engraving ? engravingDef(inst.engraving) : undefined;
@@ -134,7 +135,7 @@ export function CoinDetail({ run, uid, defId, onClose }: { run: RunState; uid?: 
   if (!id) return null;
   const def = coinDef(id);
   const rc = raceColors[def.race];
-  const mods = computeMods(run.charms);
+  const mods = runMods(run);
   const probe: CoinInstance = inst ?? { uid: 'probe', defId: id, level: 1, bonus: 0, streak: 0, streakBonus: 0 };
   const eng = inst?.engraving ? engravingDef(inst.engraving) : undefined;
   const destroyedNow = uid && !inst;
