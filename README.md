@@ -23,6 +23,9 @@ You are a moneylender at a crossroads bazaar where Humans, Orcs and Elves gamble
 4. **Grow your bag.** After each round, add 1 of 3 coins or skip for 3 gold. Three identical coins fuse into a stronger one.
 5. **Pay the Guild.** Every 5 rounds the Guild collects dues (22 gold, rising to 375 by phase 8). If you can't pay, the run ends.
 6. **Shop at the bazaar.** Buy coins, Charms (run-wide passives, up to 6) and Engravings (upgrades for one coin). Reroll the stock, and use Melt tokens to remove weak coins.
+7. **Build combos.** The strongest bags mix races and stack synergies: mixed tables (Caravan Master, Envoy), three-of-a-kind set bonuses (Town Crier, War Drummer, Grove Elder), tails and flip engines (Cutpurse, Night Raider, Juggler, Brawler), wreckage (Berserker, Looter, Powder Keg) and ×2 multipliers (Gem Cutter). Coloured tags on every coin and Charm name its combos, and offers say which coins in your bag they work with.
+
+**More ways to play:** a **Daily bazaar** run that is the same for everyone each day (offline, seeded from the date), five **Guild ranks** opened by winning, and a collection log of every coin and Charm you have found.
 
 The full rules, every coin, Charm and Engraving, balance data and design decisions are in [DESIGN.md](DESIGN.md). All currencies are play money — there are no purchases, ads, accounts or tracking.
 
@@ -44,7 +47,7 @@ Other commands:
 
 | Command | What it does |
 |---|---|
-| `npm test` | Jest tests for the engine (every trigger, fusion, dues, shop pricing, full seeded runs) and content checks |
+| `npm test` | Jest tests for the engine (every trigger, synergy, fusion, dues, shop pricing, full seeded runs, a random-content fuzz test) and content checks |
 | `npx tsc --noEmit` | Type-check |
 | `npm run simulate -- 1000 --detail` | Balance simulation: 1,000 bot runs per strategy |
 | `npx expo export -p web` | Static web build into `dist/` |
