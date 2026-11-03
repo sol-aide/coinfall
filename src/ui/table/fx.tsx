@@ -27,12 +27,18 @@ export type Fx =
 
 const ms = (base: number, speed: number) => Math.max(40, base / speed);
 
-/** Renders every live effect, positioned in table units (x,y scaled by width). */
-export function FxLayer({ items, proj, speed, reduceMotion }: { items: Fx[]; proj: Projection; speed: number; reduceMotion: boolean }) {
+/** Landing dust lies on the cloth, so it is drawn under the coins; everything else above them. */
+const onGround = (fx: Fx) => fx.kind === 'poof' && !!fx.dust;
+
+/**
+ * Renders the live effects, positioned in table units (x,y scaled by width).
+ * `ground` draws only the effects that sit on the cloth beneath the coins.
+ */
+export function FxLayer({ items, proj, speed, reduceMotion, ground = false }: { items: Fx[]; proj: Projection; speed: number; reduceMotion: boolean; ground?: boolean }) {
   const width = proj.width;
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      {items.map((fx) => {
+      {items.filter((fx) => onGround(fx) === ground).map((fx) => {
         const pt = proj.project(fx.x, fx.y);
         const px = pt.x;
         const py = pt.y;
@@ -210,11 +216,16 @@ function Poof({ px, py, delay, big, dust, speed }: { px: number; py: number; del
   const specs = useMemo<PuffSpec[]>(
     () =>
       Array.from({ length: 7 }, (_, i) => {
+        if (dust) {
+          // Kicked out sideways along the cloth, clear of the coin's rim.
+          const side = i % 2 ? 1 : -1;
+          return { vx: side * size * (0.95 + (i % 3) * 0.25), vy: -2 - (i % 3) * 3, g: 6, size: size * (0.32 + (i % 2) * 0.1), spin: 0 };
+        }
         const a = (Math.PI * 2 * i) / 7 + 0.3;
         const v = size * (0.38 + (i % 3) * 0.08);
         return { vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.6 + 8, g: 18, size: size * (0.3 + (i % 2) * 0.08), spin: 0 };
       }),
-    [size],
+    [size, dust],
   );
   useEffect(() => {
     op.value = withDelay(delay, withSequence(withTiming(1, { duration: 1 }), withDelay(ms(250, speed), withTiming(0, { duration: ms(90, speed) }))));

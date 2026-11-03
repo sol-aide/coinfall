@@ -146,6 +146,7 @@ export function Table({ width, coins, fx, shake, adjacency, speed, reduceMotion,
         </G>
       </Svg>
       {children}
+      <FxLayer items={fx} proj={proj} speed={speed} reduceMotion={reduceMotion} ground />
       {ordered.map((c) => (
         <TableCoinView key={c.uid} coin={c} size={nearSize} proj={proj} speed={speed} reduceMotion={reduceMotion} engraved={engraved.has(c.uid)} onPress={onCoinPress} />
       ))}

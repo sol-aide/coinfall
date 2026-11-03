@@ -233,6 +233,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | Art | Owner: right direction but not enough; wanted semi-3D with better coin flips. | Perspective table, thick 3D coins with real end-over-end flips, settling wobble, glints; embossed coin faces. |
 | Art | The cloth rendered orange on web: its SVG gradient id clashed with the backdrop's. | Prefixed every SVG id per component. |
 | Art | The landing smoke poof hid the new 3D landing. | Landing uses a small dust puff at the coin's base. |
+| Art | Frame-by-frame playtest (120 ms frames, 390×844): the landing dust puff was drawn over the coin, sitting on its face like a stain, because every effect rendered in one layer above the coins. | Effects layer split: landing dust renders on the cloth under the coins and kicks out sideways past the rim; everything else stays above. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
