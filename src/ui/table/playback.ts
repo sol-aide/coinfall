@@ -4,7 +4,7 @@ import type { Fx } from './fx';
 
 /** How long a cosmetic effect stays mounted (ms). */
 export const FX_LIFETIME = 1400;
-import { abilityText, charmDef, coinDef, type Face, type GameEvent, type RoundResult, type StageName } from '../../engine';
+import { abilityText, charmDef, coinDef, type Effect, type Face, type GameEvent, type RoundResult, type StageName } from '../../engine';
 
 export interface DisplayCoin {
   uid: string;
@@ -195,7 +195,12 @@ export function fxFor(e: GameEvent, prev: PlaybackState, next: PlaybackState, ne
       return { fx: [{ id: nextId(), kind: 'poof', x: e.x, y: e.y, delay: Math.max(10, 520 / speed), dust: true }], shake: 0 };
     case 'trigger': {
       const c = at(next, e.uid);
-      return c ? { fx: [{ id: nextId(), kind: 'ring', x: c.x, y: c.y, color: '#FFF3C4' }], shake: 0 } : none;
+      const call = comboCallout(e, c?.defId);
+      const fx: Fx[] = [];
+      if (c) fx.push({ id: nextId(), kind: 'ring', x: c.x, y: c.y, color: '#FFF3C4' });
+      // Announced in one fixed spot near the top of the table, clear of the coins' own numbers.
+      if (call) fx.push({ id: nextId(), kind: 'callout', x: 0.5, y: 0.12, text: call });
+      return fx.length ? { fx, shake: 0 } : none;
     }
     case 'move': {
       const target = at(prev, e.uid);
@@ -220,6 +225,27 @@ export function fxFor(e: GameEvent, prev: PlaybackState, next: PlaybackState, ne
     default:
       return none;
   }
+}
+
+/**
+ * A callout for an effect gated by a condition (set bonus or all three races).
+ * The engine only reports such a trigger once its condition has passed.
+ */
+export function comboCallout(e: GameEvent, defId?: string): string | null {
+  if (e.t !== 'trigger') return null;
+  if (e.charmId) return calloutFor(charmDef(e.charmId).effects ?? []);
+  // Only a coin's own trigger, not "X retriggers Y" / "X copies Y" (those name another coin).
+  if (!defId || / (retriggers|copies) /.test(e.label)) return null;
+  return calloutFor(coinDef(defId).effects);
+}
+
+function calloutFor(effects: Effect[]): string | null {
+  const gated = effects.find((x) => x.require);
+  if (!gated?.require) return null;
+  const per = gated.require.per;
+  if ('races' in per) return 'All three races!';
+  const race = 'count' in per ? per.count.race : undefined;
+  return race && race !== 'neutral' ? `${raceColors[race].label} set bonus!` : 'Set bonus!';
 }
 
 /**

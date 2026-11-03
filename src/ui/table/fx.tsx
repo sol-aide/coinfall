@@ -23,7 +23,8 @@ export type Fx =
   | { id: number; kind: 'poof'; x: number; y: number; delay: number; big?: boolean; dust?: boolean }
   | { id: number; kind: 'hit'; x: number; y: number }
   | { id: number; kind: 'shards'; x: number; y: number; color: string }
-  | { id: number; kind: 'ring'; x: number; y: number; color: string };
+  | { id: number; kind: 'ring'; x: number; y: number; color: string }
+  | { id: number; kind: 'callout'; x: number; y: number; text: string };
 
 const ms = (base: number, speed: number) => Math.max(40, base / speed);
 
@@ -53,6 +54,8 @@ export function FxLayer({ items, proj, speed, reduceMotion, ground = false }: { 
             return reduceMotion ? null : <Shards key={fx.id} px={px} py={py} color={fx.color} speed={speed} />;
           case 'ring':
             return reduceMotion ? null : <Ring key={fx.id} px={px} py={py} color={fx.color} speed={speed} />;
+          case 'callout':
+            return <Callout key={fx.id} text={fx.text} px={Math.min(Math.max(px, 130), width - 130)} py={Math.max(py, 30)} speed={speed} still={reduceMotion} />;
         }
       })}
     </View>
@@ -125,6 +128,30 @@ function PopNumber({ fx, px, py, speed, still }: { fx: Extract<Fx, { kind: 'numb
   return (
     <Animated.View style={[styles.abs, { left: px + 8, top: py - h - 2, width: w, height: h }, style]}>
       <StickerText text={fx.text} size={size} fill={TONE[fx.tone]} width={w} height={h} anchor="start" />
+    </Animated.View>
+  );
+}
+
+/** A combo callout ("Set bonus!"): slapped down tilted with an overshoot, held, then faded. */
+function Callout({ text, px, py, speed, still }: { text: string; px: number; py: number; speed: number; still: boolean }) {
+  const s = useSharedValue(still ? 1 : 0.3);
+  const op = useSharedValue(still ? 0 : 1);
+  useEffect(() => {
+    const hold = ms(900, speed);
+    if (still) {
+      op.value = withSequence(withTiming(1, { duration: 150 }), withDelay(hold, withTiming(0, { duration: 250 })));
+      return;
+    }
+    s.value = withSequence(withTiming(1.25, { duration: ms(110, speed), easing: Easing.out(Easing.quad) }), withTiming(1, { duration: ms(120, speed) }));
+    op.value = withDelay(hold, withTiming(0, { duration: ms(300, speed) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const style = useAnimatedStyle(() => ({ opacity: op.value, transform: [{ rotate: '-5deg' }, { scale: s.value }] }));
+  const w = 260;
+  const h = 52;
+  return (
+    <Animated.View style={[styles.abs, { left: px - w / 2, top: py - h / 2, width: w, height: h }, style]} accessibilityLiveRegion="polite" accessibilityLabel={text}>
+      <StickerText text={text} size={28} fill="#F2B41E" width={w} height={h} />
     </Animated.View>
   );
 }

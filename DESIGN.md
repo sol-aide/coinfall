@@ -282,6 +282,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 9 | End of round: a lingering "+11" score number drew over the round-total card on the web (the table's transform makes its own stacking context). | The card's layer sits above the table (`zIndex`). |
 | 10 | Rewards and shop showed only rules text, so spotting which coins combine meant reading every line. | Synergy tags derived from each coin's data (e.g. "Set: 3 Humans", "Mixed table", "Counts Humans", "Flips", "Tails", "×2") as coloured chips; set and mixed-table offers say how well they fit the bag ("Your bag: 3 Humans"); the bag view summarises the build. Checked at 390×844 and 375×667. |
 | 12 | All 26 Charms shared one generic gem icon, so owned Charms and shop offers were hard to tell apart. | Each Charm has its own symbol on a hanging-tag sticker (tag colour = rarity, race colour for starters), used in the shop, the Charms list and How to play. Symbols enlarged after a first pass read too small at 38px. |
+| 13 | Set bonuses and mixed-table effects fired silently: only numbers changed, so the moment a combo came together went unnoticed. | A sticker callout ("Orc set bonus!", "All three races!") when a gated effect fires. A first pass drew it over the triggering coin, where it collided with that coin's numbers; it now sits in one fixed spot at the top of the table. Reduce Motion: fades in place. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions

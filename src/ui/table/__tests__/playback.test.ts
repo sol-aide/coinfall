@@ -16,3 +16,14 @@ describe('playback reducer', () => {
     }
   });
 });
+
+describe('combo callouts', () => {
+  it('call out set bonuses and all-three-races conditions, nothing else', () => {
+    const { comboCallout } = require('../playback') as typeof import('../playback');
+    expect(comboCallout({ t: 'trigger', uid: 'c1', label: 'War Drummer' }, 'wardrummer')).toBe('Orc set bonus!');
+    expect(comboCallout({ t: 'trigger', uid: 'c1', label: 'Envoy' }, 'envoy')).toBe('All three races!');
+    expect(comboCallout({ t: 'trigger', charmId: 'treaty', label: 'Treaty Seal' })).toBe('All three races!');
+    expect(comboCallout({ t: 'trigger', uid: 'c1', label: 'Caravan Master' }, 'caravan')).toBeNull();
+    expect(comboCallout({ t: 'trigger', uid: 'c1', label: 'Bard retriggers War Drummer' }, 'bard')).toBeNull();
+  });
+});
