@@ -12,7 +12,7 @@ import {
   type RunState,
 } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
-import { bagFitNote, synergyTags, type TagId } from '../content/tags';
+import { bagFitNote, partnerNote, synergyTags, type TagId } from '../content/tags';
 import { TOUCH, colors, font, raceColors, radius, rarityColors } from '../theme';
 import { Overlay, Stitch, Txt } from './ui';
 
@@ -79,6 +79,7 @@ export function CoinRow({
   const eng = inst?.engraving ? engravingDef(inst.engraving) : undefined;
   // On offers (rewards, shop), say how well a set or mixed-table coin fits the bag.
   const fit = run && !inst ? bagFitNote(def, run) : undefined;
+  const partners = run && !inst ? partnerNote(def, run) : undefined;
   const tagLabels = synergyTags(def).map((t) => t.label);
   const body = (
     <>
@@ -95,6 +96,7 @@ export function CoinRow({
         <Txt style={styles.ability}>{abilityText(def, level)}</Txt>
         <TagChips defId={defId} />
         {fit && <Txt style={styles.fit}>{fit}</Txt>}
+        {partners && <Txt style={styles.fit}>{partners}</Txt>}
         {eng && <Txt style={styles.eng}>◆ {eng.name}: {eng.text}</Txt>}
         {level > 1 && <Txt style={styles.eng}>{levelNote(level)}</Txt>}
       </View>
@@ -107,7 +109,7 @@ export function CoinRow({
       </View>
     </>
   );
-  const label = `${def.name}, ${rc.label}${level > 1 ? `, level ${level}` : ''}, value ${value}. ${abilityText(def, level)}${tagLabels.length ? ` Synergies: ${tagLabels.join(', ')}.` : ''}${fit ? ` ${fit}.` : ''}${eng ? ` Engraved ${eng.name}.` : ''}`;
+  const label = `${def.name}, ${rc.label}${level > 1 ? `, level ${level}` : ''}, value ${value}. ${abilityText(def, level)}${tagLabels.length ? ` Synergies: ${tagLabels.join(', ')}.` : ''}${fit ? ` ${fit}.` : ''}${partners ? ` ${partners}.` : ''}${eng ? ` Engraved ${eng.name}.` : ''}`;
   if (!onPress)
     return (
       <View style={styles.row} accessible accessibilityLabel={label}>
@@ -155,6 +157,7 @@ export function CoinDetail({ run, uid, defId, onClose }: { run: RunState; uid?: 
         <TagChips defId={id} />
       </View>
       {bagFitNote(def, run) && <Txt style={styles.detailSub}>{bagFitNote(def, run)}</Txt>}
+      {partnerNote(def, run, 4) && <Txt style={styles.detailSub}>{partnerNote(def, run, 4)}</Txt>}
       {probe.level > 1 && <Txt style={styles.detailSub}>{levelNote(probe.level)}</Txt>}
       {eng && (
         <Txt style={styles.detailSub}>

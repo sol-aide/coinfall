@@ -1,7 +1,7 @@
 import { COINS, coinDef } from '../../../engine';
 import { newInstance } from '../../../engine/economy';
 import { newRun } from '../../../engine/run';
-import { bagFitNote, bagTagSummary, synergyTags } from '../tags';
+import { bagFitNote, bagTagSummary, partnerNote, synergyPartners, synergyTags } from '../tags';
 
 const labels = (id: string) => synergyTags(coinDef(id)).map((t) => t.label);
 
@@ -33,5 +33,28 @@ describe('synergy tags', () => {
       { label: 'Flips', count: 2 },
       { label: 'Gold', count: 2 },
     ]);
+  });
+});
+
+describe('synergy partners', () => {
+  const run = newRun(2);
+  run.bag = ['copper', 'squire', 'grunt', 'archer', 'wrecker', 'berserker'].map((id) => newInstance(run, id));
+
+  it('pair flip makers with flip and tails payoffs, destroyers with wreckage', () => {
+    expect(synergyPartners(coinDef('cutpurse'), run)).toEqual(['Wrecker']);
+    expect(synergyPartners(coinDef('brawler'), run)).toEqual(['Wrecker']);
+    expect(synergyPartners(coinDef('looter'), run)).toEqual(['Berserker']);
+  });
+
+  it('pair race payoffs with that race, both ways, and never list plain Copper', () => {
+    expect(synergyPartners(coinDef('mercenary'), run)).toEqual(['Squire']);
+    expect(synergyPartners(coinDef('warlord'), run)).toEqual(['Berserker', 'Grunt', 'Wrecker']);
+    expect(synergyPartners(coinDef('moneychanger'), run)).toEqual(['Squire']); // Squire counts Humans
+    expect(synergyPartners(coinDef('caravan'), run)).not.toContain('Copper');
+  });
+
+  it('shorten long lists', () => {
+    expect(partnerNote(coinDef('warlord'), run)).toBe('Works with: Berserker, Grunt +1 more');
+    expect(partnerNote(coinDef('sentinel'), run)).toBeUndefined();
   });
 });

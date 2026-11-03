@@ -120,3 +120,65 @@ export function bagTagSummary(run: RunState, max = 5): { label: string; count: n
     .slice(0, max)
     .map(([label, count]) => ({ label, count }));
 }
+
+interface Roles {
+  makesFlips: boolean;
+  paysFlips: boolean;
+  paysTails: boolean;
+  destroys: boolean;
+  paysWreck: boolean;
+  races: Set<Race>;
+  mixed: boolean;
+}
+
+/** What a coin does for others and what it wants from them, read from its effects. */
+function roles(def: CoinDef): Roles {
+  const r: Roles = { makesFlips: false, paysFlips: false, paysTails: false, destroys: false, paysWreck: false, races: new Set(), mixed: false };
+  for (const e of def.effects) {
+    const a = e.do;
+    if ((a.kind === 'flip' && a.target.face !== 'tails') || a.kind === 'bump') r.makesFlips = true;
+    if (e.trigger === 'onFlip') r.paysFlips = true;
+    const tailsCount = counts(a).some((c) => 'count' in c && c.count.face === 'tails');
+    if (e.when === 'tails' || tailsCount) r.paysTails = true;
+    if (a.kind === 'destroy' && a.target.scope !== 'self') r.destroys = true;
+    if (e.trigger === 'onDestroy') r.paysWreck = true;
+    const ts: Target[] = [...targets(a), ...counts(a).flatMap((c) => ('count' in c ? [c.count] : []))];
+    if (e.require && 'count' in e.require.per) ts.push(e.require.per.count);
+    for (const t of ts) if (t.race && t.race !== 'neutral') r.races.add(t.race);
+    if ([...counts(a), ...(e.require ? [e.require.per] : [])].some((c) => 'races' in c)) r.mixed = true;
+  }
+  return r;
+}
+
+function pairs(a: CoinDef, ra: Roles, b: CoinDef, rb: Roles): boolean {
+  if (ra.makesFlips && (rb.paysFlips || rb.paysTails)) return true;
+  if (ra.destroys && rb.paysWreck) return true;
+  if (ra.races.has(b.race)) return true;
+  if (ra.mixed && b.race !== a.race && b.race !== 'neutral') return true;
+  return false;
+}
+
+/**
+ * Names of coins in the bag that combo with `def` (either direction), most
+ * common first, for offers: "Works with: Squire, Captain +2 more".
+ */
+export function synergyPartners(def: CoinDef, run: RunState): string[] {
+  const ra = roles(def);
+  const tally = new Map<string, number>();
+  for (const c of run.bag) {
+    if (c.defId === def.id) continue;
+    const other = coinDef(c.defId);
+    if (other.race === 'neutral' && !other.effects.length) continue;
+    const rb = roles(other);
+    if (pairs(def, ra, other, rb) || pairs(other, rb, def, ra)) tally.set(other.name, (tally.get(other.name) ?? 0) + 1);
+  }
+  return [...tally.entries()].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).map(([name]) => name);
+}
+
+/** "Works with: A, B +2 more", or undefined when nothing in the bag combos with the coin. */
+export function partnerNote(def: CoinDef, run: RunState, max = 2): string | undefined {
+  const names = synergyPartners(def, run);
+  if (!names.length) return undefined;
+  const more = names.length - max;
+  return `Works with: ${names.slice(0, max).join(', ')}${more > 0 ? ` +${more} more` : ''}`;
+}
