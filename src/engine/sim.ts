@@ -97,12 +97,30 @@ function starterRace(run: RunState) {
   return c?.race;
 }
 
+/**
+ * Reads a coin's conditions from its data: set bonuses are worth more the more
+ * of that race the bag holds, mixed-table coins the more races it holds.
+ */
+function synergyBonus(run: RunState, def: ReturnType<typeof coinDef>): number {
+  let bonus = 0;
+  const share = (race: string) => run.bag.filter((c) => coinDef(c.defId).race === race).length / Math.max(1, run.bag.length);
+  const racesHeld = new Set(run.bag.map((c) => coinDef(c.defId).race).filter((r) => r !== 'neutral'));
+  for (const e of def.effects) {
+    const per = e.require?.per ?? (e.do.kind === 'gold' || e.do.kind === 'buff' ? e.do.per : undefined);
+    if (!per) continue;
+    if ('races' in per) bonus += racesHeld.size >= 3 ? 1 : racesHeld.size === 2 ? 0 : -1;
+    else if (e.require && 'count' in per && per.count.race) bonus += share(per.count.race) * 4 - 1;
+  }
+  return Math.max(-1.5, Math.min(1.5, bonus));
+}
+
 function rateCoin(run: RunState, defId: string): number {
   const def = coinDef(defId);
   let r = COIN_RATING[defId] ?? 2;
   if (def.race === starterRace(run)) r += 0.6;
   const raceCount = run.bag.filter((c) => coinDef(c.defId).race === def.race).length;
   r += Math.min(1, raceCount * 0.15);
+  r += synergyBonus(run, def);
   const same = run.bag.filter((c) => c.defId === defId && c.level === 1).length;
   if (same === 2) r += 2.5;
   else if (same === 1) r += 0.5;

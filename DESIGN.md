@@ -96,7 +96,7 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | Tinker | common | 2 | Phase end: +1 gold for each Human in your bag, even from the bag. | onPhaseEnd |
 | Guildmaster | rare | 2 | Heads: +3 gold for each heads Human on the table (itself included). | onRoundEnd |
 | Caravan Master | uncommon | 2 | Round end: +2 gold for each race on the table (Humans, Orcs, Elves). | onRoundEnd |
-| Juggler | common | 2 | Whenever another coin on the table flips: +1 gold. | onFlip |
+| Juggler | common | 2 | Whenever another coin on the table flips: +2 gold. | onFlip |
 | Town Crier | uncommon | 2 | Round end: if 3 or more Humans are on the table, +8 gold. | onRoundEnd |
 | Gem Cutter | rare | 2 | Round end: doubles the value of the highest-value adjacent heads coin. | onRoundEnd |
 
@@ -105,7 +105,7 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | Coin | Rarity | Value | Ability | Triggers |
 |---|---|---|---|---|
 | Grunt | common | 4 | No ability. Just heavy. | — |
-| Berserker | uncommon | 3 | Destroys the lowest-value adjacent coin and permanently gains its value. | onAdjacent |
+| Berserker | uncommon | 3 | Destroys the lowest-value adjacent coin and permanently gains half its value. | onAdjacent |
 | Charger | common | 3 | On land: rams the nearest coin, pushing it away and flipping it. | onLand |
 | Shaman | common | 2 | Adjacent Orcs get +3 value this round. | onAdjacent |
 | Firebrand | uncommon | 6 | Round end: 1 in 4 chance to blow up. When destroyed: +10 gold. | onRoundEnd, onDestroy |
@@ -141,7 +141,7 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | Charm | Rarity | Effect |
 |---|---|---|
 | Commons Banner | starter | Humans get +1 value. |
-| Tusk Warhorn | starter | Orcs get +2 value. +2 gold whenever a coin is destroyed. |
+| Tusk Warhorn | starter | Orcs get +3 value. +3 gold whenever a coin is destroyed. |
 | Silverleaf Brooch | starter | Elves land heads 68% of the time. |
 | Four-Leaf Pin | uncommon | All coins are 6% more likely to land heads. |
 | Deep Pockets | rare | Draw 1 extra coin every round. |
@@ -190,22 +190,22 @@ Balance is tuned with `npm run simulate -- 1000 --detail`, which plays 1,000 see
 ```
 Dues: 22, 40, 65, 100, 150, 210, 285, 375
 
-sensible: 273/1000 wins (27.3%), avg best round 68.3
-  lost in phase: 1:23 2:12 3:21 4:54 5:142 6:167 7:184 8:124
-  by starter: warhorn 25.5%, silverleaf 28.5%, banner 27.8%
-  median gold at dues: 1:43/22 2:77/40 3:114/65 4:156/100 5:213/150 6:277/210 7:371/285 8:475/375
-  win% when coin in final bag: berserker(212) 46.7%, druid(160) 32.5%, patron(146) 30.1%, towncrier(190) 30.0%, tinker(154) 27.9%, gemcutter(197) 27.4%, moonpriestess(168) 27.4%, bladedancer(172) 26.7%, grovelder(206) 26.2%, caravan(185) 24.9%, moneychanger(150) 24.7%, innkeeper(205) 24.4%, wrecker(63) 23.8%, longbow(183) 23.5%, apprentice(56) 23.2%, raider(105) 22.9%, ranger(161) 22.4%, captain(180) 21.7%, brawler(117) 21.4%, merchant(310) 21.0%, starweaver(186) 21.0%, warlord(247) 20.2%, guildmaster(239) 20.1%, squire(775) 19.7%, sentinel(152) 19.1%, archer(755) 19.1%, mercenary(126) 19.0%, juggler(91) 18.7%, envoy(171) 18.1%, looter(130) 16.9%, grunt(642) 16.7%, bard(85) 16.5%, cutpurse(134) 16.4%, shaman(108) 15.7%, wisp(167) 15.6%, firebrand(104) 14.4%, wardrummer(160) 14.4%, seer(74) 13.5%, copper(315) 13.3%, powderkeg(60) 11.7%, charger(65) 10.8%
-  win% when charm owned: pockets(79) 68.4%, scales(86) 53.5%, anvil(74) 51.4%, firstlight(248) 43.5%, tailwind(259) 42.9%, clover(249) 39.8%, longtable(252) 39.3%, ledger(255) 38.4%, crucible(71) 38.0%, skullcup(238) 37.4%, crown(393) 37.2%, moonwell(221) 37.1%, treaty(228) 36.8%, haggler(320) 35.3%, collector(66) 34.8%, charter(260) 33.5%, whirlwind(55) 32.7%, spade(55) 30.9%, lantern(56) 30.4%, silverleaf(344) 28.5%, banner(335) 27.8%, warhorn(321) 25.5%, dice(5) 20.0%
+sensible: 327/1000 wins (32.7%), avg best round 73.7
+  lost in phase: 1:14 2:10 3:10 4:43 5:102 6:176 7:156 8:162
+  by starter: warhorn 32.7%, silverleaf 32.8%, banner 32.5%
+  median gold at dues: 1:44/22 2:80/40 3:118/65 4:166/100 5:223/150 6:283/210 7:366/285 8:431/375
+  win% when coin in final bag: druid(148) 38.5%, berserker(194) 38.1%, tinker(149) 36.9%, wardrummer(168) 35.7%, patron(150) 35.3%, towncrier(256) 34.8%, grovelder(197) 34.5%, gemcutter(198) 32.8%, moonpriestess(162) 32.7%, raider(86) 32.6%, starweaver(193) 32.1%, bladedancer(160) 30.6%, warlord(258) 30.6%, caravan(458) 30.3%, innkeeper(203) 29.1%, envoy(273) 28.9%, longbow(179) 28.5%, moneychanger(164) 28.0%, guildmaster(232) 28.0%, looter(126) 27.8%, ranger(156) 26.9%, mercenary(124) 26.6%, seer(64) 26.6%, archer(710) 26.1%, squire(701) 26.0%, merchant(306) 25.5%, cutpurse(123) 25.2%, shaman(88) 25.0%, grunt(611) 23.9%, sentinel(149) 22.1%, captain(176) 21.6%, wrecker(56) 21.4%, firebrand(89) 21.3%, wisp(155) 21.3%, brawler(113) 20.4%, apprentice(55) 20.0%, powderkeg(59) 18.6%, bard(76) 17.1%, charger(49) 16.3%, juggler(89) 15.7%, copper(214) 11.2%
+  win% when charm owned: pockets(91) 83.5%, scales(87) 72.4%, anvil(73) 52.1%, firstlight(267) 47.6%, clover(266) 46.2%, tailwind(270) 44.1%, moonwell(251) 43.4%, crucible(67) 43.3%, lantern(58) 43.1%, crown(402) 42.8%, collector(68) 41.2%, haggler(340) 39.7%, longtable(284) 39.1%, skullcup(265) 38.9%, charter(281) 38.8%, ledger(297) 38.4%, treaty(272) 36.4%, whirlwind(61) 34.4%, silverleaf(344) 32.8%, warhorn(321) 32.7%, banner(335) 32.5%, spade(56) 30.4%, dice(8) 12.5%
 
-greedy: 74/1000 wins (7.4%), avg best round 52.2
-  lost in phase: 1:23 2:16 3:26 4:108 5:257 6:244 7:160 8:92
-  by starter: warhorn 12.1%, silverleaf 3.2%, banner 7.2%
-  median gold at dues: 1:42/22 2:75/40 3:109/65 4:142/100 5:176/150 6:220/210 7:280/285 8:345/375
+greedy: 61/1000 wins (6.1%), avg best round 51.1
+  lost in phase: 1:14 2:11 3:17 4:89 5:193 6:283 7:227 8:105
+  by starter: warhorn 9.3%, silverleaf 2.0%, banner 7.2%
+  median gold at dues: 1:44/22 2:79/40 3:115/65 4:151/100 5:187/150 6:225/210 7:262/285 8:314/375
 
-random: 1/1000 wins (0.1%), avg best round 21.4
-  lost in phase: 1:13 2:40 3:259 4:504 5:171 6:11 7:1 8:0
-  by starter: warhorn 0.3%, silverleaf 0.0%, banner 0.0%
-  median gold at dues: 1:43/22 2:65/40 3:77/65 4:82/100 5:97/150 6:151/210 7:581/285 8:970/375
+random: 0/1000 wins (0.0%), avg best round 21.4
+  lost in phase: 1:10 2:44 3:235 4:504 5:194 6:12 7:1 8:0
+  by starter: warhorn 0.0%, silverleaf 0.0%, banner 0.0%
+  median gold at dues: 1:43/22 2:66/40 3:79/65 4:85/100 5:96/150 6:121/210 7:119/285 8:NaN/375
 ```
 
 ### What changed during tuning
@@ -216,11 +216,13 @@ random: 1/1000 wins (0.1%), avg best round 21.4
 5. **Starter parity**: Tusk Warhorn raised to Orcs +2 value, Silverleaf to 68% heads. Starters now win 28–31% each.
 6. **Curve**: dues softened early (22/40/65) so ~2% of sensible runs die in phase 1, and raised late (150/210/285/375) so runs are decided in phases 5–8.
 7. **Synergy expansion** (12 coins, 1 Charm; 29 → 41 coins). The first pass dropped the sensible bot from 28.8% to 19.5% (Silverleaf 12.8%): with a bigger pool, duplicate offers and three-of-a-kind fusions became rare, and the tails coin in the Elf pool worked against Elf heads-control. Fixes: owned coins are offered twice as often; the tails-counting coin moved from Elves to Orcs as Night Raider and pays whatever its own face; Cutpurse tails +4 → +6; Powder Keg +6 → +8 gold and value 1 → 2.
+8. **Berserker and bot synergy sense** (milestone 8). Berserker runs still won 47% against a 27% average: it thins Copper out of the bag for free *and* grows by the full value of what it eats. It now gains **half** the victim's value. That pulled Tusk Warhorn to 23%, so the Orc starter became Orcs +3 value and +3 gold per destruction (was +2/+2). The sensible bot now reads set-bonus and mixed-table conditions from coin data (more of a race in the bag makes a set coin worth more; three races make a mixed-table coin worth more). Juggler +1 → +2 gold per flip. Starters now win within one point of each other.
 
-Result: a sensible strategy wins about **27%** of runs, the greedy bot about **7%**, and random play essentially never. Runs usually end in phases 4–8, so most runs reach the interesting mid-game.
+Result: a sensible strategy wins about **33%** of runs, the greedy bot about **6%**, and random play essentially never. The three starters are within one point of each other. Runs usually end in phases 4–8, so most runs reach the interesting mid-game.
 
 ### Known strengths to watch
-- **Berserker** runs win ~45% of the time when it survives to the end of the run (it is still the riskiest coin: it destroys your own coins). Deep Pockets and Golden Scales are the strongest Charms (rare, 15 gold).
+- **Druid, Berserker and Tinker** lead the final-bag win rates (~37–39% against a ~33% average); no coin is far out on its own any more. Deep Pockets and Golden Scales remain the strongest Charms (rare, 15 gold).
+- **Juggler, Charger and Bard** trail (~16%): they need a flip build or strong neighbours, and the bot doesn't plan for them.
 - Copper in the final bag correlates with losing, as intended: melting and outgrowing Copper is part of the strategy.
 
 ## Art direction

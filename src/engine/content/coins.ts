@@ -162,8 +162,8 @@ export const COINS: CoinDef[] = [
     race: 'human',
     rarity: 'common',
     value: 2,
-    text: 'Whenever another coin on the table flips: +{1} gold.',
-    effects: [{ trigger: 'onFlip', any: true, do: { kind: 'gold', amount: 1 } }],
+    text: 'Whenever another coin on the table flips: +{2} gold.',
+    effects: [{ trigger: 'onFlip', any: true, do: { kind: 'gold', amount: 2 } }],
   },
   {
     id: 'towncrier',
@@ -208,11 +208,11 @@ export const COINS: CoinDef[] = [
     race: 'orc',
     rarity: 'uncommon',
     value: 3,
-    text: 'Destroys the lowest-value adjacent coin and permanently gains its value.',
+    text: 'Destroys the lowest-value adjacent coin and permanently gains half its value.',
     effects: [
       {
         trigger: 'onAdjacent',
-        do: { kind: 'destroy', target: { scope: 'adjacent', pick: 'lowest' }, absorb: true },
+        do: { kind: 'destroy', target: { scope: 'adjacent', pick: 'lowest' }, absorb: 0.5 },
       },
     ],
   },

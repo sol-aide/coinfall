@@ -304,8 +304,9 @@ export function execute(
         const gained = valueOf(ctx, t);
         const wasDestroyed = t.destroyed;
         destroyCoin(ctx, t, self);
-        if (a.absorb && self && !self.destroyed && !wasDestroyed && t.destroyed && gained > 0) {
-          changeValue(ctx, self, gained, true);
+        const share = a.absorb === true ? gained : Math.floor(gained * (a.absorb || 0));
+        if (a.absorb && self && !self.destroyed && !wasDestroyed && t.destroyed && share > 0) {
+          changeValue(ctx, self, share, true);
         }
       }
       return;

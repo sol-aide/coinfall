@@ -118,7 +118,7 @@ describe('tails and flip payoffs', () => {
     setFace(ctx, coins[1], 'tails');
     setFace(ctx, coins[1], 'heads');
     setFace(ctx, coins[0], 'tails');
-    expect(goldEvents(ctx)).toBe(2);
+    expect(goldEvents(ctx)).toBe(4);
   });
 
   it('Wisp turns the best adjacent tails coin to heads', () => {

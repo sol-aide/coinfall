@@ -130,7 +130,7 @@ describe('onAdjacent', () => {
     expect(coins[0].temp).toBe(0);
   });
 
-  it('Berserker destroys the lowest adjacent coin and absorbs its value', () => {
+  it('Berserker destroys the lowest adjacent coin and absorbs half its value', () => {
     const { ctx, coins, inst, run } = table([
       { defId: 'berserker', x: 0.5, y: 0.5 },
       { defId: 'grunt', x: 0.6, y: 0.5 },
@@ -140,8 +140,8 @@ describe('onAdjacent', () => {
     runCoinTrigger(ctx, coins[0], 'onAdjacent');
     expect(coins[2].destroyed).toBe(true);
     expect(coins[1].destroyed).toBe(false);
-    expect(inst[0].bonus).toBe(2);
-    expect(valueOf(ctx, coins[0])).toBe(5);
+    expect(inst[0].bonus).toBe(1);
+    expect(valueOf(ctx, coins[0])).toBe(4);
     expect(run.bag).toHaveLength(3 + PAD.length); // removed from bag only when the round settles
   });
 
@@ -193,7 +193,7 @@ describe('onDestroy', () => {
   it('Tusk Warhorn and Spade pay gold on destroy', () => {
     const { ctx, coins } = table([{ defId: 'copper' }, ...PAD], ['warhorn', 'spade']);
     destroyCoin(ctx, coins[0]);
-    expect(goldEvents(ctx)).toBe(5);
+    expect(goldEvents(ctx)).toBe(6);
   });
 
   it('Second Wind returns a destroyed coin to the bag once', () => {

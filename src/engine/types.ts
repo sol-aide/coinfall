@@ -41,7 +41,8 @@ export type Action =
   | { kind: 'flip'; target: Target }
   | { kind: 'reflip'; target: Target; amount?: number }
   | { kind: 'setHeads'; target: Target }
-  | { kind: 'destroy'; target: Target; absorb?: boolean }
+  /** `absorb`: the destroyer permanently gains the victim's value (true), or that fraction of it. */
+  | { kind: 'destroy'; target: Target; absorb?: boolean | number }
   | { kind: 'bump'; target: Target }
   | { kind: 'retrigger'; target: Target }
   | { kind: 'copy'; target: Target }
