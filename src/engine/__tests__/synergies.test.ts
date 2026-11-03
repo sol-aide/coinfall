@@ -241,3 +241,16 @@ describe('synergy engravings', () => {
     expect(goldEvents(ctx)).toBe(5);
   });
 });
+
+describe('Juggler starts its own flips', () => {
+  it('on land flips the best adjacent tails coin to heads, and is paid for it', () => {
+    const { ctx, coins } = table([
+      { defId: 'grunt', x: 0.5, y: 0.5, face: 'tails' },
+      { defId: 'copper', x: 0.6, y: 0.5, face: 'heads' },
+      { defId: 'juggler', x: 0.55, y: 0.6 },
+    ]);
+    runCoinTrigger(ctx, coins[2], 'onLand');
+    expect(coins.map((c) => c.face)).toEqual(['heads', 'heads', 'heads']);
+    expect(goldEvents(ctx)).toBe(2);
+  });
+});

@@ -126,7 +126,7 @@ describe('onAdjacent', () => {
     runCoinTrigger(ctx, coins[0], 'onAdjacent');
     runCoinTrigger(ctx, coins[3], 'onAdjacent');
     expect(coins[1].temp).toBe(3);
-    expect(coins[2].temp).toBe(3);
+    expect(coins[2].temp).toBe(4);
     expect(coins[0].temp).toBe(0);
   });
 
@@ -172,7 +172,7 @@ describe('onDestroy', () => {
   it('Firebrand pays out when destroyed and Looter grows', () => {
     const { ctx, coins, inst } = table([{ defId: 'firebrand' }, { defId: 'looter' }, ...PAD]);
     destroyCoin(ctx, coins[0]);
-    expect(goldEvents(ctx)).toBe(10);
+    expect(goldEvents(ctx)).toBe(12);
     expect(inst[1].bonus).toBe(2);
   });
 
@@ -193,7 +193,7 @@ describe('onDestroy', () => {
   it('Tusk Warhorn and Spade pay gold on destroy', () => {
     const { ctx, coins } = table([{ defId: 'copper' }, ...PAD], ['warhorn', 'spade']);
     destroyCoin(ctx, coins[0]);
-    expect(goldEvents(ctx)).toBe(6);
+    expect(goldEvents(ctx)).toBe(5);
   });
 
   it('Second Wind returns a destroyed coin to the bag once', () => {
