@@ -41,6 +41,8 @@ export const COIN_RATING: Record<string, number> = {
   juggler: 2.4,
   towncrier: 3,
   gemcutter: 4.2,
+  herald: 2.8,
+  quartermaster: 2.2,
   grunt: 2.4,
   berserker: 3,
   charger: 2.4,
@@ -55,6 +57,8 @@ export const COIN_RATING: Record<string, number> = {
   mercenary: 2.6,
   powderkeg: 2.6,
   wardrummer: 3,
+  bonebreaker: 2.8,
+  wargrider: 2.4,
   archer: 2.6,
   moonpriestess: 3,
   sentinel: 2.6,
@@ -67,6 +71,8 @@ export const COIN_RATING: Record<string, number> = {
   envoy: 4,
   wisp: 2.6,
   grovelder: 4.2,
+  lorekeeper: 3,
+  gladewarden: 2.6,
 };
 
 export const CHARM_RATING: Record<string, number> = {

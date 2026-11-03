@@ -195,6 +195,28 @@ export const COINS: CoinDef[] = [
     ],
   },
 
+  {
+    id: 'herald',
+    name: 'Herald',
+    race: 'human',
+    rarity: 'uncommon',
+    value: 2,
+    text: 'Round start: every Human drawn this round gets +{2} value (itself included).',
+    effects: [{ trigger: 'onRoundStart', do: { kind: 'buff', target: { scope: 'table', race: 'human', includeSelf: true }, amount: 2 } }],
+  },
+  {
+    id: 'quartermaster',
+    name: 'Quartermaster',
+    race: 'human',
+    rarity: 'common',
+    value: 2,
+    text: 'Phase end: +{1} Reroll token and +{1} Melt token, even from the bag.',
+    effects: [
+      { trigger: 'onPhaseEnd', do: { kind: 'token', token: 'reroll', amount: 1 } },
+      { trigger: 'onPhaseEnd', do: { kind: 'token', token: 'melt', amount: 1 } },
+    ],
+  },
+
   // ---------------------------------------------------------------- Orcs
   {
     id: 'grunt',
@@ -357,6 +379,25 @@ export const COINS: CoinDef[] = [
     ],
   },
 
+  {
+    id: 'bonebreaker',
+    name: 'Bonebreaker',
+    race: 'orc',
+    rarity: 'uncommon',
+    value: 3,
+    text: 'Round end: destroys the lowest-value tails coin on the table.',
+    effects: [{ trigger: 'onRoundEnd', do: { kind: 'destroy', target: { scope: 'table', face: 'tails', pick: 'lowest' } } }],
+  },
+  {
+    id: 'wargrider',
+    name: 'Warg Rider',
+    race: 'orc',
+    rarity: 'common',
+    value: 3,
+    text: 'On land: rams the farthest tails coin, pushing it away and flipping it to heads.',
+    effects: [{ trigger: 'onLand', do: { kind: 'bump', target: { scope: 'farthest', face: 'tails' } } }],
+  },
+
   // ---------------------------------------------------------------- Elves
   {
     id: 'archer',
@@ -514,6 +555,24 @@ export const COINS: CoinDef[] = [
         do: { kind: 'mult', target: { scope: 'table', race: 'elf', face: 'heads', includeSelf: true }, factor: 2 },
       },
     ],
+  },
+  {
+    id: 'lorekeeper',
+    name: 'Lorekeeper',
+    race: 'elf',
+    rarity: 'uncommon',
+    value: 2,
+    text: 'Round start: the first {2} coins tossed land heads.',
+    effects: [{ trigger: 'onRoundStart', do: { kind: 'blessNext', amount: 2 } }],
+  },
+  {
+    id: 'gladewarden',
+    name: 'Glade Warden',
+    race: 'elf',
+    rarity: 'common',
+    value: 2,
+    text: 'Adjacent heads coins get +{3} value this round.',
+    effects: [{ trigger: 'onAdjacent', do: { kind: 'buff', target: { scope: 'adjacent', face: 'heads' }, amount: 3 } }],
   },
 ];
 

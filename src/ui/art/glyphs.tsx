@@ -358,6 +358,49 @@ export const GLYPHS: Record<string, GlyphFn> = {
       <Circle cx={60} cy={40} r={2.5} fill={accent} />
     </G>
   ),
+  herald: (ink, accent, o) => (
+    <G>
+      <Path d="M22 58 L22 42 L44 42 L74 24 L74 76 L44 58 Z" fill={ink} stroke={ink} strokeWidth={2 + o} strokeLinejoin="round" />
+      <Rect x={28} y={58} width={10} height={16} rx={3} fill={ink} />
+      <Path d="M80 40 Q86 50 80 60" stroke={ink} strokeWidth={3 + o} fill="none" strokeLinecap="round" />
+      <Rect x={44} y={46} width={20} height={8} rx={3} fill={accent} />
+    </G>
+  ),
+  quartermaster: (ink, accent, o) => (
+    <G>
+      <Rect x={24} y={38} width={52} height={36} rx={4} fill={ink} />
+      <Path d="M24 50 L76 50" stroke={accent} strokeWidth={3 + o} />
+      <Path d="M30 38 L36 26 L64 26 L70 38" fill={ink} stroke={ink} strokeWidth={2 + o} strokeLinejoin="round" />
+      <Rect x={44} y={46} width={12} height={10} rx={2} fill={accent} />
+    </G>
+  ),
+  bonebreaker: (ink, accent, o) => (
+    <G>
+      <Path d="M30 30 Q24 24 30 20 Q36 16 40 24 L62 46 Q70 42 76 46 Q82 52 76 58 Q80 64 74 68 Q68 72 64 64 L42 42 Q36 46 30 40 Q24 34 30 30 Z" fill={ink} />
+      <Path d="M48 56 L40 64 M54 62 L50 74" stroke={accent} strokeWidth={3 + o} strokeLinecap="round" />
+    </G>
+  ),
+  wargrider: (ink, accent, o) => (
+    <G>
+      <Path d="M22 62 Q24 40 44 38 L58 28 L62 38 Q74 38 80 48 L72 54 Q68 66 54 66 L52 76 L44 76 L44 66 L34 66 L32 76 L24 76 Z" fill={ink} />
+      <Circle cx={66} cy={44} r={3} fill={accent} />
+      <Path d="M14 46 L24 46 M12 54 L22 54" stroke={ink} strokeWidth={3 + o} strokeLinecap="round" />
+    </G>
+  ),
+  lorekeeper: (ink, accent, o) => (
+    <G>
+      <Path d="M50 32 Q36 24 20 28 L20 72 Q36 68 50 76 Q64 68 80 72 L80 28 Q64 24 50 32 Z" fill={ink} />
+      <Line x1={50} y1={32} x2={50} y2={76} stroke={accent} strokeWidth={2 + o} />
+      <Path d="M28 40 L42 42 M28 50 L42 52 M58 42 L72 40 M58 52 L72 50" stroke={accent} strokeWidth={2 + o} strokeLinecap="round" />
+    </G>
+  ),
+  gladewarden: (ink, accent, o) => (
+    <G>
+      <Path d="M50 18 L74 28 Q74 60 50 80 Q26 60 26 28 Z" fill={ink} />
+      <Path d="M50 34 Q62 46 50 66 Q38 46 50 34 Z" fill={accent} />
+      <Line x1={50} y1={42} x2={50} y2={64} stroke={ink} strokeWidth={2 + o} />
+    </G>
+  ),
 };
 
 /** Race emblem used on tails faces and labels. */

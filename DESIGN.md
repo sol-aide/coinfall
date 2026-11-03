@@ -33,7 +33,7 @@ Coinfall is an original roguelike coin-toss bag builder. You are a moneylender a
 
 ### After each round
 - Choose **1 of 3** new coins (4 with Collector's Case) to add to your bag, or **skip for 3 gold**. A Reroll token re-rolls the choices.
-- Offers (rewards and bazaar coins) are weighted by rarity, and a coin you already own below level 3 is **twice as likely** to be offered, so fusions and focused builds stay reachable.
+- Offers (rewards and bazaar coins) are weighted by rarity, and a coin you already own below level 3 is **2.5× as likely** to be offered, so fusions and focused builds stay reachable.
 - **Fusion**: three identical coins of the same level automatically fuse into one coin a level higher (max level 3). A level-*n* coin has *n*× base value and *n*× ability numbers (chances and "all tails" style effects don't scale). Fused coins keep the sum of their parts' permanent growth (minus streak growth) and the first engraving found. Plain Copper never fuses.
 
 ### Phase end, dues and the bazaar
@@ -105,6 +105,8 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | Juggler | common | 2 | On land: flips an adjacent tails coin to heads. Whenever another coin on the table flips: +2 gold. | onLand, onFlip |
 | Town Crier | uncommon | 2 | Round end: if 3 or more Humans are on the table, +8 gold. | onRoundEnd |
 | Gem Cutter | rare | 2 | Round end: doubles the value of the highest-value adjacent heads coin. | onRoundEnd |
+| Herald | uncommon | 2 | Round start: every Human drawn this round gets +2 value (itself included). | onRoundStart |
+| Quartermaster | common | 2 | Phase end: +1 Reroll token and +1 Melt token, even from the bag. | onPhaseEnd |
 
 **Orcs**
 
@@ -124,6 +126,8 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | Mercenary | common | 3 | Round end: +2 gold for each Human on the table. | onRoundEnd |
 | Powder Keg | uncommon | 2 | When destroyed: +8 gold and flips every adjacent coin. | onDestroy |
 | War Drummer | uncommon | 2 | Round end: if 3 or more Orcs are on the table, every Orc gets +3 value. | onRoundEnd |
+| Bonebreaker | uncommon | 3 | Round end: destroys the lowest-value tails coin on the table. | onRoundEnd |
+| Warg Rider | common | 3 | On land: rams the farthest tails coin, pushing it away and flipping it to heads. | onLand |
 
 **Elfs**
 
@@ -141,6 +145,8 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | Envoy | rare | 2 | Round end: if Humans, Orcs and Elves are all on the table, every heads coin gets +3 value. | onRoundEnd |
 | Wisp | common | 3 | On land: turns the highest-value adjacent tails coin to heads. | onLand |
 | Grove Elder | rare | 3 | Round end: if 3 or more heads Elves are on the table, they all get ×2 value. | onRoundEnd |
+| Lorekeeper | uncommon | 2 | Round start: the first 2 coins tossed land heads. | onRoundStart |
+| Glade Warden | common | 2 | Adjacent heads coins get +3 value this round. | onAdjacent |
 
 **Charms**
 
@@ -203,28 +209,28 @@ Balance is tuned with `npm run simulate -- 1000 --detail`, which plays 1,000 see
 ```
 Dues: 22, 40, 65, 100, 150, 210, 285, 375
 
-sensible: 313/1000 wins (31.3%), avg best round 70.8
-  lost in phase: 1:14 2:3 3:13 4:38 5:104 6:179 7:165 8:171
-  by starter: warhorn 30.5%, silverleaf 30.2%, banner 33.1%
-  median gold at dues: 1:44/22 2:81/40 3:120/65 4:166/100 5:217/150 6:279/210 7:365/285 8:443/375
-  win% when coin in final bag: patron(143) 37.8%, druid(140) 36.4%, towncrier(246) 36.2%, grovelder(186) 36.0%, berserker(189) 36.0%, starweaver(213) 31.9%, gemcutter(218) 31.7%, wardrummer(177) 31.6%, tinker(147) 31.3%, guildmaster(227) 31.3%, juggler(83) 30.1%, caravan(459) 29.8%, moneychanger(139) 28.8%, longbow(175) 28.6%, moonpriestess(158) 28.5%, raider(88) 27.3%, shaman(92) 27.2%, ranger(160) 26.9%, innkeeper(201) 26.9%, warlord(233) 26.6%, cutpurse(117) 26.5%, envoy(270) 25.9%, mercenary(118) 25.4%, looter(134) 25.4%, firebrand(113) 24.8%, captain(162) 24.7%, archer(686) 24.5%, apprentice(49) 24.5%, bladedancer(152) 23.7%, merchant(309) 23.6%, squire(710) 23.5%, wisp(158) 22.8%, grunt(581) 22.5%, wrecker(45) 22.2%, sentinel(147) 21.8%, seer(66) 21.2%, brawler(106) 20.8%, bard(72) 18.1%, copper(202) 11.9%, powderkeg(54) 11.1%, charger(47) 6.4%
-  win% when charm owned: pockets(83) 68.7%, scales(67) 55.2%, firstlight(244) 50.0%, rallyhorn(31) 48.4%, anvil(60) 46.7%, crucible(99) 45.5%, moonwell(236) 42.4%, clover(242) 41.7%, loupe(17) 41.2%, spade(111) 40.5%, tailwind(284) 40.5%, collector(106) 38.7%, skullcup(244) 38.5%, longtable(256) 38.3%, crown(392) 38.3%, treaty(248) 37.5%, charter(254) 37.4%, ledger(265) 36.6%, haggler(315) 35.9%, lantern(104) 34.6%, banner(335) 33.1%, warhorn(321) 30.5%, silverleaf(344) 30.2%, whirlwind(100) 30.0%, dice(48) 27.1%, spintop(57) 26.3%
+sensible: 328/1000 wins (32.8%), avg best round 78.3
+  lost in phase: 1:16 2:14 3:11 4:27 5:98 6:163 7:185 8:158
+  by starter: warhorn 34.3%, silverleaf 29.7%, banner 34.6%
+  median gold at dues: 1:44/22 2:81/40 3:121/65 4:173/100 5:227/150 6:287/210 7:364/285 8:455/375
+  win% when coin in final bag: patron(120) 43.3%, quartermaster(21) 42.9%, towncrier(214) 41.1%, wardrummer(152) 40.8%, gemcutter(169) 38.5%, grovelder(185) 38.4%, starweaver(176) 38.1%, bard(66) 37.9%, bladedancer(157) 35.7%, raider(82) 35.4%, wargrider(37) 35.1%, druid(125) 34.4%, tinker(131) 34.4%, berserker(168) 33.9%, warlord(195) 32.8%, herald(114) 32.5%, caravan(359) 31.2%, juggler(68) 30.9%, innkeeper(146) 30.8%, lorekeeper(151) 30.5%, moonpriestess(132) 30.3%, guildmaster(212) 30.2%, ranger(126) 29.4%, captain(137) 28.5%, gladewarden(136) 27.9%, moneychanger(138) 27.5%, bonebreaker(112) 26.8%, archer(646) 26.6%, squire(665) 26.5%, longbow(150) 26.0%, envoy(237) 25.3%, firebrand(104) 25.0%, brawler(96) 25.0%, wrecker(60) 25.0%, looter(94) 24.5%, mercenary(105) 23.8%, shaman(78) 23.1%, merchant(232) 22.8%, grunt(556) 22.8%, cutpurse(84) 22.6%, wisp(125) 20.0%, sentinel(119) 19.3%, apprentice(22) 18.2%, seer(45) 17.8%, charger(49) 14.3%, powderkeg(51) 13.7%, copper(224) 11.2%
+  win% when charm owned: pockets(68) 75.0%, loupe(20) 60.0%, scales(97) 48.5%, anvil(93) 48.4%, clover(285) 47.4%, crucible(112) 46.4%, firstlight(238) 45.4%, treaty(265) 43.4%, lantern(111) 43.2%, tailwind(259) 42.1%, longtable(224) 42.0%, skullcup(251) 41.8%, rallyhorn(24) 41.7%, ledger(271) 41.3%, moonwell(261) 41.0%, spintop(54) 38.9%, crown(398) 38.4%, haggler(315) 37.5%, collector(91) 37.4%, charter(220) 36.8%, spade(100) 35.0%, banner(335) 34.6%, warhorn(321) 34.3%, whirlwind(87) 32.2%, silverleaf(344) 29.7%, dice(55) 25.5%
 
-greedy: 66/1000 wins (6.6%), avg best round 52.8
-  lost in phase: 1:14 2:11 3:13 4:80 5:197 6:278 7:230 8:111
-  by starter: warhorn 6.5%, silverleaf 4.7%, banner 8.7%
-  median gold at dues: 1:44/22 2:80/40 3:116/65 4:150/100 5:188/150 6:223/210 7:265/285 8:324/375
+greedy: 94/1000 wins (9.4%), avg best round 54.5
+  lost in phase: 1:18 2:9 3:17 4:68 5:219 6:280 7:186 8:109
+  by starter: warhorn 13.4%, silverleaf 5.2%, banner 9.9%
+  median gold at dues: 1:43/22 2:80/40 3:116/65 4:153/100 5:189/150 6:224/210 7:285/285 8:349/375
 
 random: 0/1000 wins (0.0%), avg best round 21.9
-  lost in phase: 1:9 2:36 3:210 4:503 5:227 6:14 7:1 8:0
+  lost in phase: 1:11 2:30 3:218 4:478 5:243 6:20 7:0 8:0
   by starter: warhorn 0.0%, silverleaf 0.0%, banner 0.0%
-  median gold at dues: 1:44/22 2:66/40 3:80/65 4:86/100 5:96/150 6:149/210 7:125/285 8:NaN/375
+  median gold at dues: 1:43/22 2:67/40 3:81/65 4:88/100 5:98/150 6:117/210 7:NaN/285 8:NaN/375
 ```
 
 ### Guild ranks (1,000 sensible runs each)
 | Rank | 1 | 2 | 3 | 4 | 5 |
 |---|---|---|---|---|---|
-| Win rate | 32.3% | 22.6% | 17.9% | 14.0% | 12.8% |
+| Win rate | 32.6% | 23.8% | 22.1% | 14.0% | 11.9% |
 
 A first pass (dues +10% per step, prices +15%, heads −4%) fell off a cliff: 30% → 13.5% at rank 2 and 2.6% at rank 5. The steps were softened so each rank is a noticeable but fair step.
 
@@ -240,6 +246,7 @@ A first pass (dues +10% per step, prices +15%, heads −4%) fell off a cliff: 30
 9. **Rule-bending items** (milestone 11): Rally Horn, Jeweler's Loupe, Spinning Top and the Kinship engraving. The bot first bought Jeweler's Loupe with no ×2 coins (14% win rate when owned); it now rates Loupe and Rally Horn by whether the bag holds coins they improve, and buys them only then.
 10. **Synergy engravings** (milestone 15): Two-Faced, Spiked and Hollow. With 12 engravings competing for the shop's two engraving slots, Double and Echo turn up less often and the sensible bot fell from 31% to about 29%, still inside the target. The bot places them by rule (Two-Faced only on face-conditioned coins, Hollow on cheap fodder when the bag has destroyers, Spiked only with flip payoffs).
 11. **Weak-coin pass** (milestone 20, 2,000-run samples): Juggler (13.6%), Captain and Firebrand (15.3%), Wisp (18.4%) and Charger (18.9%) trailed coins at ~37%. Juggler now also flips an adjacent tails coin to heads on landing (starting its own flip payouts); Captain +4; Firebrand 1-in-5 for +12 gold; Wisp and Charger +1 value. They now sit at 21–23% (Charger ~17%, small sample). Tusk Warhorn's destruction gold went back to +2 to keep the Orc starter level.
+12. **Six more coins** (milestone 27; 41 → 47): Herald, Quartermaster, Bonebreaker, Warg Rider, Lorekeeper, Glade Warden, using the round-start trigger, tokens and tails culling. The pool grew again and the sensible bot fell to 24%; owned coins are now offered 2.5× as often (was 2×), Herald +2, Glade Warden +3, Quartermaster also gives a Melt token, and Warg Rider rams the farthest *tails* coin (flipping it to heads) instead of any coin. Result: 32.6% over 2,000 runs, starters within one point.
 
 Result: a sensible strategy wins about **31%** of runs, the greedy bot about **6%**, and random play essentially never. The three starters are within one point of each other. Runs usually end in phases 4–8, so most runs reach the interesting mid-game.
 
@@ -327,7 +334,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 - **Charm cap of 6** (incl. starter) — added after the bot hoarded 16 Charms.
 - **Bag floor of 5 coins** for both melting and destruction (destroy "holds firm" at 5).
 - **Synergy expansion (milestone 7)**, inspired by how coin-tossing roguelikes in the genre reward cross-faction builds. All names, rules and art are original. 12 coins (4 per race) and the Treaty Seal Charm, built on two new engine blocks: `Effect.require` (an effect fires only when a count reaches a minimum: set bonuses) and `Count.races` (number of different races among matching coins: mixed-table payoffs). See the Synergies section.
-- **Owned coins are offered twice as often.** With 41 coins, three-of-a-kind fusions had become rare and the sensible bot fell to 19.5%. Weighting offers toward coins you already own (below level 3) restored fusions and focused builds without trimming the pool.
+- **Owned coins are offered more often** (2× at 41 coins, 2.5× at 47). With 41 coins, three-of-a-kind fusions had become rare and the sensible bot fell to 19.5%. Weighting offers toward coins you already own (below level 3) restored fusions and focused builds without trimming the pool.
 - **Multipliers apply to the final value** (`(base + bonuses) × mult`), so a ×2 placed early still doubles buffs that land later in the same round. Bard can retrigger a ×2 for ×4, a rare high-roll the sim shows is not dominant.
 - **Synergy tags are derived, not authored** (`src/ui/content/tags.ts`): they are computed from each coin's effects, so a rules change can never leave a stale tag, and a test checks that every coin with an ability has at least one.
 - **Rule-bending items over more coins (milestone 11).** With 41 coins the pool is wide enough; depth now comes from Charms and engravings that change how synergies work (Rally Horn lowers set thresholds, Jeweler's Loupe raises multipliers, Spinning Top rewards flips, Kinship makes one coin every race). Two engine hooks support them: `Mods.setDiscount` / `Mods.multBonus`, and a `subject` target for reactive Charm effects (the coin that flipped or was destroyed).

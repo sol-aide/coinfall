@@ -3,7 +3,7 @@
 
 import { coinDef, type Action, type CharmDef, type CoinDef, type Count, type Race, type RunState, type Target } from '../../engine';
 
-export type TagId = 'gold' | 'grows' | 'flips' | 'tails' | 'heads' | 'wreck' | 'mult' | 'set' | 'mixed' | 'counts' | 'boost' | 'echo';
+export type TagId = 'gold' | 'grows' | 'flips' | 'tails' | 'heads' | 'wreck' | 'mult' | 'set' | 'mixed' | 'counts' | 'boost' | 'echo' | 'tokens';
 
 export interface SynergyTag {
   id: TagId;
@@ -36,6 +36,7 @@ export function synergyTags(def: CoinDef): SynergyTag[] {
     if (a.kind === 'destroy' || e.trigger === 'onDestroy') has.add('wreck');
     if (a.kind === 'mult') has.add('mult');
     if (a.kind === 'retrigger' || a.kind === 'copy') has.add('echo');
+    if (a.kind === 'token') has.add('tokens');
     if ((a.kind === 'buff' || a.kind === 'mult') && a.target.scope !== 'self') has.add('boost');
     const all: Count[] = [...counts(a), ...(e.require ? [e.require.per] : [])];
     // Tails payoffs (not coins that merely turn tails coins over to heads).
@@ -55,7 +56,7 @@ export function synergyTags(def: CoinDef): SynergyTag[] {
     }
   }
   if (has.has('mult')) has.delete('boost'); // ×2 already says it
-  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold'];
+  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold', 'tokens'];
   const label = (id: TagId): string => {
     switch (id) {
       case 'set':
@@ -82,6 +83,8 @@ export function synergyTags(def: CoinDef): SynergyTag[] {
         return 'Grows';
       case 'gold':
         return 'Gold';
+      case 'tokens':
+        return 'Tokens';
     }
   };
   return order.filter((id) => has.has(id)).map((id) => ({ id, label: label(id) }));
@@ -201,6 +204,6 @@ export function charmTags(def: CharmDef): SynergyTag[] {
   if (m.valueBonus || m.coinValueBonus) add('boost', 'Boosts others');
   const race = def.race ?? (Object.keys(m.valueBonus ?? {}).find((k) => k !== 'all') as Race | undefined);
   if (race && race !== 'neutral') add('counts', PLURAL[race]);
-  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold'];
+  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold', 'tokens'];
   return order.filter((id) => out.has(id)).map((id) => out.get(id)!);
 }

@@ -62,7 +62,7 @@ export const HOW_TO_PLAY: HelpSection[] = [
   {
     title: 'Growing your bag',
     body: [
-      'After each round, add one of three coins to your bag, or skip for 3 gold. A bigger bag means each coin is drawn less often, so choose carefully. Coins you already own turn up more often.',
+      'After each round, add one of three coins to your bag, or skip for 3 gold. A bigger bag means each coin is drawn less often, so choose carefully. Coins you already own turn up more often, which helps you complete fusions.',
       'Three identical coins of the same level fuse automatically into one stronger coin (up to level 3). Fused coins have doubled or tripled values and ability numbers. Plain Copper never fuses.',
     ],
   },

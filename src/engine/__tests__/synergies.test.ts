@@ -254,3 +254,35 @@ describe('Juggler starts its own flips', () => {
     expect(goldEvents(ctx)).toBe(2);
   });
 });
+
+describe('round-start, token and culling coins', () => {
+  it('Herald buffs every drawn Human at round start; Bonebreaker culls the cheapest tails coin', () => {
+    const { ctx, coins } = table([
+      { defId: 'herald', x: 0.1, y: 0.1 },
+      { defId: 'squire', x: 0.9, y: 0.1 },
+      { defId: 'grunt', x: 0.5, y: 0.9 },
+    ]);
+    runCoinTrigger(ctx, coins[0], 'onRoundStart');
+    expect(coins.map((c) => c.temp)).toEqual([2, 2, 0]);
+
+    const cull = table([
+      { defId: 'bonebreaker', x: 0.1, y: 0.1, face: 'heads' },
+      { defId: 'grunt', x: 0.9, y: 0.1, face: 'tails' },
+      { defId: 'copper', x: 0.5, y: 0.9, face: 'tails' },
+      { defId: 'copper', x: 0.5, y: 0.5, face: 'heads' },
+      ...PAD,
+    ]);
+    runCoinTrigger(cull.ctx, cull.coins[0], 'onRoundEnd');
+    expect(cull.coins.map((c) => c.destroyed).slice(0, 4)).toEqual([false, false, true, false]);
+  });
+
+  it('Glade Warden buffs adjacent heads coins of any race', () => {
+    const { ctx, coins } = table([
+      { defId: 'gladewarden', x: 0.5, y: 0.5 },
+      { defId: 'grunt', x: 0.6, y: 0.5, face: 'heads' },
+      { defId: 'squire', x: 0.5, y: 0.6, face: 'tails' },
+    ]);
+    runCoinTrigger(ctx, coins[0], 'onAdjacent');
+    expect(coins.map((c) => c.temp)).toEqual([0, 3, 0]);
+  });
+});
