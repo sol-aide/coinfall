@@ -55,6 +55,7 @@ export const HOW_TO_PLAY: HelpSection[] = [
       'Some coins wake up with friends: 3 Humans for the Town Crier, 3 Orcs for the War Drummer, 3 heads Elves for the Grove Elder.',
       'Tails is not always bad: Cutpurse and Night Raider pay for tails, and Wrecker or Charger can flip coins over to feed them. Juggler and Brawler love every flip.',
       'Gem Cutter and Grove Elder double values (×2) after every other bonus, so stack buffs first.',
+      'Coloured tags under each coin name the combos it plays into, and your bag shows which tags you have most of.',
     ],
   },
   {

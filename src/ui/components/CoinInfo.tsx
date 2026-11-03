@@ -11,8 +11,40 @@ import {
   type RunState,
 } from '../../engine';
 import { CoinArt, RaceBadge } from '../art/CoinArt';
+import { bagFitNote, synergyTags, type TagId } from '../content/tags';
 import { TOUCH, colors, font, raceColors, radius, rarityColors } from '../theme';
 import { Overlay, Stitch, Txt } from './ui';
+
+/** Tag colours: one hue per family so related coins are easy to spot. */
+const TAG_COLOR: Record<TagId, string> = {
+  set: '#F7B53A',
+  mixed: '#F7B53A',
+  counts: '#9CC6F5',
+  mult: '#F28C28',
+  echo: '#C9A6F2',
+  boost: '#9EDDA9',
+  flips: '#F5A096',
+  tails: '#B7AEDB',
+  heads: '#F2D06B',
+  wreck: '#E8836F',
+  grows: '#9EDDA9',
+  gold: '#F2C14E',
+};
+
+/** Small chips naming the synergies a coin plays into (derived from its rules). */
+export function TagChips({ defId }: { defId: string }) {
+  const tags = synergyTags(coinDef(defId));
+  if (!tags.length) return null;
+  return (
+    <View style={styles.tags} accessible accessibilityLabel={`Synergies: ${tags.map((t) => t.label).join(', ')}`}>
+      {tags.map((t) => (
+        <View key={t.id} style={[styles.tag, { borderColor: TAG_COLOR[t.id] }]}>
+          <Txt style={[styles.tagTxt, { color: TAG_COLOR[t.id] }]}>{t.label}</Txt>
+        </View>
+      ))}
+    </View>
+  );
+}
 
 export function levelNote(level: number) {
   return level > 1 ? `Level ${level}: base value and ability numbers ×${level} (shown above).` : '';
@@ -44,6 +76,9 @@ export function CoinRow({
   const value = inst ? displayValue(inst, mods) : def.value;
   const level = inst?.level ?? 1;
   const eng = inst?.engraving ? engravingDef(inst.engraving) : undefined;
+  // On offers (rewards, shop), say how well a set or mixed-table coin fits the bag.
+  const fit = run && !inst ? bagFitNote(def, run) : undefined;
+  const tagLabels = synergyTags(def).map((t) => t.label);
   const body = (
     <>
       <Stitch r={radius.md} inset={4} opacity={selected ? 0.9 : 0.35} color={selected ? colors.gold : colors.stitch} />
@@ -57,6 +92,8 @@ export function CoinRow({
           {def.rarity === 'rare' && <Txt style={[styles.race, { color: rarityColors.rare }]}>Rare</Txt>}
         </View>
         <Txt style={styles.ability}>{abilityText(def, level)}</Txt>
+        <TagChips defId={defId} />
+        {fit && <Txt style={styles.fit}>{fit}</Txt>}
         {eng && <Txt style={styles.eng}>◆ {eng.name}: {eng.text}</Txt>}
         {level > 1 && <Txt style={styles.eng}>{levelNote(level)}</Txt>}
       </View>
@@ -69,7 +106,7 @@ export function CoinRow({
       </View>
     </>
   );
-  const label = `${def.name}, ${rc.label}${level > 1 ? `, level ${level}` : ''}, value ${value}. ${abilityText(def, level)}${eng ? ` Engraved ${eng.name}.` : ''}`;
+  const label = `${def.name}, ${rc.label}${level > 1 ? `, level ${level}` : ''}, value ${value}. ${abilityText(def, level)}${tagLabels.length ? ` Synergies: ${tagLabels.join(', ')}.` : ''}${fit ? ` ${fit}.` : ''}${eng ? ` Engraved ${eng.name}.` : ''}`;
   if (!onPress)
     return (
       <View style={styles.row} accessible accessibilityLabel={label}>
@@ -113,6 +150,10 @@ export function CoinDetail({ run, uid, defId, onClose }: { run: RunState; uid?: 
         <Txt style={[styles.detailRace, { color: rarityColors[def.rarity] }]}>{def.rarity === 'starter' ? 'Starter' : def.rarity[0].toUpperCase() + def.rarity.slice(1)}</Txt>
       </View>
       <Txt style={styles.detailText}>{abilityText(def, probe.level)}</Txt>
+      <View style={styles.detailTags}>
+        <TagChips defId={id} />
+      </View>
+      {bagFitNote(def, run) && <Txt style={styles.detailSub}>{bagFitNote(def, run)}</Txt>}
       {probe.level > 1 && <Txt style={styles.detailSub}>{levelNote(probe.level)}</Txt>}
       {eng && (
         <Txt style={styles.detailSub}>
@@ -140,6 +181,11 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+  tag: { borderWidth: 1.5, borderRadius: 999, paddingHorizontal: 7, paddingVertical: 1 },
+  tagTxt: { fontSize: font.tiny, lineHeight: 17, fontWeight: '600' },
+  fit: { fontSize: font.tiny, color: colors.gold, marginTop: 3 },
+  detailTags: { alignItems: 'center', marginTop: 6 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

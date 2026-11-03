@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { MIN_BAG, charmDef, coinDef, type RunState } from '../../engine';
 import { Icon } from '../art/Icons';
 import { CoinDetail, CoinRow } from '../components/CoinInfo';
+import { bagTagSummary } from '../content/tags';
 import { Button, Overlay, Stitch, Txt } from '../components/ui';
 import { colors, font, radius, raceColors } from '../theme';
 
@@ -56,6 +57,11 @@ export function BagOverlay({
             </Txt>
           ))}
         </View>
+      )}
+      {!onPick && bagTagSummary(run).length > 0 && (
+        <Txt style={styles.build} accessibilityLabel={`Your build: ${bagTagSummary(run).map((t) => `${t.label} ${t.count}`).join(', ')}`}>
+          Build: {bagTagSummary(run).map((t) => `${t.label}: ${t.count}`).join(' · ')}
+        </Txt>
       )}
       <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 6 }}>
         {coins.map((c) => (
@@ -114,6 +120,7 @@ export function CharmsOverlay({ run, onClose }: { run: RunState; onClose: () => 
 }
 
 const styles = StyleSheet.create({
+  build: { fontSize: font.tiny, color: colors.textDim, textAlign: 'center', marginBottom: 6 },
   prompt: { fontSize: font.small, color: colors.textDim, marginBottom: 8 },
   counts: { flexDirection: 'row', gap: 12, flexWrap: 'wrap', marginBottom: 8 },
   count: { fontSize: font.small, fontWeight: '800' },

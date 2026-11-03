@@ -275,6 +275,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 9 | Title coins frame by frame: edge-on, the 3D rim broke into separate thin lines with gaps; at the lamp-glint angle the whole face washed out pale. | Rim slices never thinner than their spacing (solid reeded band edge-on); glint 65% → 35%. |
 | 9 | Patron screen: the intro text and starting bag sat directly on the busy backdrop (window, moon, a lantern behind the Archer coin). | Intro on its own dark plate. Checked at 375×667 and 440×956. |
 | 9 | End of round: a lingering "+11" score number drew over the round-total card on the web (the table's transform makes its own stacking context). | The card's layer sits above the table (`zIndex`). |
+| 10 | Rewards and shop showed only rules text, so spotting which coins combine meant reading every line. | Synergy tags derived from each coin's data (e.g. "Set: 3 Humans", "Mixed table", "Counts Humans", "Flips", "Tails", "×2") as coloured chips; set and mixed-table offers say how well they fit the bag ("Your bag: 3 Humans"); the bag view summarises the build. Checked at 390×844 and 375×667. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
@@ -295,6 +296,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 - **Synergy expansion (milestone 7)**, inspired by how coin-tossing roguelikes in the genre reward cross-faction builds. All names, rules and art are original. 12 coins (4 per race) and the Treaty Seal Charm, built on two new engine blocks: `Effect.require` (an effect fires only when a count reaches a minimum: set bonuses) and `Count.races` (number of different races among matching coins: mixed-table payoffs). See the Synergies section.
 - **Owned coins are offered twice as often.** With 41 coins, three-of-a-kind fusions had become rare and the sensible bot fell to 19.5%. Weighting offers toward coins you already own (below level 3) restored fusions and focused builds without trimming the pool.
 - **Multipliers apply to the final value** (`(base + bonuses) × mult`), so a ×2 placed early still doubles buffs that land later in the same round. Bard can retrigger a ×2 for ×4, a rare high-roll the sim shows is not dominant.
+- **Synergy tags are derived, not authored** (`src/ui/content/tags.ts`): they are computed from each coin's effects, so a rules change can never leave a stale tag, and a test checks that every coin with an ability has at least one.
 - **Skipping a reward pays 3 gold** so skipping is a real choice rather than a pure loss.
 - **Reroll tokens also work on round rewards**, not only the shop, to give them more uses.
 - **Starting race Charms** only change their race's coins (they don't add extra coins), keeping the starting bag exactly as specified.
