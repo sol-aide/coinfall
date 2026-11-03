@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CHARMS, COINS, ENGRAVINGS } from '../../engine';
 import { CoinArt } from '../art/CoinArt';
 import { CharmArt } from '../art/CharmArt';
-import { Icon } from '../art/Icons';
+import { EngravingArt } from '../art/EngravingArt';
 import { CoinRow } from '../components/CoinInfo';
 import { Button, Overlay, Panel, Ribbon, Stitch, Txt } from '../components/ui';
 import { HOW_TO_PLAY, PRIVACY_TEXT, TUTORIAL_STEPS } from '../content/text';
@@ -89,7 +89,7 @@ export function HowToScreen({ onBack }: { onBack: () => void }) {
       {ENGRAVINGS.map((e) => (
         <View key={e.id} style={styles.guideRow} accessible accessibilityLabel={`${e.name}. ${e.text}`}>
           <Stitch r={radius.md} inset={4} opacity={0.35} />
-          <Icon name="engraving" size={30} />
+          <EngravingArt id={e.id} size={42} />
           <View style={{ flex: 1 }}>
             <Txt style={styles.guideName}>{e.name}</Txt>
             <Txt style={styles.guideText}>{e.text}</Txt>

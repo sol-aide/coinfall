@@ -33,6 +33,11 @@ describe('player-facing text', () => {
     }
   });
 
+  it('every Engraving has its own symbol', () => {
+    const src = readFileSync(join(root, 'src/ui/art/EngravingArt.tsx'), 'utf8');
+    for (const e of ENGRAVINGS) expect(src).toMatch(new RegExp(`\\b${e.id}: \\(\\)`));
+  });
+
   it('every Charm has its own symbol', () => {
     const src = readFileSync(join(root, 'src/ui/art/CharmArt.tsx'), 'utf8');
     for (const c of CHARMS) expect(src).toMatch(new RegExp(`\\b${c.id}: \\(\\)`));
