@@ -246,13 +246,14 @@ export function execute(
   const outer = ctx.subject;
   ctx.subject = subject;
   try {
-    run(ctx, e, self, level, label, subject, charmId);
+    resolveEffect(ctx, e, self, level, label, subject, charmId);
   } finally {
     ctx.subject = outer;
   }
 }
 
-function run(ctx: Ctx, e: Effect, self: TableCoin | undefined, level: number, label: string, subject?: TableCoin, charmId?: string) {
+/** Resolves one effect once its face condition has passed (see execute). */
+function resolveEffect(ctx: Ctx, e: Effect, self: TableCoin | undefined, level: number, label: string, subject?: TableCoin, charmId?: string) {
   if (e.require) {
     // Rally Horn: set bonuses (a race count) need fewer coins.
     const isSet = 'count' in e.require.per && !!e.require.per.count.race;

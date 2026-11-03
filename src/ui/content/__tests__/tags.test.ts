@@ -13,6 +13,7 @@ describe('synergy tags', () => {
     expect(labels('mercenary')).toEqual(['Counts Humans', 'Gold']);
     expect(labels('cutpurse')).toEqual(['Tails', 'Gold']);
     expect(labels('wisp')).toEqual(['Heads control']);
+    expect(labels('juggler')).toEqual(['Flips', 'Heads control', 'Gold']);
     expect(labels('powderkeg')).toEqual(['Flips', 'Wreckage', 'Gold']);
     expect(labels('copper')).toEqual([]);
   });
