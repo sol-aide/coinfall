@@ -25,20 +25,23 @@ You are a moneylender at a crossroads bazaar where Humans, Orcs and Elves gamble
 Each round you draw five coins from your bag and toss them onto the table. Heads pay their value in gold, tails pay nothing — unless a coin's ability says otherwise. Every coin is a character with its own ability:
 
 • Humans run the economy: Merchants earn from their neighbours, Squires grow stronger together, Bards retrigger the coin beside them.
-• Orcs bring big numbers and chaos: Berserkers smash neighbours to absorb their value, Chargers ram coins and flip them, Firebrands might blow up for a pile of gold.
+• Orcs bring big numbers and chaos: Berserkers smash neighbours and grow from them, Chargers ram coins and flip them, Firebrands might blow up for a pile of gold.
 • Elves bring control: Sentinels always land heads, the Moon Priestess re-flips tails, Bladedancers build streaks.
+
+The best bags mix races. Field Humans, Orcs and Elves together for the Caravan Master and the Envoy, gather three of a kind for the Town Crier, War Drummer and Grove Elder, or turn bad luck into gold with Cutpurses and Night Raiders that pay out on tails. Gem Cutters double your best coin. Tags on every coin show which combos it belongs to.
 
 After every round, add a new coin to your bag or skip it for gold. Three identical coins fuse into a stronger one. After paying dues, visit the bazaar for new coins, Charms that last the whole run and Engravings that upgrade a single coin. Melt away weak coins, reroll the stock, and plan for dues that keep climbing.
 
-• 28 coins across three races, 22 Charms and 8 Engravings
+• 40 coins across three races, 26 Charms and 12 Engravings
 • Every run is different: random draws, landings and offers
+• A Daily bazaar run that is the same for everyone each day, offline
 • Clear animated resolution with a full score breakdown, tap any coin to read it
 • Short tutorial, full coin guide, adjustable animation speed, respects Reduce Motion
 • Your run is saved automatically on your device
 • No ads, no accounts, no tracking, no purchases — play money only
 
 ### Keywords (≤100 characters)
-`roguelike,deckbuilder,bag builder,coin toss,strategy,fantasy,orcs,elves,single player,offline,run`
+`roguelike,deckbuilder,bag builder,coin toss,strategy,fantasy,orcs,elves,single player,offline,daily`
 (97 characters)
 
 ## Age rating questionnaire (suggested answers)
@@ -76,9 +79,9 @@ Apple computes the final rating. With Simulated Gambling = Infrequent/Mild, expe
 
 Use real gameplay, not only the title screen. Draft 6.9" screenshots (1320×2868) generated from the build are in `store/screenshots/`:
 
-1. `3-round-in-play.png` — **lead image**: coins on the table mid-round, abilities firing, value pop-ups, the ability text under the caption.
-2. `4-pick-a-coin.png` — the round result and the "Add a coin to your bag" choice.
-3. `5-bazaar.png` — the Bazaar with coins and Charms for sale.
+1. `3-round-in-play.png` — **lead image**: a mixed table mid-round with the "All three races!" combo callout, value pop-ups and the ability text under the caption.
+2. `4-pick-a-coin.png` — the round result and the "Add a coin to your bag" choice, with synergy tags on each coin.
+3. `5-bazaar.png` — the Bazaar with coins and Charms (each with its own art) for sale.
 4. `2-choose-patron.png` — choosing a starting race Charm.
 5. `1-title.png` — title screen with the three races.
 
@@ -89,7 +92,7 @@ Optional extras worth capturing on a device: a fusion toast ("Three Captain coin
 | # | Requirement | Status | Where |
 |---|---|---|---|
 | 1 | Complete and polished: no placeholder text, empty screens, crashes or debug UI (2.1) | **Pass** | Every screen has content; no dev menus or debug UI; playtested every screen at 375×667, 390×844 and 440×956 with no console errors; test checks content text for placeholders |
-| 2 | Real native app with lasting value, not a website wrapper (4.2) | **Pass** | React Native app with native rendering, haptics, local saves, and a replayable roguelike loop (8 phases, 28 coins, 22 Charms, 8 Engravings) |
+| 2 | Real native app with lasting value, not a website wrapper (4.2) | **Pass** | React Native app with native rendering, haptics, local saves, and a replayable roguelike loop (8 phases, 40 coins, 26 Charms, 12 Engravings, a Daily bazaar) |
 | 3 | Distinct name, icon and art; nothing copied (4.1, 4.3, 5.2) | **Pass** | Original name, original SVG icon/splash (`assets/source/`), every coin glyph hand-drawn in `src/ui/art/glyphs.tsx`, all text original; no third-party art; the only third-party asset is the Fredoka font (SIL Open Font License) |
 | 4 | Play money only; can't be bought or cashed out; no real money (5.3) | **Pass** | No purchase code or IAP libraries; stated in How to play, Privacy, Settings footer and review notes |
 | 5 | Fantasy coin-toss look, not a casino (no slots, cards, chips) | **Pass** | Wooden bazaar table, character coins with race emblems; no slot machines, playing cards, chips, roulette or felt |

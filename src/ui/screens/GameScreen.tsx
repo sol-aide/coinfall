@@ -75,6 +75,9 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
     }
   }, [r.fusionNotes]);
 
+  // The round card is switched on in an effect, one render after playback ends;
+  // treat it as already showing in that render so the reward sheet never flashes first.
+  const cardUp = haul !== null || (!!state?.done && sawPlaying.current && !!r.lastRound);
   const mods = useMemo(() => computeMods(r.charms), [r.charms]);
   const tableW = Math.max(0, Math.min(area.w - 16, area.h / (tableHeightFor(100) / 100)));
   const coins = state ? state.order.map((u) => state.coins[u]) : [];
@@ -131,7 +134,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
         {r.screen === 'ready' && (
           <Button big label="Toss coins" icon="play" onPress={toss} testID="toss" a11yHint="Draws coins from your bag and tosses them onto the table" />
         )}
-        {r.screen === 'reward' && state?.done && haul === null && !sheetOpen && r.lastRound && (
+        {r.screen === 'reward' && state?.done && !cardUp && !sheetOpen && r.lastRound && (
           <View style={styles.playRow}>
             <View style={{ flex: 1 }}>
               <Txt style={styles.stage}>Round {r.lastRound.round}</Txt>
@@ -162,7 +165,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
         )}
       </View>
 
-      {r.screen === 'reward' && state?.done && haul === null && sheetOpen && r.lastRound && (
+      {r.screen === 'reward' && state?.done && !cardUp && sheetOpen && r.lastRound && (
         <Overlay position="bottom">
           <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8 }}>
             <View style={styles.sumRow}>

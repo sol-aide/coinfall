@@ -291,6 +291,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 12 | All 26 Charms shared one generic gem icon, so owned Charms and shop offers were hard to tell apart. | Each Charm has its own symbol on a hanging-tag sticker (tag colour = rarity, race colour for starters), used in the shop, the Charms list and How to play. Symbols enlarged after a first pass read too small at 38px. |
 | 13 | Set bonuses and mixed-table effects fired silently: only numbers changed, so the moment a combo came together went unnoticed. | A sticker callout ("Orc set bonus!", "All three races!") when a gated effect fires. A first pass drew it over the triggering coin, where it collided with that coin's numbers; it now sits in one fixed spot at the top of the table. Reduce Motion: fades in place. |
 | 14 | Daily bazaar: title layout at 390×844 and 375×667 with the new New run / Daily row; a retry of the daily run offers the same three starters in the same order. | — |
+| 16 | Recapturing store screenshots frame by frame: when a round ended, the reward sheet started popping in for one frame before the round-total card covered it (the card is switched on in an effect, one render late). | The sheet waits while the card is pending. Store set (6.9", 1320×2868, RGB) retaken with the new features; App Store text counts updated (40 coins, 26 Charms, 12 Engravings) and the Daily bazaar added. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
