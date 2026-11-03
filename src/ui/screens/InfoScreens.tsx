@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CHARMS, COINS, ENGRAVINGS } from '../../engine';
 import { CoinArt } from '../art/CoinArt';
+import { CharmArt } from '../art/CharmArt';
 import { Icon } from '../art/Icons';
 import { CoinRow } from '../components/CoinInfo';
 import { Button, Overlay, Panel, Ribbon, Stitch, Txt } from '../components/ui';
@@ -59,7 +60,7 @@ export function HowToScreen({ onBack }: { onBack: () => void }) {
       {CHARMS.map((c) => (
         <View key={c.id} style={styles.guideRow} accessible accessibilityLabel={`${c.name}. ${c.text}`}>
           <Stitch r={radius.md} inset={4} opacity={0.35} />
-          <Icon name="charm" size={30} />
+          <CharmArt id={c.id} size={44} />
           <View style={{ flex: 1 }}>
             <Txt style={styles.guideName}>
               {c.name}

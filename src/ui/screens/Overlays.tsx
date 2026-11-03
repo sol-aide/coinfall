@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { MIN_BAG, charmDef, coinDef, type RunState } from '../../engine';
-import { Icon } from '../art/Icons';
+import { CharmArt } from '../art/CharmArt';
 import { CoinDetail, CoinRow } from '../components/CoinInfo';
 import { bagTagSummary } from '../content/tags';
 import { Button, Overlay, Stitch, Txt } from '../components/ui';
@@ -106,7 +106,7 @@ export function CharmsOverlay({ run, onClose }: { run: RunState; onClose: () => 
           return (
             <View key={id} style={styles.charm} accessible accessibilityLabel={`${c.name}. ${c.text}`}>
               <Stitch r={radius.md} inset={4} opacity={0.35} />
-              <Icon name="charm" size={34} />
+              <CharmArt id={id} size={46} />
               <View style={{ flex: 1 }}>
                 <Txt style={styles.charmName}>{c.name}</Txt>
                 <Txt style={styles.charmText}>{c.text}</Txt>

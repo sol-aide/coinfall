@@ -16,6 +16,7 @@ import {
   type RunState,
   type ShopItem,
 } from '../../engine';
+import { CharmArt } from '../art/CharmArt';
 import { Icon, type IconName } from '../art/Icons';
 import { CoinRow } from '../components/CoinInfo';
 import { Hud } from '../components/Hud';
@@ -88,7 +89,7 @@ export function ShopScreen({ onMenu }: { onMenu: () => void }) {
           return (
             <View key={i} style={[styles.item, item.sold && { opacity: 0.55 }]} accessible={false}>
               <Stitch r={radius.md} inset={4} opacity={0.35} />
-              <Icon name={icon} size={40} />
+              {item.kind === 'charm' ? <CharmArt id={item.charmId} size={44} /> : <Icon name={icon} size={40} />}
               <View style={{ flex: 1 }} accessible accessibilityLabel={`${name}. ${text}`}>
                 <Txt style={styles.itemName}>
                   {name}

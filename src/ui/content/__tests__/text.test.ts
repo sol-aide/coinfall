@@ -33,6 +33,11 @@ describe('player-facing text', () => {
     }
   });
 
+  it('every Charm has its own symbol', () => {
+    const src = readFileSync(join(root, 'src/ui/art/CharmArt.tsx'), 'utf8');
+    for (const c of CHARMS) expect(src).toMatch(new RegExp(`\\b${c.id}: \\(\\)`));
+  });
+
   it('every coin has its own hand-drawn glyph', () => {
     const src = readFileSync(join(root, 'src/ui/art/glyphs.tsx'), 'utf8');
     for (const c of COINS) expect(src).toMatch(new RegExp(`\\b${c.id}: \\(`));

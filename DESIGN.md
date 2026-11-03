@@ -281,6 +281,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 9 | Patron screen: the intro text and starting bag sat directly on the busy backdrop (window, moon, a lantern behind the Archer coin). | Intro on its own dark plate. Checked at 375×667 and 440×956. |
 | 9 | End of round: a lingering "+11" score number drew over the round-total card on the web (the table's transform makes its own stacking context). | The card's layer sits above the table (`zIndex`). |
 | 10 | Rewards and shop showed only rules text, so spotting which coins combine meant reading every line. | Synergy tags derived from each coin's data (e.g. "Set: 3 Humans", "Mixed table", "Counts Humans", "Flips", "Tails", "×2") as coloured chips; set and mixed-table offers say how well they fit the bag ("Your bag: 3 Humans"); the bag view summarises the build. Checked at 390×844 and 375×667. |
+| 12 | All 26 Charms shared one generic gem icon, so owned Charms and shop offers were hard to tell apart. | Each Charm has its own symbol on a hanging-tag sticker (tag colour = rarity, race colour for starters), used in the shop, the Charms list and How to play. Symbols enlarged after a first pass read too small at 38px. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
