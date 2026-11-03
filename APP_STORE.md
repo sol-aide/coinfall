@@ -73,7 +73,7 @@ Apple computes the final rating. With Simulated Gambling = Infrequent/Mild, expe
 >
 > Gold, Melt tokens and Reroll tokens are play money. They are earned only by playing, cannot be bought, and cannot be exchanged for money or anything of value. Players do not wager: coins land heads or tails as part of the scoring rules.
 >
-> How to review: tap New run → choose a patron Charm → Begin run → follow the 5-step tutorial → Toss coins. After each round pick a coin (or Skip). After 5 rounds pay the Guild dues and visit the Bazaar. Tap any coin on the table to read its ability. How to play (title screen) includes a full rules page and a guide to every coin, Charm and Engraving. Settings has animation speed, haptics, and "Delete all saved data". The Privacy screen is on the title screen and in Settings.
+> How to review: tap New run → choose a patron Charm → Begin run → follow the 6-step tutorial → Toss coins. After each round pick a coin (or Skip). After 5 rounds pay the Guild dues and visit the Bazaar. Tap any coin on the table to read its ability. How to play (title screen) includes a full rules page and a guide to every coin, Charm and Engraving. Settings has animation speed, haptics, and "Delete all saved data". The Privacy screen is on the title screen and in Settings. The Daily button starts a run seeded from the device’s date (offline).
 
 ## Screenshots
 

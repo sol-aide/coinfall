@@ -98,6 +98,10 @@ export const TUTORIAL_STEPS: { title: string; body: string }[] = [
     body: 'After each round, pick a new coin or skip for gold. Three identical coins fuse into a stronger one.',
   },
   {
+    title: 'Look for combos',
+    body: 'Coins work best together. The coloured tags under each coin show its combos, like “Set: 3 Orcs” or “Mixed table”.',
+  },
+  {
     title: 'Keep an eye on dues',
     body: 'The Dues badge at the top shows what the Guild wants at the end of this phase, and how much more you need.',
   },
