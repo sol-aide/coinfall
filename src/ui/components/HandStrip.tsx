@@ -25,6 +25,10 @@ export function HandStrip({ run, onSwap, onFirst }: { run: RunState; onSwap: (ui
   const selDef = sel ? coinDef(sel.defId) : undefined;
   const cost = free ? 'free' : `1 Reroll token (${run.rerollTokens} left)`;
   const combos = handComboNotes(run);
+  // What a swap can bring in: the rest of the bag, grouped by kind.
+  const restCounts = new Map<string, number>();
+  for (const c of run.bag) if (!hand.includes(c.uid)) restCounts.set(coinDef(c.defId).name, (restCounts.get(coinDef(c.defId).name) ?? 0) + 1);
+  const rest = [...restCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([n, k]) => (k > 1 ? `${n} ×${k}` : n));
 
   return (
     <View style={styles.wrap}>
@@ -63,6 +67,11 @@ export function HandStrip({ run, onSwap, onFirst }: { run: RunState; onSwap: (ui
             </Txt>
           ))}
         </View>
+      )}
+      {canSwap && rest.length > 0 && (
+        <Txt style={styles.rest} numberOfLines={1} accessibilityLabel={`A swap draws from: ${rest.join(', ')}`}>
+          Left in your bag: {rest.join(', ')}
+        </Txt>
       )}
       <View style={styles.row}>
         <Txt style={styles.info} numberOfLines={2}>
@@ -114,6 +123,7 @@ const styles = StyleSheet.create({
   name: { fontSize: font.tiny, fontWeight: '800', color: colors.text },
   swap: { minWidth: 84 },
   first: { minWidth: 76 },
+  rest: { fontSize: font.tiny, color: colors.textMuted, textAlign: 'center', paddingHorizontal: 4 },
   combos: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: 10, rowGap: 2 },
   combo: { fontSize: font.tiny, color: colors.textMuted, fontWeight: '700' },
   comboOn: { color: colors.success },
