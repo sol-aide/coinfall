@@ -69,7 +69,7 @@ export function HandStrip({ run, onSwap, onFirst }: { run: RunState; onSwap: (ui
         </View>
       )}
       {canSwap && rest.length > 0 && (
-        <Txt style={styles.rest} numberOfLines={1} accessibilityLabel={`A swap draws from: ${rest.join(', ')}`}>
+        <Txt style={styles.rest} numberOfLines={1} accessibilityLabel={`Left in your bag: ${rest.join(', ')}`}>
           Left in your bag: {rest.join(', ')}
         </Txt>
       )}
