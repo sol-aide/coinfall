@@ -102,6 +102,16 @@ export function ensureHand(prev: RunState): RunState {
   return run;
 }
 
+/** Moves a coin of the hand to the front, so it is tossed first. Free; uses no randomness. */
+export function tossFirst(prev: RunState, uid: string): RunState {
+  assertScreen(prev, 'ready');
+  const hand = prev.hand ?? [];
+  if (!hand.includes(uid)) throw new ActionError('That coin is not in your hand');
+  const run = clone(prev);
+  run.hand = [uid, ...hand.filter((u) => u !== uid)];
+  return run;
+}
+
 /**
  * Puts one coin of the hand back and draws a random other coin from the bag in
  * its place. The first swap each round is free; after that each costs a Reroll token.

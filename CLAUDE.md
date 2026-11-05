@@ -38,7 +38,7 @@ For rule/number changes also run `npm run simulate -- 1000 --detail` and update 
 - `app.json` stays iOS + web only (no Android section), bundle id `com.solaide.coinfall`, privacy manifest under `ios.privacyManifests`.
 
 ## Playtesting
-Build the web version, serve `dist/` under `/coinfall/` (the base URL), and drive it with Playwright at 390×844 (also 375×667 and 440×956). Use the `testID`s on buttons (`new-run`, `starter-<id>`, `begin`, `hand-<i>`, `swap`, `toss`, `skip`, `reward-<i>`, `reward-take`, `reward-skip`, `pay`, `buy-<i>`, `shop-melt`, `leave-shop`, `end-new`…). `scripts/make-save.ts` generates mid-run saves to inject. Log notable findings in DESIGN.md's playtest log.
+Build the web version, serve `dist/` under `/coinfall/` (the base URL), and drive it with Playwright at 390×844 (also 375×667 and 440×956). Use the `testID`s on buttons (`new-run`, `starter-<id>`, `begin`, `hand-<i>`, `swap`, `toss-first`, `toss`, `skip`, `reward-<i>`, `reward-take`, `reward-skip`, `pay`, `buy-<i>`, `shop-melt`, `leave-shop`, `end-new`…). `scripts/make-save.ts` generates mid-run saves to inject. Log notable findings in DESIGN.md's playtest log.
 
 ## Git
 Work in milestones with descriptive commits. Don't include model identifiers in commits or files.

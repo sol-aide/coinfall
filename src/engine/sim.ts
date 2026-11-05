@@ -21,6 +21,7 @@ import {
   rerollShop,
   shopRerollCost,
   swapCoin,
+  tossFirst,
 } from './run';
 import type { CoinDef, RunState } from './types';
 
@@ -286,6 +287,9 @@ function botHand(run: RunState): RunState {
     if (rate(worst) >= bagAverage(run) || run.bag.length <= run.hand!.length) break;
     run = swapCoin(run, worst);
   }
+  // Coins that bless the next tosses (Seer) go first.
+  const blesser = run.hand!.find((u) => coinDef(run.bag.find((b) => b.uid === u)!.defId).effects.some((e) => e.trigger === 'onLand' && e.do.kind === 'blessNext'));
+  if (blesser && run.hand![0] !== blesser) run = tossFirst(run, blesser);
   return run;
 }
 

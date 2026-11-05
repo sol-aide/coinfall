@@ -11,7 +11,7 @@ import { Button, Stitch, Txt, tap } from './ui';
  * Swap puts it back and draws another from the bag: once free each round, then
  * one Reroll token per swap.
  */
-export function HandStrip({ run, onSwap }: { run: RunState; onSwap: (uid: string) => void }) {
+export function HandStrip({ run, onSwap, onFirst }: { run: RunState; onSwap: (uid: string) => void; onFirst: (uid: string) => void }) {
   const [selected, setSelected] = useState<string | null>(null);
   const hand = run.hand ?? [];
   // Forget a selection that is no longer in the hand (after a swap or a melt).
@@ -74,9 +74,21 @@ export function HandStrip({ run, onSwap }: { run: RunState; onSwap: (uid: string
           ) : canSwap ? (
             free ? 'Tap a coin to swap it for free.' : `Tap a coin to swap it for 1 Reroll token (${run.rerollTokens} left).`
           ) : (
-            'Your hand for this round.'
+            'Your hand for this round. Coins are tossed left to right.'
           )}
         </Txt>
+        {selected && hand[0] !== selected && (
+          <Button
+            label="First"
+            sub="toss order"
+            variant="secondary"
+            onPress={() => onFirst(selected)}
+            a11yLabel="Toss the selected coin first"
+            a11yHint="Coins are tossed left to right"
+            testID="toss-first"
+            style={styles.first}
+          />
+        )}
         <Button
           label="Swap"
           sub={free ? ((run.freeSwaps ?? 0) > 1 ? `${run.freeSwaps} free` : 'free') : '1 token'}
@@ -101,6 +113,7 @@ const styles = StyleSheet.create({
   info: { flex: 1, fontSize: font.tiny, color: colors.textDim },
   name: { fontSize: font.tiny, fontWeight: '800', color: colors.text },
   swap: { minWidth: 84 },
+  first: { minWidth: 76 },
   combos: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: 10, rowGap: 2 },
   combo: { fontSize: font.tiny, color: colors.textMuted, fontWeight: '700' },
   comboOn: { color: colors.success },

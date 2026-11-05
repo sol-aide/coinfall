@@ -13,6 +13,7 @@ import {
   rerollRewards,
   runMods,
   swapCoin,
+  tossFirst,
   type RunState,
 } from '../../engine';
 import { CoinDetail, CoinRow } from '../components/CoinInfo';
@@ -152,7 +153,7 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
       <View style={[styles.bottom, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         {r.screen === 'ready' && (
           <>
-            <HandStrip run={r} onSwap={(uid) => act((s) => swapCoin(s, uid))} />
+            <HandStrip run={r} onSwap={(uid) => act((s) => swapCoin(s, uid))} onFirst={(uid) => act((s) => tossFirst(s, uid))} />
             <Button big label="Toss coins" icon="play" onPress={toss} testID="toss" a11yHint="Tosses your hand onto the table" />
           </>
         )}

@@ -445,3 +445,18 @@ describe('on-swap coins', () => {
     expect(after.fusionNotes.join(' ')).toMatch(/Vagabond: \+3 value/);
   });
 });
+
+describe('toss order', () => {
+  it('moves a hand coin to the front, and it lands first', () => {
+    const { tossFirst } = require('../run') as typeof import('../run');
+    const run = chooseStarter(newRun('order'), 'banner');
+    const last = run.hand![4];
+    const moved = tossFirst(run, last);
+    expect(moved.hand![0]).toBe(last);
+    expect(moved.hand!.slice(1)).toEqual(run.hand!.slice(0, 4));
+    expect(moved.rng).toBe(run.rng);
+    const lands = playRound(moved).lastRound!.events.filter((e) => e.t === 'land');
+    expect(lands[0].t === 'land' && lands[0].uid).toBe(last);
+    expect(() => tossFirst(run, 'nope')).toThrow();
+  });
+});

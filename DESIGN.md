@@ -18,7 +18,7 @@ Coinfall is an original roguelike coin-toss bag builder. You are a moneylender a
 
 ### A round
 1. **Draw**: 5 coins (6 with Deep Pockets) are drawn at random from the bag into your **hand**, shown before the toss. The whole bag is available every round.
-   - **Swap**: tap a coin in the hand and Swap to put it back and draw a different kind of coin from the rest of the bag (the same kind only if nothing else is left). The first swap each round is free (two with the Spare Purse Charm); each further swap costs a Reroll token. The hand is tossed in order.
+   - **Swap**: tap a coin in the hand and Swap to put it back and draw a different kind of coin from the rest of the bag (the same kind only if nothing else is left). The first swap each round is free (two with the Spare Purse Charm); each further swap costs a Reroll token. The hand is tossed left to right; **First** moves the selected coin to the front (free), which matters for coins like Seer that bless the coins tossed after them.
 2. **Round start** abilities fire (coins in hand, then Charms).
 3. **Toss**: coins land one by one at random, non-overlapping spots on the table. Each lands heads with 50% (modified by Charms, Engravings and abilities). *On land* abilities fire immediately as each coin lands, so landing order matters.
 4. **Adjacency**: each coin, in landing order, resolves its adjacency abilities. Coins are adjacent when their centres are within 0.4 table-widths (Long Table: +30%). The table shows adjacency as dashed lines.
@@ -327,6 +327,7 @@ All playtests were run on the web build in headless Chromium at iPhone sizes (39
 | 28 | A combo callout didn't show which coins formed the combo. First pass: thin pale rings on each member, too faint and quick to read (420 ms, pale on the cloth). | Members get a thick ring in their race colour, held ~750 ms: every Orc for "Orc set bonus!", one coin per race for "All three races!". Skipped under Reduce Motion (the callout still fades in place). |
 | 30 | Hand and swap at 390×844 and 375×667: the hand strip sits above Toss; tapping a coin shows its ability; Swap reads "free", then "1 token". The tossed coins matched the final hand. A Copper was first swapped for another Copper (wasted swap). | Swaps draw a different kind of coin whenever the bag has one. |
 | 31 | Whether to swap depended on combos you had to work out yourself. | The hand shows its gated combos ("War Drummer: 2/3 Orcs", "Envoy: 3/3 races ✓"), counting Rally Horn and Kinship. A first pass printed "5/3 Orcs"; counts are now capped at the target. Checked at 375×667, including a save from before hands existed (a hand is dealt on load). |
+| 36 | Toss order already mattered (Seer blesses later tosses; Charger and Wisp act on coins already landed) but couldn't be chosen. | A First button on the selected hand coin moves it to the front; shown only when the coin isn't already first. Fits at 375×667. Sim (bot leads with Seer): sensible 30.6% over 3,000 runs, unchanged. |
 | Art | The effects module pulled React Native into the pure playback test. | Moved the shared constant into `playback.ts`. |
 
 ## Decisions
