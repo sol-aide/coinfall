@@ -44,6 +44,7 @@ export const ENGRAVINGS: EngravingDef[] = [
     text: 'When this coin is destroyed: +5 gold.',
     effects: [{ trigger: 'onDestroy', noScale: true, do: { kind: 'gold', amount: 5 } }],
   },
+  { id: 'anchored', name: 'Anchored', rarity: 'rare', text: 'This coin is always drawn into your hand (you can still swap it out).', anchored: true },
   { id: 'weighted', name: 'Weighted', rarity: 'uncommon', text: 'Tails still scores half its value.', tailsFraction: 0.5 },
 ];
 

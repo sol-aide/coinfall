@@ -460,3 +460,16 @@ describe('toss order', () => {
     expect(() => tossFirst(run, 'nope')).toThrow();
   });
 });
+
+describe('Anchored engraving', () => {
+  it('is always drawn into the hand', () => {
+    const { ensureHand } = require('../run') as typeof import('../run');
+    for (let i = 0; i < 25; i++) {
+      const run = chooseStarter(newRun(`anchor-${i}`), 'banner');
+      const target = run.bag.find((c) => c.defId === 'grunt')!;
+      target.engraving = 'anchored';
+      const dealt = ensureHand({ ...run, hand: undefined });
+      expect(dealt.hand).toContain(target.uid);
+    }
+  });
+});

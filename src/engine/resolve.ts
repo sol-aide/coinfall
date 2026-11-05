@@ -481,7 +481,11 @@ export function drawCount(run: RunState, mods: Mods): number {
 
 /** Draws a round's coins from the bag at random (the run's RNG). */
 export function drawFromBag(run: RunState, mods: Mods): CoinInstance[] {
-  return R.shuffle(run, run.bag).slice(0, drawCount(run, mods));
+  // Anchored coins come first (a random few if there are more than fit), then the rest at random.
+  const shuffled = R.shuffle(run, run.bag);
+  const anchored = shuffled.filter((c) => c.engraving && engravingDef(c.engraving).anchored);
+  const rest = shuffled.filter((c) => !anchored.includes(c));
+  return [...anchored, ...rest].slice(0, drawCount(run, mods));
 }
 
 /** Plays one full round on `run` (mutated) and returns the animated result. */

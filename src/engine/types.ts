@@ -138,6 +138,8 @@ export interface EngravingDef {
   allRaces?: boolean;
   /** The coin's own heads-only / tails-only abilities work on either face. */
   anyFace?: boolean;
+  /** Always drawn into the hand (it can still be swapped out). */
+  anchored?: boolean;
   effects?: Effect[];
 }
 

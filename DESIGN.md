@@ -75,7 +75,7 @@ Most strong builds pair two races, or lean on one of these cross-cutting engines
 | **Set bonuses** (3+ of a race on the table) | Race Charms (Commons Banner, Skull Cup, Moonwell Vial), extra draws (Deep Pockets), Rally Horn (sets need 2), Kinship engraving (counts as every race) | Town Crier (3+ Humans), War Drummer (3+ Orcs), Grove Elder (3+ heads Elves: ×2) |
 | **Mixed table** (all three races) | A bag that holds every race, Kinship engraving | Caravan Master (per race), Envoy (+3 to heads coins), Treaty Seal, Mercenary (Orc paid per Human) |
 | **Multipliers** | Big coins: Warlord, Berserker, buffed Squires | Gem Cutter (×2 the best adjacent heads coin), Grove Elder; Bard can retrigger either for ×4; Jeweler's Loupe makes every ×2 a ×3 |
-| **Swapping** | Free swaps, Spare Purse, Reroll tokens (Quartermaster, Bone Knucklebones) | Vagabond (grows when swapped out), Scrounger (+gold per swap) |
+| **Swapping** | Free swaps, Spare Purse, Reroll tokens (Quartermaster, Bone Knucklebones), the Anchored engraving (a chosen coin is always in the hand) | Vagabond (grows when swapped out), Scrounger (+gold per swap) |
 
 The two engines that pull against each other are deliberate: **tails market** wants coins to land tails, **heads control** wants them heads, and Wrecker feeds one while starving the other.
 
@@ -199,6 +199,7 @@ All content is data in `src/engine/content/`, built from effect building blocks 
 | Two-Faced | rare | This coin’s “Heads:” and “Tails:” abilities work on either face. |
 | Spiked | uncommon | Whenever this coin flips, it flips a random adjacent coin too. |
 | Hollow | common | When this coin is destroyed: +5 gold. |
+| Anchored | rare | This coin is always drawn into your hand (you can still swap it out). |
 | Weighted | uncommon | Tails still scores half its value. |
 
 ## Balance
@@ -214,22 +215,22 @@ Balance is tuned with `npm run simulate -- 1000 --detail`, which plays 1,000 see
 ```
 Dues: 26, 47, 76, 117, 175, 245, 332, 437
 
-sensible: 314/1000 wins (31.4%), avg best round 87.5
-  lost in phase: 1:13 2:2 3:9 4:42 5:111 6:168 7:191 8:150
-  by starter: warhorn 31.8%, silverleaf 27.6%, banner 34.9%
-  median gold at dues: 1:54/26 2:99/47 3:151/76 4:207/117 5:274/175 6:347/245 7:428/332 8:544/437
-  win% when coin in final bag: quartermaster(18) 50.0%, wargrider(35) 48.6%, patron(126) 41.3%, druid(123) 40.7%, grovelder(156) 40.4%, wardrummer(148) 38.5%, towncrier(227) 37.4%, herald(97) 37.1%, seer(52) 34.6%, tinker(136) 34.6%, juggler(76) 34.2%, starweaver(170) 33.5%, charger(39) 33.3%, caravan(335) 33.1%, bladedancer(145) 32.4%, gemcutter(159) 32.1%, cutpurse(89) 31.5%, mercenary(91) 30.8%, guildmaster(195) 30.8%, looter(92) 30.4%, vagabond(69) 30.4%, innkeeper(163) 29.4%, raider(74) 28.4%, lorekeeper(127) 28.3%, squire(654) 28.0%, merchant(240) 27.9%, envoy(202) 27.7%, berserker(183) 27.3%, apprentice(41) 26.8%, archer(633) 26.5%, warlord(195) 26.2%, shaman(73) 26.0%, scrounger(31) 25.8%, ranger(129) 25.6%, moneychanger(133) 25.6%, longbow(139) 24.5%, gladewarden(131) 23.7%, sentinel(162) 22.8%, firebrand(71) 22.5%, moonpriestess(143) 22.4%, wisp(109) 22.0%, grunt(549) 21.7%, powderkeg(43) 20.9%, captain(154) 18.8%, bard(55) 16.4%, wrecker(43) 16.3%, bonebreaker(101) 14.9%, copper(279) 14.3%, brawler(77) 11.7%
-  win% when charm owned: pockets(86) 67.4%, scales(78) 57.7%, rallyhorn(21) 47.6%, firstlight(238) 47.5%, dice(59) 42.4%, clover(249) 41.8%, spintop(53) 41.5%, sparepurse(239) 40.2%, charter(240) 39.6%, tailwind(284) 39.4%, skullcup(234) 38.5%, crucible(118) 38.1%, anvil(90) 37.8%, longtable(244) 36.5%, loupe(11) 36.4%, treaty(242) 35.1%, banner(335) 34.9%, crown(425) 34.6%, moonwell(240) 34.2%, lantern(118) 33.9%, spade(104) 32.7%, whirlwind(120) 32.5%, warhorn(321) 31.8%, haggler(300) 31.0%, ledger(271) 29.9%, silverleaf(344) 27.6%, collector(103) 26.2%
+sensible: 307/1000 wins (30.7%), avg best round 88.4
+  lost in phase: 1:13 2:2 3:7 4:45 5:107 6:177 7:182 8:160
+  by starter: warhorn 32.1%, silverleaf 26.2%, banner 34.0%
+  median gold at dues: 1:54/26 2:99/47 3:151/76 4:207/117 5:273/175 6:344/245 7:429/332 8:514/437
+  win% when coin in final bag: quartermaster(19) 52.6%, patron(126) 42.1%, druid(129) 41.9%, wargrider(35) 40.0%, grovelder(157) 38.9%, towncrier(222) 37.4%, cutpurse(83) 37.3%, wardrummer(148) 36.5%, tinker(137) 33.6%, bladedancer(135) 32.6%, caravan(326) 32.5%, charger(34) 32.4%, herald(97) 32.0%, juggler(73) 31.5%, looter(93) 31.2%, starweaver(174) 31.0%, scrounger(33) 30.3%, vagabond(66) 30.3%, gemcutter(168) 29.8%, innkeeper(165) 29.7%, lorekeeper(125) 28.8%, ranger(138) 28.3%, warlord(192) 28.1%, mercenary(97) 27.8%, guildmaster(195) 27.7%, squire(648) 27.5%, raider(74) 27.0%, berserker(185) 27.0%, seer(52) 26.9%, envoy(212) 26.9%, shaman(75) 26.7%, longbow(140) 26.4%, archer(632) 26.4%, apprentice(42) 26.2%, moneychanger(133) 25.6%, gladewarden(127) 25.2%, merchant(244) 23.8%, moonpriestess(142) 22.5%, powderkeg(45) 22.2%, grunt(553) 21.9%, captain(156) 19.9%, sentinel(149) 19.5%, brawler(77) 18.2%, bonebreaker(100) 17.0%, wisp(113) 16.8%, bard(54) 16.7%, firebrand(68) 14.7%, copper(284) 12.7%, wrecker(41) 9.8%
+  win% when charm owned: pockets(85) 62.4%, scales(84) 56.0%, firstlight(232) 47.0%, loupe(13) 46.2%, spintop(54) 42.6%, rallyhorn(19) 42.1%, dice(62) 41.9%, crucible(103) 41.7%, clover(251) 41.0%, tailwind(284) 38.7%, sparepurse(243) 38.7%, charter(245) 38.4%, skullcup(238) 37.0%, longtable(250) 36.4%, anvil(88) 34.1%, banner(335) 34.0%, crown(414) 33.1%, treaty(242) 32.6%, whirlwind(117) 32.5%, spade(112) 32.1%, ledger(271) 32.1%, warhorn(321) 32.1%, lantern(124) 31.5%, moonwell(239) 30.5%, haggler(308) 30.2%, collector(100) 28.0%, silverleaf(344) 26.2%
 
-greedy: 100/1000 wins (10.0%), avg best round 63.0
-  lost in phase: 1:15 2:3 3:20 4:62 5:205 6:281 7:212 8:102
-  by starter: warhorn 17.8%, silverleaf 4.7%, banner 8.1%
-  median gold at dues: 1:53/26 2:97/47 3:143/76 4:189/117 5:224/175 6:264/245 7:325/332 8:415/437
+greedy: 109/1000 wins (10.9%), avg best round 63.7
+  lost in phase: 1:15 2:3 3:22 4:67 5:205 6:267 7:208 8:104
+  by starter: warhorn 19.3%, silverleaf 4.1%, banner 9.9%
+  median gold at dues: 1:54/26 2:96/47 3:143/76 4:191/117 5:229/175 6:268/245 7:324/332 8:413/437
 
 random: 0/1000 wins (0.0%), avg best round 20.2
-  lost in phase: 1:31 2:108 3:433 4:366 5:62 6:0 7:0 8:0
+  lost in phase: 1:31 2:109 3:430 4:366 5:64 6:0 7:0 8:0
   by starter: warhorn 0.0%, silverleaf 0.0%, banner 0.0%
-  median gold at dues: 1:44/26 2:64/47 3:75/76 4:85/117 5:95/175 6:NaN/245 7:NaN/332 8:NaN/437
+  median gold at dues: 1:44/26 2:64/47 3:76/76 4:86/117 5:95/175 6:NaN/245 7:NaN/332 8:NaN/437
 ```
 
 ### Guild ranks (1,000 sensible runs each)

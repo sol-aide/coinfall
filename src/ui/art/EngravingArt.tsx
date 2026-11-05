@@ -65,6 +65,15 @@ export const ENGRAVING_SYMBOLS: Record<string, () => React.ReactNode> = {
       <Circle cx={50} cy={50} r={9} fill="#2B2320" />
     </>
   ),
+  anchored: () => (
+    <>
+      <Line x1={50} y1={22} x2={50} y2={72} />
+      <Circle cx={50} cy={22} r={7} fill="none" />
+      <Line x1={38} y1={36} x2={62} y2={36} />
+      <Path d="M28 58 Q30 76 50 78 Q70 76 72 58" fill="none" />
+      <Path d="M24 62 L28 54 L34 62 M66 62 L72 54 L76 62" fill="none" />
+    </>
+  ),
   weighted: () => (
     <>
       <Path d="M36 40 L64 40 L72 76 L28 76 Z" fill="#8C7A6A" />

@@ -192,6 +192,8 @@ function bestCoinFor(run: RunState, engravingId: string): string | undefined {
     if (engravingId === 'echo' && def.effects.length === 0) s = -1;
     if (engravingId === 'secondwind' && c.defId !== 'firebrand') s *= 0.5;
     if (engravingId === 'twofaced' && !def.effects.some((e) => e.when)) s = -1;
+    // Anchored makes the best coin show up every round.
+    if (engravingId === 'anchored' && def.effects.length === 0) s *= 0.5;
     // Hollow goes on cheap fodder, and only when something in the bag destroys coins.
     if (engravingId === 'hollow') s = destroyers ? 20 - displayValue(c, mods) : -1;
     // Spiked only helps when the bag pays for flips.
