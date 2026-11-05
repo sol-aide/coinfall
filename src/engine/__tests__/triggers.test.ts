@@ -193,7 +193,7 @@ describe('onDestroy', () => {
   it('Tusk Warhorn and Spade pay gold on destroy', () => {
     const { ctx, coins } = table([{ defId: 'copper' }, ...PAD], ['warhorn', 'spade']);
     destroyCoin(ctx, coins[0]);
-    expect(goldEvents(ctx)).toBe(5);
+    expect(goldEvents(ctx)).toBe(4);
   });
 
   it('Second Wind returns a destroyed coin to the bag once', () => {

@@ -101,6 +101,7 @@ export const CHARM_RATING: Record<string, number> = {
   rallyhorn: 3,
   loupe: 2.5,
   spintop: 2,
+  sparepurse: 3,
 };
 
 /** Build-around Charms are only worth their rating when the bag has coins they improve. */
@@ -269,14 +270,18 @@ function botShopBuyOnly(run: RunState, reserve: number): RunState {
 /** Uses the free swap on the weakest coin in hand when it rates below the bag average. */
 function botHand(run: RunState): RunState {
   run = ensureHand(run);
-  if (!run.hand || (run.freeSwaps ?? 0) < 1) return run;
+  if (!run.hand) return run;
   const rate = (uid: string) => {
     const c = run.bag.find((b) => b.uid === uid)!;
     return (COIN_RATING[c.defId] ?? 2) * c.level;
   };
-  const worst = run.hand.slice().sort((a, b) => rate(a) - rate(b))[0];
-  if (rate(worst) >= bagAverage(run) || run.bag.length <= run.hand.length) return run;
-  return swapCoin(run, worst);
+  // Spend every free swap on the weakest coin while it is below the bag average.
+  for (let i = 0; i < 4 && (run.freeSwaps ?? 0) > 0; i++) {
+    const worst = run.hand!.slice().sort((a, b) => rate(a) - rate(b))[0];
+    if (rate(worst) >= bagAverage(run) || run.bag.length <= run.hand!.length) break;
+    run = swapCoin(run, worst);
+  }
+  return run;
 }
 
 /** Advances a run by one bot decision. */

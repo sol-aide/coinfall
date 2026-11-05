@@ -102,6 +102,8 @@ export interface Mods {
   setDiscount: number;
   /** Added to every multiplier factor (×2 becomes ×3). */
   multBonus: number;
+  /** Extra free hand swaps each round. */
+  freeSwaps: number;
 }
 
 export interface CharmDef {

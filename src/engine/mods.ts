@@ -21,6 +21,7 @@ export function emptyMods(): Mods {
     rareBoost: 0,
     setDiscount: 0,
     multBonus: 0,
+    freeSwaps: 0,
   };
 }
 
@@ -65,6 +66,7 @@ export function computeMods(charmIds: readonly string[], rank = 1): Mods {
     m.rareBoost += c.rareBoost ?? 0;
     m.setDiscount += c.setDiscount ?? 0;
     m.multBonus += c.multBonus ?? 0;
+    m.freeSwaps += c.freeSwaps ?? 0;
   }
   return m;
 }

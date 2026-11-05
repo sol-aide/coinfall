@@ -8,8 +8,8 @@ export const CHARMS: CharmDef[] = [
     rarity: 'starter',
     race: 'human',
     starter: true,
-    text: 'Humans get +1 value.',
-    mods: { valueBonus: { human: 1 } },
+    text: 'Humans get +1 value and are 3% more likely to land heads.',
+    mods: { valueBonus: { human: 1 }, headsBonus: { human: 0.03 } },
   },
   {
     id: 'warhorn',
@@ -17,9 +17,9 @@ export const CHARMS: CharmDef[] = [
     rarity: 'starter',
     race: 'orc',
     starter: true,
-    text: 'Orcs get +4 value. +2 gold whenever a coin is destroyed.',
+    text: 'Orcs get +4 value. +1 gold whenever a coin is destroyed.',
     mods: { valueBonus: { orc: 4 } },
-    effects: [{ trigger: 'onDestroy', noScale: true, do: { kind: 'gold', amount: 2 } }],
+    effects: [{ trigger: 'onDestroy', noScale: true, do: { kind: 'gold', amount: 1 } }],
   },
   {
     id: 'silverleaf',
@@ -177,6 +177,13 @@ export const CHARMS: CharmDef[] = [
     rarity: 'uncommon',
     text: 'Whenever a coin on the table flips, it gets +1 value this round.',
     effects: [{ trigger: 'onFlip', noScale: true, do: { kind: 'buff', target: { scope: 'subject' }, amount: 1 } }],
+  },
+  {
+    id: 'sparepurse',
+    name: 'Spare Purse',
+    rarity: 'uncommon',
+    text: 'One extra free swap in your hand every round.',
+    mods: { freeSwaps: 1 },
   },
   {
     id: 'skullcup',

@@ -166,6 +166,13 @@ export const CHARM_SYMBOLS: Record<string, () => React.ReactNode> = {
       <Path d="M26 42 Q50 52 74 42" fill="none" />
     </>
   ),
+  sparepurse: () => (
+    <>
+      <Path d="M30 40 Q20 54 26 68 Q32 80 50 80 Q68 80 74 68 Q80 54 70 40 Z" />
+      <Path d="M34 40 L30 28 L70 28 L66 40" />
+      <Path d="M40 60 L60 60 M54 54 L60 60 L54 66" fill="none" />
+    </>
+  ),
   skullcup: () => (
     <>
       <Path d="M28 24 L72 24 Q72 56 50 60 Q28 56 28 24 Z" />

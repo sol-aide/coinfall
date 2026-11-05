@@ -32,7 +32,7 @@ The best bags mix races. Field Humans, Orcs and Elves together for the Caravan M
 
 After every round, add a new coin to your bag or skip it for gold. Three identical coins fuse into a stronger one. After paying dues, visit the bazaar for new coins, Charms that last the whole run and Engravings that upgrade a single coin. Melt away weak coins, reroll the stock, and plan for dues that keep climbing.
 
-• 46 coins across three races, 26 Charms and 12 Engravings
+• 46 coins across three races, 27 Charms and 12 Engravings
 • Every run is different: random draws, landings and offers
 • A Daily bazaar run that is the same for everyone each day, offline
 • Clear animated resolution with a full score breakdown, tap any coin to read it
@@ -92,7 +92,7 @@ Optional extras worth capturing on a device: a fusion toast ("Three Captain coin
 | # | Requirement | Status | Where |
 |---|---|---|---|
 | 1 | Complete and polished: no placeholder text, empty screens, crashes or debug UI (2.1) | **Pass** | Every screen has content; no dev menus or debug UI; playtested every screen at 375×667, 390×844 and 440×956 with no console errors; test checks content text for placeholders |
-| 2 | Real native app with lasting value, not a website wrapper (4.2) | **Pass** | React Native app with native rendering, haptics, local saves, and a replayable roguelike loop (8 phases, 46 coins, 26 Charms, 12 Engravings, a Daily bazaar, 5 Guild ranks) |
+| 2 | Real native app with lasting value, not a website wrapper (4.2) | **Pass** | React Native app with native rendering, haptics, local saves, and a replayable roguelike loop (8 phases, 46 coins, 27 Charms, 12 Engravings, a Daily bazaar, 5 Guild ranks) |
 | 3 | Distinct name, icon and art; nothing copied (4.1, 4.3, 5.2) | **Pass** | Original name, original SVG icon/splash (`assets/source/`), every coin glyph hand-drawn in `src/ui/art/glyphs.tsx`, all text original; no third-party art; the only third-party asset is the Fredoka font (SIL Open Font License) |
 | 4 | Play money only; can't be bought or cashed out; no real money (5.3) | **Pass** | No purchase code or IAP libraries; stated in How to play, Privacy, Settings footer and review notes |
 | 5 | Fantasy coin-toss look, not a casino (no slots, cards, chips) | **Pass** | Wooden bazaar table, character coins with race emblems; no slot machines, playing cards, chips, roulette or felt |

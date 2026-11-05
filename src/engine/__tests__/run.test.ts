@@ -413,3 +413,18 @@ describe('the hand', () => {
     expect(a.hand).toEqual(b.hand);
   });
 });
+
+describe('Spare Purse', () => {
+  it('gives an extra free swap each round', () => {
+    const { swapCoin, FREE_SWAPS, chooseReward: take } = require('../run') as typeof import('../run');
+    let run = chooseStarter(newRun('purse'), 'banner');
+    run = { ...run, charms: [...run.charms, 'sparepurse'] };
+    run = take(playRound(run), null); // next round's hand is dealt with the Charm owned
+    expect(run.freeSwaps).toBe(FREE_SWAPS + 1);
+    const tokens = run.rerollTokens;
+    run = swapCoin(run, run.hand![0]);
+    run = swapCoin(run, run.hand![1]);
+    expect(run.rerollTokens).toBe(tokens);
+    expect(run.freeSwaps).toBe(0);
+  });
+});

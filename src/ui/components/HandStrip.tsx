@@ -79,7 +79,7 @@ export function HandStrip({ run, onSwap }: { run: RunState; onSwap: (uid: string
         </Txt>
         <Button
           label="Swap"
-          sub={free ? 'free' : '1 token'}
+          sub={free ? ((run.freeSwaps ?? 0) > 1 ? `${run.freeSwaps} free` : 'free') : '1 token'}
           variant="secondary"
           disabled={!selected || !canSwap}
           onPress={() => selected && onSwap(selected)}

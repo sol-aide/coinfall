@@ -80,8 +80,9 @@ export const FREE_SWAPS = 1;
 
 /** Draws the hand for the round about to be tossed (mutates). */
 function dealHand(run: RunState) {
-  run.hand = drawFromBag(run, runMods(run)).map((c) => c.uid);
-  run.freeSwaps = FREE_SWAPS;
+  const mods = runMods(run);
+  run.hand = drawFromBag(run, mods).map((c) => c.uid);
+  run.freeSwaps = FREE_SWAPS + mods.freeSwaps;
 }
 
 function startPhase(run: RunState) {
