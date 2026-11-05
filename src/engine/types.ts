@@ -12,7 +12,9 @@ export type Trigger =
   | 'onDestroy'
   | 'onRoundEnd'
   | 'onPhaseStart'
-  | 'onPhaseEnd';
+  | 'onPhaseEnd'
+  /** A coin was swapped out of the hand (before the toss). */
+  | 'onSwap';
 
 /** Selects coins on the table relative to the acting coin. */
 export interface Target {

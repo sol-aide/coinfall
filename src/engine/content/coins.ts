@@ -217,6 +217,16 @@ export const COINS: CoinDef[] = [
     ],
   },
 
+  {
+    id: 'vagabond',
+    name: 'Vagabond',
+    race: 'human',
+    rarity: 'common',
+    value: 2,
+    text: 'Whenever you swap this coin out of your hand: +{3} value permanently.',
+    effects: [{ trigger: 'onSwap', do: { kind: 'buff', target: { scope: 'self' }, amount: 3, permanent: true } }],
+  },
+
   // ---------------------------------------------------------------- Orcs
   {
     id: 'grunt',
@@ -396,6 +406,16 @@ export const COINS: CoinDef[] = [
     value: 3,
     text: 'On land: rams the farthest tails coin, pushing it away and flipping it to heads.',
     effects: [{ trigger: 'onLand', do: { kind: 'bump', target: { scope: 'farthest', face: 'tails' } } }],
+  },
+
+  {
+    id: 'scrounger',
+    name: 'Scrounger',
+    race: 'orc',
+    rarity: 'common',
+    value: 3,
+    text: 'Whenever you swap any other coin out of your hand: +{1} gold, even from the bag.',
+    effects: [{ trigger: 'onSwap', any: true, do: { kind: 'gold', amount: 1 } }],
   },
 
   // ---------------------------------------------------------------- Elves

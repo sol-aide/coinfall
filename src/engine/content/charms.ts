@@ -8,8 +8,8 @@ export const CHARMS: CharmDef[] = [
     rarity: 'starter',
     race: 'human',
     starter: true,
-    text: 'Humans get +1 value and are 3% more likely to land heads.',
-    mods: { valueBonus: { human: 1 }, headsBonus: { human: 0.03 } },
+    text: 'Humans get +1 value and are 2% more likely to land heads.',
+    mods: { valueBonus: { human: 1 }, headsBonus: { human: 0.02 } },
   },
   {
     id: 'warhorn',

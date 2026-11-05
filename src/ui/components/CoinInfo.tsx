@@ -31,6 +31,7 @@ const TAG_COLOR: Record<TagId, string> = {
   grows: '#9EDDA9',
   gold: '#F2C14E',
   tokens: '#7CC4F2',
+  swaps: '#F2B41E',
 };
 
 /** Small chips naming the synergies a coin plays into (derived from its rules). */

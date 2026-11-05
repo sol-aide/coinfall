@@ -45,6 +45,7 @@ export const COIN_RATING: Record<string, number> = {
   gemcutter: 4.2,
   herald: 2.8,
   quartermaster: 2.2,
+  vagabond: 2.4,
   grunt: 2.4,
   berserker: 3,
   charger: 2.4,
@@ -61,6 +62,7 @@ export const COIN_RATING: Record<string, number> = {
   wardrummer: 3,
   bonebreaker: 2.8,
   wargrider: 2.4,
+  scrounger: 2.4,
   archer: 2.6,
   moonpriestess: 3,
   sentinel: 2.6,
@@ -275,6 +277,9 @@ function botHand(run: RunState): RunState {
     const c = run.bag.find((b) => b.uid === uid)!;
     return (COIN_RATING[c.defId] ?? 2) * c.level;
   };
+  // A coin that grows when swapped out (Vagabond) is worth a free swap first.
+  const grower = run.hand.find((u) => coinDef(run.bag.find((b) => b.uid === u)!.defId).effects.some((e) => e.trigger === 'onSwap' && !e.any));
+  if (grower && (run.freeSwaps ?? 0) > 0 && run.bag.length > run.hand.length) run = swapCoin(run, grower);
   // Spend every free swap on the weakest coin while it is below the bag average.
   for (let i = 0; i < 4 && (run.freeSwaps ?? 0) > 0; i++) {
     const worst = run.hand!.slice().sort((a, b) => rate(a) - rate(b))[0];

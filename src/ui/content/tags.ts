@@ -3,7 +3,7 @@
 
 import { CHARM_MAP, ENGRAVING_MAP, coinDef, runMods, type Action, type CharmDef, type CoinDef, type Count, type Race, type RunState, type Target } from '../../engine';
 
-export type TagId = 'gold' | 'grows' | 'flips' | 'tails' | 'heads' | 'wreck' | 'mult' | 'set' | 'mixed' | 'counts' | 'boost' | 'echo' | 'tokens';
+export type TagId = 'gold' | 'grows' | 'flips' | 'tails' | 'heads' | 'wreck' | 'mult' | 'set' | 'mixed' | 'counts' | 'boost' | 'echo' | 'tokens' | 'swaps';
 
 export interface SynergyTag {
   id: TagId;
@@ -37,6 +37,7 @@ export function synergyTags(def: CoinDef): SynergyTag[] {
     if (a.kind === 'mult') has.add('mult');
     if (a.kind === 'retrigger' || a.kind === 'copy') has.add('echo');
     if (a.kind === 'token') has.add('tokens');
+    if (e.trigger === 'onSwap') has.add('swaps');
     if ((a.kind === 'buff' || a.kind === 'mult') && a.target.scope !== 'self') has.add('boost');
     const all: Count[] = [...counts(a), ...(e.require ? [e.require.per] : [])];
     // Tails payoffs (not coins that merely turn tails coins over to heads).
@@ -57,7 +58,7 @@ export function synergyTags(def: CoinDef): SynergyTag[] {
     }
   }
   if (has.has('mult')) has.delete('boost'); // ×2 already says it
-  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold', 'tokens'];
+  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold', 'tokens', 'swaps'];
   const label = (id: TagId): string => {
     switch (id) {
       case 'set':
@@ -86,6 +87,8 @@ export function synergyTags(def: CoinDef): SynergyTag[] {
         return 'Gold';
       case 'tokens':
         return 'Tokens';
+      case 'swaps':
+        return 'Swaps';
     }
   };
   return order.filter((id) => has.has(id)).map((id) => ({ id, label: label(id) }));
@@ -133,11 +136,12 @@ interface Roles {
   paysWreck: boolean;
   races: Set<Race>;
   mixed: boolean;
+  swaps: boolean;
 }
 
 /** What a coin does for others and what it wants from them, read from its effects. */
 function roles(def: CoinDef): Roles {
-  const r: Roles = { makesFlips: false, paysFlips: false, paysTails: false, destroys: false, paysWreck: false, races: new Set(), mixed: false };
+  const r: Roles = { makesFlips: false, paysFlips: false, paysTails: false, destroys: false, paysWreck: false, races: new Set(), mixed: false, swaps: false };
   for (const e of def.effects) {
     const a = e.do;
     if ((a.kind === 'flip' && a.target.face !== 'tails') || a.kind === 'bump') r.makesFlips = true;
@@ -146,6 +150,7 @@ function roles(def: CoinDef): Roles {
     if (e.when === 'tails' || tailsCount) r.paysTails = true;
     if (a.kind === 'destroy' && a.target.scope !== 'self') r.destroys = true;
     if (e.trigger === 'onDestroy') r.paysWreck = true;
+    if (e.trigger === 'onSwap') r.swaps = true;
     const ts: Target[] = [...targets(a), ...counts(a).flatMap((c) => ('count' in c ? [c.count] : []))];
     if (e.require && 'count' in e.require.per) ts.push(e.require.per.count);
     for (const t of ts) if (t.race && t.race !== 'neutral') r.races.add(t.race);
@@ -159,6 +164,7 @@ function pairs(a: CoinDef, ra: Roles, b: CoinDef, rb: Roles): boolean {
   if (ra.destroys && rb.paysWreck) return true;
   if (ra.races.has(b.race)) return true;
   if (ra.mixed && b.race !== a.race && b.race !== 'neutral') return true;
+  if (ra.swaps && rb.swaps) return true;
   return false;
 }
 
@@ -205,7 +211,7 @@ export function charmTags(def: CharmDef): SynergyTag[] {
   if (m.valueBonus || m.coinValueBonus) add('boost', 'Boosts others');
   const race = def.race ?? (Object.keys(m.valueBonus ?? {}).find((k) => k !== 'all') as Race | undefined);
   if (race && race !== 'neutral') add('counts', PLURAL[race]);
-  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold', 'tokens'];
+  const order: TagId[] = ['set', 'mixed', 'counts', 'mult', 'echo', 'boost', 'flips', 'tails', 'heads', 'wreck', 'grows', 'gold', 'tokens', 'swaps'];
   return order.filter((id) => out.has(id)).map((id) => out.get(id)!);
 }
 

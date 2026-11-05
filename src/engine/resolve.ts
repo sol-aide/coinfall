@@ -575,6 +575,31 @@ export function resolveRound(run: RunState): RoundResult {
   };
 }
 
+/**
+ * Resolves onSwap after `outUid` was swapped out of the hand: that coin's own
+ * effects, then every other bag coin's `any` effects. Gold goes to the purse.
+ */
+export function resolveSwapTrigger(run: RunState, outUid: string): { events: GameEvent[]; gold: number } {
+  const ctx = newCtx(run, 'phase', true);
+  ctx.table = run.bag.map((inst, i) => ({
+    uid: inst.uid,
+    defId: inst.defId,
+    level: inst.level,
+    x: 0,
+    y: 0,
+    face: 'heads' as Face,
+    landed: true,
+    destroyed: false,
+    temp: 0,
+    mult: 1,
+    order: i,
+  }));
+  const out = ctx.table.find((t) => t.uid === outUid);
+  if (out) runCoinTrigger(ctx, out, 'onSwap');
+  for (const tc of ctx.table) if (tc !== out) runCoinTrigger(ctx, tc, 'onSwap', true);
+  return { events: ctx.events, gold: ctx.total };
+}
+
 /** Resolves onPhaseStart / onPhaseEnd for every coin in the bag and every Charm. */
 export function resolvePhaseTrigger(run: RunState, trigger: 'onPhaseStart' | 'onPhaseEnd'): { events: GameEvent[]; gold: number } {
   const ctx = newCtx(run, 'phase', true);

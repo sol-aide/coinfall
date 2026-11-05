@@ -18,7 +18,7 @@ import {
   rollShop,
 } from './economy';
 import { runMods } from './mods';
-import { drawFromBag, resolvePhaseTrigger, resolveRound } from './resolve';
+import { drawFromBag, resolvePhaseTrigger, resolveRound, resolveSwapTrigger } from './resolve';
 import * as R from './rng';
 import type { RunState } from './types';
 
@@ -125,6 +125,11 @@ export function swapCoin(prev: RunState, uid: string): RunState {
   run.hand[at] = pick.uid;
   if (free) run.freeSwaps = (run.freeSwaps ?? 0) - 1;
   else run.rerollTokens--;
+  // On-swap abilities (Vagabond, Scrounger); their results show as a toast.
+  const { events } = resolveSwapTrigger(run, uid);
+  run.fusionNotes = events.flatMap((e) =>
+    e.t === 'gold' ? [`${e.label}: +${e.amount} gold`] : e.t === 'value' ? [`${coinDef(run.bag.find((c) => c.uid === e.uid)!.defId).name}: +${e.delta} value`] : [],
+  );
   return run;
 }
 

@@ -428,3 +428,20 @@ describe('Spare Purse', () => {
     expect(run.freeSwaps).toBe(0);
   });
 });
+
+describe('on-swap coins', () => {
+  it('Vagabond grows when swapped out; Scrounger pays for any other swap, even from the bag', () => {
+    const { swapCoin } = require('../run') as typeof import('../run');
+    const base = chooseStarter(newRun('swapcoins'), 'banner');
+    const run = { ...base, bag: base.bag.map((c) => ({ ...c })) };
+    run.bag.push(newInstance(run, 'vagabond'), newInstance(run, 'scrounger'));
+    const vag = run.bag.find((c) => c.defId === 'vagabond')!;
+    const scr = run.bag.find((c) => c.defId === 'scrounger')!;
+    run.hand = [vag.uid, ...run.bag.filter((c) => c !== vag && c !== scr).slice(0, 4).map((c) => c.uid)];
+    const gold = run.gold;
+    const after = swapCoin(run, vag.uid);
+    expect(after.bag.find((c) => c.uid === vag.uid)!.bonus).toBe(3);
+    expect(after.gold).toBe(gold + 1); // Scrounger is in the bag, not the hand
+    expect(after.fusionNotes.join(' ')).toMatch(/Vagabond: \+3 value/);
+  });
+});

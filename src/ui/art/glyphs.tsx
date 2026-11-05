@@ -401,6 +401,25 @@ export const GLYPHS: Record<string, GlyphFn> = {
       <Line x1={50} y1={42} x2={50} y2={64} stroke={ink} strokeWidth={2 + o} />
     </G>
   ),
+  vagabond: (ink, accent, o) => (
+    <G>
+      <Line x1={22} y1={78} x2={70} y2={30} stroke={ink} {...sw(o)} />
+      <Path d="M58 22 Q80 14 84 34 Q86 50 68 52 Q52 50 54 36 Q54 26 58 22 Z" fill={ink} />
+      <Path d="M62 30 Q70 26 76 32" stroke={accent} strokeWidth={2.5 + o} fill="none" strokeLinecap="round" />
+      <Circle cx={30} cy={70} r={4} fill={accent} />
+    </G>
+  ),
+  scrounger: (ink, accent, o) => (
+    <G>
+      <Path d="M30 44 Q20 58 26 72 Q32 82 50 82 Q68 82 74 72 Q80 58 70 44 Z" fill={ink} />
+      <Path d="M34 44 Q50 36 66 44" stroke={ink} strokeWidth={4 + o} fill="none" />
+      <Circle cx={40} cy={30} r={8} fill={ink} />
+      <Circle cx={58} cy={24} r={7} fill={ink} />
+      <Circle cx={40} cy={30} r={3} fill={accent} />
+      <Circle cx={58} cy={24} r={2.5} fill={accent} />
+      <Path d="M40 60 L60 60" stroke={accent} strokeWidth={3 + o} strokeLinecap="round" />
+    </G>
+  ),
 };
 
 /** Race emblem used on tails faces and labels. */

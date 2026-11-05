@@ -21,7 +21,7 @@ You are a moneylender at a crossroads bazaar where Humans, Orcs and Elves gamble
    - **Orcs** – big values and chaos (Berserker, Charger, Firebrand, Warlord…)
    - **Elves** – precision and control (Sentinel, Moon Priestess, Bladedancer, Longbow…)
 4. **Grow your bag.** After each round, add 1 of 3 coins or skip for 3 gold. Three identical coins fuse into a stronger one.
-5. **Pay the Guild.** Every 5 rounds the Guild collects dues (27 gold, rising to 446 by phase 8). If you can't pay, the run ends.
+5. **Pay the Guild.** Every 5 rounds the Guild collects dues (26 gold, rising to 437 by phase 8). If you can't pay, the run ends.
 6. **Shop at the bazaar.** Buy coins, Charms (run-wide passives, up to 6) and Engravings (upgrades for one coin). Reroll the stock, and use Melt tokens to remove weak coins.
 7. **Build combos.** The strongest bags mix races and stack synergies: mixed tables (Caravan Master, Envoy), three-of-a-kind set bonuses (Town Crier, War Drummer, Grove Elder), tails and flip engines (Cutpurse, Night Raider, Juggler, Brawler), wreckage (Berserker, Looter, Powder Keg) and ×2 multipliers (Gem Cutter). Coloured tags on every coin and Charm name its combos, and offers say which coins in your bag they work with.
 

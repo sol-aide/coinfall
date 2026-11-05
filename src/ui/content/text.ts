@@ -55,6 +55,7 @@ export const HOW_TO_PLAY: HelpSection[] = [
       'Some coins wake up with friends: 3 Humans for the Town Crier, 3 Orcs for the War Drummer, 3 heads Elves for the Grove Elder.',
       'Tails is not always bad: Cutpurse and Night Raider pay for tails, and Wrecker or Charger can flip coins over to feed them. Juggler and Brawler love every flip.',
       'Gem Cutter and Grove Elder double values (×2) after every other bonus, so stack buffs first.',
+      'Swapping is a combo too: a Vagabond grows each time you swap it out, and a Scrounger pays gold for every swap.',
       'Some Charms and engravings bend the rules: the Rally Horn makes sets need only 2 coins, the Jeweler’s Loupe turns ×2 into ×3, and a Kinship engraving makes one coin count as every race.',
       'Coloured tags under each coin name the combos it plays into, and your bag shows which tags you have most of.',
     ],
