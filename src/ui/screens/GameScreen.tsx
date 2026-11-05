@@ -136,9 +136,8 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
               <View style={styles.emptyHint} pointerEvents="none">
                 <Txt style={styles.emptyTitle}>Round {r.round}</Txt>
                 <Txt style={styles.emptyText}>
-                  Your hand of {r.hand?.length ?? Math.min(r.bag.length, BASE_DRAW + mods.drawBonus)} coins from a bag of {r.bag.length} is below. Swap one if you like, then toss.
+                  {r.hand?.length ?? Math.min(r.bag.length, BASE_DRAW + mods.drawBonus)} coins from your bag of {r.bag.length}. Heads pay their value in gold.
                 </Txt>
-                <Txt style={styles.emptyText}>Heads pay their value in gold.</Txt>
               </View>
             )}
           </Table>
