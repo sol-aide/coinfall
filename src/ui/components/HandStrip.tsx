@@ -72,7 +72,7 @@ export function HandStrip({ run, onSwap }: { run: RunState; onSwap: (uid: string
               {abilityText(selDef, sel.level)}
             </>
           ) : canSwap ? (
-            `Tap a coin to swap it (${cost}).`
+            free ? 'Tap a coin to swap it for free.' : `Tap a coin to swap it for 1 Reroll token (${run.rerollTokens} left).`
           ) : (
             'Your hand for this round.'
           )}
