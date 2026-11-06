@@ -20,7 +20,7 @@ For rule/number changes also run `npm run simulate -- 1000 --detail` and update 
 - Coins: `src/engine/content/coins.ts`; Charms: `charms.ts`; Engravings: `engravings.ts`.
 - Build abilities from the `Effect`/`Action`/`Target` building blocks in `types.ts` (gold, buff, mult, flip, reflip, setHeads, destroy, bump, retrigger, copy, streak, blessNext, token, interest). Adding a coin should be data only; add a new `Action` kind to `resolve.ts` only when no combination works.
 - Ability numbers scale with fusion level unless `noScale`. In coin `text`, write scaling numbers as `{n}`; render with `abilityText(def, level)`.
-- A new coin also needs: a glyph in `src/ui/art/glyphs.tsx` (a test enforces this), a rating in `src/engine/sim.ts` (`COIN_RATING`), and the DESIGN.md content table (`npx tsx scripts/content-tables.ts`).
+- A new coin also needs: a glyph in `src/ui/art/glyphs.tsx` and a portrait in `src/ui/art/portraits.tsx` (tests enforce both), a rating in `src/engine/sim.ts` (`COIN_RATING`), and the DESIGN.md content table (`npx tsx scripts/content-tables.ts`).
 - All names and text must be original. Never mention other platforms or app stores (a test scans the text).
 
 ## UI conventions

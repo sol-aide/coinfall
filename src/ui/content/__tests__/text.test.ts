@@ -48,6 +48,11 @@ describe('player-facing text', () => {
     for (const c of COINS) expect(src).toMatch(new RegExp(`\\b${c.id}: \\(`));
   });
 
+  it('every character coin has its own portrait', () => {
+    const src = readFileSync(join(root, 'src/ui/art/portraits.tsx'), 'utf8');
+    for (const c of COINS) if (c.race !== 'neutral') expect(src).toMatch(new RegExp(`\\b${c.id}: (portrait\\(|\\()`));
+  });
+
   it('ability text renders scaled numbers for fused coins', () => {
     const merchant = COINS.find((c) => c.id === 'merchant')!;
     expect(abilityText(merchant)).toBe('Heads: +2 gold for each adjacent coin.');

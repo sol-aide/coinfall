@@ -1,8 +1,9 @@
 import React, { useId } from 'react';
-import Svg, { Circle, Defs, Ellipse, G, Line, LinearGradient, Polygon, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, ClipPath, Defs, Ellipse, G, Line, LinearGradient, Polygon, RadialGradient, Stop } from 'react-native-svg';
 import { coinDef, type Face, type Race } from '../../engine';
 import { colors, raceColors } from '../theme';
 import { GLYPHS, raceEmblem } from './glyphs';
+import { PORTRAITS } from './portraits';
 
 interface Props {
   defId: string;
@@ -48,7 +49,9 @@ function CoinArtImpl({ defId, face = 'heads', size, level = 1, engraved, bare }:
   const def = coinDef(defId);
   const rc = raceColors[def.race];
   const id = useId().replace(/[^a-zA-Z0-9]/g, '');
-  const glyph = GLYPHS[defId] ?? GLYPHS.copper;
+  // Characters show a portrait bust (clipped to the face); plain Copper keeps its glyph.
+  const portrait = Object.hasOwn(PORTRAITS, defId) ? PORTRAITS[defId] : undefined;
+  const glyph = portrait ?? GLYPHS[defId] ?? GLYPHS.copper;
   const heads = face === 'heads';
   const copper = def.race === 'neutral';
   const p = coinPalette(def.race, heads);
@@ -77,6 +80,9 @@ function CoinArtImpl({ defId, face = 'heads', size, level = 1, engraved, bare }:
           <Stop offset="0" stopColor="#FFFFFF" stopOpacity={0.85} />
           <Stop offset="1" stopColor="#FFFFFF" stopOpacity={0} />
         </RadialGradient>
+        <ClipPath id={`coinface${id}`}>
+          <Circle cx={50} cy={50} r={37} />
+        </ClipPath>
       </Defs>
       {!bare && <Ellipse cx={51} cy={57} rx={49} ry={46} fill="rgba(15,8,15,0.35)" />}
       {/* rim with reeding */}
@@ -98,7 +104,8 @@ function CoinArtImpl({ defId, face = 'heads', size, level = 1, engraved, bare }:
       <Circle cx={50} cy={50} r={37} fill={`url(#face${id})`} />
       <Circle cx={50} cy={50} r={37} fill="none" stroke={tone(p.face.lo, -0.3)} strokeOpacity={0.5} strokeWidth={1} />
       {heads ? (
-        <G transform="translate(50 51) scale(0.74) translate(-50 -50)">
+        <G clipPath={portrait ? `url(#coinface${id})` : undefined}>
+        <G transform={portrait ? 'translate(50 49) scale(0.8) translate(-50 -50)' : 'translate(50 51) scale(0.74) translate(-50 -50)'}>
           {/* relief: a soft shadow below-right and a highlight above-left */}
           <G transform="translate(1.6 2)" opacity={0.5} stroke={relief} strokeWidth={2.5} strokeLinejoin="round">
             {glyph(relief, relief, 2.5)}
@@ -107,6 +114,7 @@ function CoinArtImpl({ defId, face = 'heads', size, level = 1, engraved, bare }:
             {glyph('#FFFFFF', '#FFFFFF', 1.5)}
           </G>
           {glyph(glyphFill, glyphAccent, 0)}
+        </G>
         </G>
       ) : (
         <G transform="translate(50 51) scale(0.58) translate(-50 -50)">
