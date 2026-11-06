@@ -26,7 +26,7 @@ export const HOW_TO_PLAY: HelpSection[] = [
   {
     title: 'Tossing coins',
     body: [
-      'Each round you draw 5 coins from your bag into your hand. Tap one and press Swap to put it back and draw a different coin: the first swap each round is free, more cost a Reroll token. Coins are tossed left to right; press First to toss the selected coin first. Then toss them onto the table. Each coin lands heads or tails, usually 50/50.',
+      'Each round you draw coins from your bag into your hand: 5 at first, growing to 10 by phase 7. Tap one and press Swap to put it back and draw a different coin: the first swap each round is free, more cost a Reroll token. Coins are tossed left to right; press First to toss the selected coin first. Then toss them onto the table. Each coin lands heads or tails, usually 50/50.',
       'Heads coins pay their value in gold. Tails coins pay nothing unless an ability says otherwise.',
       'Tap any coin to read its ability.',
     ],
@@ -88,7 +88,7 @@ export const TUTORIAL_STEPS: { title: string; body: string }[] = [
   },
   {
     title: 'Toss your coins',
-    body: 'Each round you draw 5 coins. Swap one you don’t want for free, then toss: heads pay their value in gold, tails pay nothing.',
+    body: 'Each round you draw a hand of coins (5 at first, up to 10 later). Swap one you don’t want for free, then toss: heads pay their value in gold, tails pay nothing.',
   },
   {
     title: 'Abilities',

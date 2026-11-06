@@ -17,8 +17,8 @@ export const CHARMS: CharmDef[] = [
     rarity: 'starter',
     race: 'orc',
     starter: true,
-    text: 'Orcs get +4 value. +1 gold whenever a coin is destroyed.',
-    mods: { valueBonus: { orc: 4 } },
+    text: 'Orcs get +7 value. +1 gold whenever a coin is destroyed.',
+    mods: { valueBonus: { orc: 7 } },
     effects: [{ trigger: 'onDestroy', noScale: true, do: { kind: 'gold', amount: 1 } }],
   },
   {

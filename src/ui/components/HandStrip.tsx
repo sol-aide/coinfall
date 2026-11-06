@@ -25,6 +25,8 @@ export function HandStrip({ run, onSwap, onFirst }: { run: RunState; onSwap: (ui
   const selDef = sel ? coinDef(sel.defId) : undefined;
   const cost = free ? 'free' : `1 Reroll token (${run.rerollTokens} left)`;
   const combos = handComboNotes(run);
+  // Up to 10 coins: past 5 they wrap into two rows of 5, a little smaller.
+  const big = hand.length > 5;
   // What a swap can bring in: the rest of the bag, grouped by kind.
   const restCounts = new Map<string, number>();
   for (const c of run.bag) if (!hand.includes(c.uid)) restCounts.set(coinDef(c.defId).name, (restCounts.get(coinDef(c.defId).name) ?? 0) + 1);
@@ -33,7 +35,7 @@ export function HandStrip({ run, onSwap, onFirst }: { run: RunState; onSwap: (ui
   return (
     <View style={styles.wrap}>
       <Stitch r={radius.lg} inset={4} opacity={0.35} />
-      <View style={styles.coins} accessibilityRole="radiogroup" accessibilityLabel="Your hand">
+      <View style={[styles.coins, big && styles.coinsTwoRows]} accessibilityRole="radiogroup" accessibilityLabel={`Your hand, ${hand.length} coins`}>
         {hand.map((uid, i) => {
           const inst = run.bag.find((c) => c.uid === uid);
           if (!inst) return null;
@@ -51,9 +53,9 @@ export function HandStrip({ run, onSwap, onFirst }: { run: RunState; onSwap: (ui
                 tap();
                 setSelected(on ? null : uid);
               }}
-              style={[styles.coin, on && styles.coinOn]}
+              style={[styles.coin, big && styles.coinSmall, on && styles.coinOn]}
             >
-              <CoinArt defId={inst.defId} size={46} level={inst.level} engraved={!!inst.engraving} />
+              <CoinArt defId={inst.defId} size={big ? 38 : 46} level={inst.level} engraved={!!inst.engraving} />
             </Pressable>
           );
         })}
@@ -117,6 +119,8 @@ const styles = StyleSheet.create({
   wrap: { backgroundColor: 'rgba(20, 13, 22, 0.78)', borderRadius: radius.lg, padding: 8, gap: 6, marginBottom: 8 },
   coins: { flexDirection: 'row', justifyContent: 'center', gap: 6 },
   coin: { width: 54, height: 54, borderRadius: 27, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: 'transparent' },
+  coinSmall: { width: 46, height: 46, borderRadius: 23 },
+  coinsTwoRows: { flexWrap: 'wrap', alignSelf: 'center', maxWidth: 5 * 46 + 4 * 6, rowGap: 4 },
   coinOn: { borderColor: colors.gold, backgroundColor: 'rgba(242, 180, 30, 0.18)' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4 },
   info: { flex: 1, fontSize: font.tiny, color: colors.textDim },

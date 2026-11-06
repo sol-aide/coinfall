@@ -473,3 +473,22 @@ describe('Anchored engraving', () => {
     }
   });
 });
+
+describe('coins in play grow by phase', () => {
+  it('runs 5,5,6,7,8,9,10,10 and never exceeds 10, with Deep Pockets', () => {
+    const { tableSize, MAX_TABLE } = require('../resolve') as typeof import('../resolve');
+    const plain = computeMods([]);
+    expect([1, 2, 3, 4, 5, 6, 7, 8].map((p) => tableSize(p, plain))).toEqual([5, 5, 6, 7, 8, 9, 10, 10]);
+    const pockets = computeMods(['pockets']);
+    expect(tableSize(1, pockets)).toBe(6);
+    expect(tableSize(8, pockets)).toBe(MAX_TABLE);
+  });
+
+  it('deals as many coins as the phase allows, or the whole bag if smaller', () => {
+    const { ensureHand } = require('../run') as typeof import('../run');
+    const run = chooseStarter(newRun('grow'), 'banner');
+    expect(ensureHand({ ...run, phase: 7, hand: undefined }).hand).toHaveLength(8); // bag of 8
+    const big = { ...run, phase: 7, hand: undefined, bag: [...run.bag, ...run.bag.map((c) => ({ ...c, uid: c.uid + 'b' }))] };
+    expect(ensureHand(big).hand).toHaveLength(10);
+  });
+});

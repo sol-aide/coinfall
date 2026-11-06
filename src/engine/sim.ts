@@ -4,6 +4,7 @@ import { charmDef } from './content/charms';
 import { coinDef } from './content/coins';
 import { MAX_CHARMS, duesFor } from './economy';
 import { displayValue, runMods } from './mods';
+import { tableSize } from './resolve';
 import * as R from './rng';
 import {
   buyItem,
@@ -173,7 +174,9 @@ function botReward(run: RunState, strategy: Strategy): RunState {
     run = rerollRewards(run);
     rated = run.rewardChoices.map((id, i) => ({ i, r: rateCoin(run, id) })).sort((a, b) => b.r - a.r);
   }
-  const threshold = strategy === 'greedy' ? 0 : bagAverage(run) + 0.4;
+  // With a table that grows each phase, a bag smaller than next phase's table plus a few spares wastes slots.
+  const short = run.bag.length < tableSize(Math.min(run.phase + 1, 8), runMods(run)) + 3;
+  const threshold = strategy === 'greedy' ? 0 : short ? 1.5 : bagAverage(run) + 0.4;
   if (rated[0].r >= threshold) return chooseReward(run, rated[0].i);
   return chooseReward(run, null);
 }

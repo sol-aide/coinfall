@@ -22,7 +22,7 @@ Build a bag of Human, Orc and Elf coins, toss them onto your table and earn enou
 ### Description
 You are a moneylender at a crossroads bazaar where Humans, Orcs and Elves gamble at your table. Every five rounds the Lenders' Guild comes to collect its dues. Pay them, or lose your stall.
 
-Each round you draw five coins from your bag, swap out the one you don't want, and toss them onto the table. Heads pay their value in gold, tails pay nothing — unless a coin's ability says otherwise. Every coin is a character with its own ability:
+Each round you draw a hand of coins from your bag (five at first, up to ten later), swap out the one you don't want, and toss them onto the table. Heads pay their value in gold, tails pay nothing — unless a coin's ability says otherwise. Every coin is a character with its own ability:
 
 • Humans run the economy: Merchants earn from their neighbours, Squires grow stronger together, Bards retrigger the coin beside them.
 • Orcs bring big numbers and chaos: Berserkers smash neighbours and grow from them, Chargers ram coins and flip them, Firebrands might blow up for a pile of gold.

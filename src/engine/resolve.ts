@@ -30,6 +30,16 @@ export const COIN_R = 0.09;
 export const BASE_RADIUS = 0.4;
 export const BUMP_DIST = 0.22;
 export const BASE_DRAW = 5;
+/** Most coins that can be in play at once. */
+export const MAX_TABLE = 10;
+/** Coins in play each round, by phase (1-8): the table fills up as the run goes on. */
+export const TABLE_BY_PHASE = [5, 5, 6, 7, 8, 9, 10, 10];
+
+/** Coins in play per round in a phase, with Charms (Deep Pockets) and the 10-coin cap. */
+export function tableSize(phase: number, mods: Mods): number {
+  const base = TABLE_BY_PHASE[Math.max(1, Math.min(phase, TABLE_BY_PHASE.length)) - 1];
+  return Math.min(MAX_TABLE, base + mods.drawBonus);
+}
 
 type Stage = 'start' | 'toss' | 'adjacent' | 'end' | 'phase';
 
@@ -476,7 +486,7 @@ function settleDestroyed(ctx: Ctx) {
 
 /** How many coins a round draws. */
 export function drawCount(run: RunState, mods: Mods): number {
-  return Math.min(run.bag.length, BASE_DRAW + mods.drawBonus);
+  return Math.min(run.bag.length, tableSize(run.phase, mods));
 }
 
 /** Draws a round's coins from the bag at random (the run's RNG). */

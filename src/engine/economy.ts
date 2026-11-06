@@ -15,7 +15,7 @@ export const MIN_BAG = 5;
 export const MAX_CHARMS = 6;
 
 /** Guild dues owed at the end of each phase (before Charm discounts). */
-export const DUES = [26, 47, 76, 117, 175, 245, 332, 437];
+export const DUES = [26, 47, 100, 195, 345, 515, 725, 970];
 
 export function duesFor(phase: number, mods: Mods): number {
   const base = DUES[Math.min(phase, DUES.length) - 1];

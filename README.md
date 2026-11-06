@@ -15,13 +15,13 @@ You are a moneylender at a crossroads bazaar where Humans, Orcs and Elves gamble
 ## How to play
 
 1. **Choose a patron.** Each run starts with 5 Copper, a Squire (Human), a Grunt (Orc) and an Archer (Elf). Pick a starting Charm for Humans, Orcs or Elves.
-2. **Toss coins.** Each round, 5 coins are drawn from your bag into your hand. Swap one for free (more for Reroll tokens), then toss them onto the table, heads or tails. Heads pay their value in gold; tails pay nothing unless an ability says otherwise.
+2. **Toss coins.** Each round, coins are drawn from your bag into your hand: 5 at first, growing to 10 by phase 7. Swap one for free (more for Reroll tokens), then toss them onto the table, heads or tails. Heads pay their value in gold; tails pay nothing unless an ability says otherwise.
 3. **Watch the abilities.** Abilities resolve in order: round start → each coin lands → adjacency (dashed lines show neighbours) → round end → scoring. Tap any coin to read it.
    - **Humans** – economy and teamwork (Merchant, Squire, Bard, Guildmaster…)
    - **Orcs** – big values and chaos (Berserker, Charger, Firebrand, Warlord…)
    - **Elves** – precision and control (Sentinel, Moon Priestess, Bladedancer, Longbow…)
 4. **Grow your bag.** After each round, add 1 of 3 coins or skip for 3 gold. Three identical coins fuse into a stronger one.
-5. **Pay the Guild.** Every 5 rounds the Guild collects dues (26 gold, rising to 437 by phase 8). If you can't pay, the run ends.
+5. **Pay the Guild.** Every 5 rounds the Guild collects dues (26 gold, rising to 970 by phase 8). If you can't pay, the run ends.
 6. **Shop at the bazaar.** Buy coins, Charms (run-wide passives, up to 6) and Engravings (upgrades for one coin). Reroll the stock, and use Melt tokens to remove weak coins.
 7. **Build combos.** The strongest bags mix races and stack synergies: mixed tables (Caravan Master, Envoy), three-of-a-kind set bonuses (Town Crier, War Drummer, Grove Elder), tails and flip engines (Cutpurse, Night Raider, Juggler, Brawler), wreckage (Berserker, Looter, Powder Keg) and ×2 multipliers (Gem Cutter). Coloured tags on every coin and Charm name its combos, and offers say which coins in your bag they work with.
 

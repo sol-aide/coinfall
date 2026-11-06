@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  BASE_DRAW,
   ROUNDS_PER_PHASE,
   SKIP_GOLD,
   currentDues,
@@ -13,6 +12,7 @@ import {
   rerollRewards,
   runMods,
   swapCoin,
+  tableSize,
   tossFirst,
   type RunState,
 } from '../../engine';
@@ -135,9 +135,11 @@ export function GameScreen({ onMenu }: { onMenu: () => void }) {
             {r.screen === 'ready' && (
               <View style={styles.emptyHint} pointerEvents="none">
                 <Txt style={styles.emptyTitle}>Round {r.round}</Txt>
-                <Txt style={styles.emptyText}>
-                  {r.hand?.length ?? Math.min(r.bag.length, BASE_DRAW + mods.drawBonus)} coins from your bag of {r.bag.length}. Heads pay their value in gold.
-                </Txt>
+                {tableW > 260 && (
+                  <Txt style={styles.emptyText}>
+                    {r.hand?.length ?? Math.min(r.bag.length, tableSize(r.phase, mods))} coins from your bag of {r.bag.length}. Heads pay their value in gold.
+                  </Txt>
+                )}
               </View>
             )}
           </Table>

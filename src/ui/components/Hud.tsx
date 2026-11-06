@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { currentDues, duesFor, PHASES, ROUNDS_PER_PHASE, runMods, type RunState } from '../../engine';
 import { colors, font } from '../theme';
 import { IconButton, Pill, Stitch, Txt } from './ui';
@@ -24,6 +24,7 @@ export function Hud({
   const dues = nextPhase ? duesFor(Math.min(run.phase + 1, PHASES), runMods(run)) : currentDues(run);
   const gold = goldOverride ?? run.gold;
   const short = Math.max(0, dues - gold);
+  const narrow = useWindowDimensions().width < 390 && dues >= 100;
   return (
     <View style={styles.hud}>
       <Stitch r={16} inset={5} opacity={0.4} />
@@ -58,7 +59,10 @@ export function Hud({
         <View style={styles.dues} accessible accessibilityLabel={`Guild dues at the end of ${nextPhase ? 'next' : 'this'} phase: ${dues} gold${short ? `, ${short} more needed` : ', covered'}`}>
           <Txt style={styles.duesLabel}>{nextPhase ? 'Next dues' : 'Dues'}</Txt>
           <Txt style={[styles.duesValue, { color: short ? colors.text : colors.success }]}>{dues}</Txt>
-          {!nextPhase && <Txt style={[styles.duesNeed, { color: short ? colors.accent : colors.success }]}>{short ? `need ${short}` : 'covered ✓'}</Txt>}
+          {/* On narrow phones the dues bar below already shows progress, so keep this pill on one line. */}
+          {!nextPhase && (!narrow || !short) && (
+            <Txt style={[styles.duesNeed, { color: short ? colors.accent : colors.success }]}>{short ? `need ${short}` : 'covered ✓'}</Txt>
+          )}
         </View>
         <Pill icon="melt" value={run.meltTokens} label="Melt tokens" />
         <Pill icon="reroll" value={run.rerollTokens} label="Reroll tokens" />
