@@ -1,0 +1,258 @@
+// Core data types for the Coinfall engine. Pure TypeScript, no UI imports.
+
+export type Race = 'human' | 'orc' | 'elf' | 'neutral';
+export type Face = 'heads' | 'tails';
+export type Rarity = 'starter' | 'common' | 'uncommon' | 'rare';
+
+export type Trigger =
+  | 'onRoundStart'
+  | 'onLand'
+  | 'onFlip'
+  | 'onAdjacent'
+  | 'onDestroy'
+  | 'onRoundEnd'
+  | 'onPhaseStart'
+  | 'onPhaseEnd'
+  /** A coin was swapped out of the hand (before the toss). */
+  | 'onSwap';
+
+/** Selects coins on the table relative to the acting coin. */
+export interface Target {
+  /** `subject`: the coin that set off a reactive trigger (the flipped or destroyed coin). */
+  scope: 'self' | 'adjacent' | 'table' | 'nearest' | 'farthest' | 'subject';
+  race?: Race;
+  notRace?: Race;
+  face?: Face;
+  /** How to choose among matches. Default 'all'. */
+  pick?: 'all' | 'highest' | 'lowest' | 'random';
+  /** Only coins whose definition has at least one ability (retrigger/copy targets). */
+  hasAbility?: boolean;
+  /** Include the acting coin itself (default false except for scope 'self'). */
+  includeSelf?: boolean;
+}
+
+/**
+ * What an amount is multiplied by: matching coins, coins of a race in the bag,
+ * or the number of different races (Humans, Orcs, Elves) among matching coins.
+ */
+export type Count = { count: Target } | { bagRace: Race } | { races: Target };
+
+export type Action =
+  | { kind: 'gold'; amount: number; per?: Count }
+  | { kind: 'buff'; target: Target; amount: number; per?: Count; permanent?: boolean }
+  | { kind: 'mult'; target: Target; factor: number }
+  | { kind: 'flip'; target: Target }
+  | { kind: 'reflip'; target: Target; amount?: number }
+  | { kind: 'setHeads'; target: Target }
+  /** `absorb`: the destroyer permanently gains the victim's value (true), or that fraction of it. */
+  | { kind: 'destroy'; target: Target; absorb?: boolean | number }
+  | { kind: 'bump'; target: Target }
+  | { kind: 'retrigger'; target: Target }
+  | { kind: 'copy'; target: Target }
+  | { kind: 'streak'; amount: number }
+  | { kind: 'blessNext'; amount: number }
+  | { kind: 'token'; token: 'melt' | 'reroll'; amount: number }
+  | { kind: 'interest'; per: number; max: number };
+
+export interface Effect {
+  trigger: Trigger;
+  /** Condition on the subject coin's face when the effect resolves. */
+  when?: Face;
+  /** Probability (0..1) that the effect happens. */
+  chance?: number;
+  /** For onDestroy/onFlip on coins: also fire when ANY other coin is destroyed/flipped. */
+  any?: boolean;
+  /** Amounts do not scale with fusion level. */
+  noScale?: boolean;
+  /** Only resolves when the count is at least `min` (set bonuses, e.g. 3+ Orcs on the table). */
+  require?: { per: Count; min: number };
+  do: Action;
+}
+
+export interface CoinDef {
+  id: string;
+  name: string;
+  race: Race;
+  rarity: Rarity;
+  value: number;
+  /** Short rules text shown to the player. */
+  text: string;
+  effects: Effect[];
+  /** Fixed heads chance (e.g. Sentinel = 1). */
+  headsChance?: number;
+  /** Not offered in rewards/shop. */
+  unbuyable?: boolean;
+}
+
+/** Static run-wide modifiers granted by Charms. All optional and additive. */
+export interface Mods {
+  headsBonus: Partial<Record<Race | 'all', number>>;
+  valueBonus: Partial<Record<Race | 'all', number>>;
+  coinValueBonus: Record<string, number>;
+  drawBonus: number;
+  rewardChoices: number;
+  radiusMult: number;
+  shopDiscount: number;
+  duesMult: number;
+  rerollDiscount: number;
+  tailsGold: number;
+  meltPerPhase: number;
+  rerollPerPhase: number;
+  firstCoinHeads: boolean;
+  rareBoost: number;
+  /** Set bonuses (Effect.require on a race count) need this many fewer coins. */
+  setDiscount: number;
+  /** Added to every multiplier factor (×2 becomes ×3). */
+  multBonus: number;
+  /** Extra free hand swaps each round. */
+  freeSwaps: number;
+}
+
+export interface CharmDef {
+  id: string;
+  name: string;
+  text: string;
+  rarity: Rarity;
+  /** Starter race charms. */
+  race?: Race;
+  mods?: Partial<Mods>;
+  effects?: Effect[];
+  /** Starter charms are never sold in the shop. */
+  starter?: boolean;
+}
+
+export interface EngravingDef {
+  id: string;
+  name: string;
+  text: string;
+  rarity: Rarity;
+  mult?: number;
+  headsChance?: number;
+  echo?: boolean;
+  secondWind?: boolean;
+  /** Can't be destroyed. */
+  sturdy?: boolean;
+  /** Tails still scores this fraction of value. */
+  tailsFraction?: number;
+  /** Counts as a Human, an Orc and an Elf for every race check. */
+  allRaces?: boolean;
+  /** The coin's own heads-only / tails-only abilities work on either face. */
+  anyFace?: boolean;
+  /** Always drawn into the hand (it can still be swapped out). */
+  anchored?: boolean;
+  effects?: Effect[];
+}
+
+/** A coin owned by the player. */
+export interface CoinInstance {
+  uid: string;
+  defId: string;
+  level: number;
+  /** Permanent value gained during the run. */
+  bonus: number;
+  engraving?: string;
+  streak: number;
+  streakBonus: number;
+}
+
+export interface TableCoin {
+  uid: string;
+  defId: string;
+  level: number;
+  x: number;
+  y: number;
+  face: Face;
+  landed: boolean;
+  destroyed: boolean;
+  temp: number;
+  mult: number;
+  order: number;
+}
+
+export type GameEvent =
+  | { t: 'stage'; stage: StageName }
+  | { t: 'draw'; uids: string[] }
+  | { t: 'land'; uid: string; x: number; y: number; face: Face; value: number; blessed?: boolean }
+  | { t: 'trigger'; uid?: string; charmId?: string; label: string }
+  | { t: 'flip'; uid: string; face: Face }
+  | { t: 'reflip'; uid: string; face: Face }
+  | { t: 'move'; uid: string; x: number; y: number; by: string }
+  | { t: 'value'; uid: string; delta: number; permanent: boolean; value: number; /** Set when a multiplier caused the change. */ factor?: number }
+  | { t: 'gold'; amount: number; uid?: string; charmId?: string; label: string }
+  | { t: 'destroy'; uid: string; by?: string }
+  | { t: 'revive'; uid: string }
+  | { t: 'token'; token: 'melt' | 'reroll'; amount: number; uid?: string; charmId?: string }
+  | { t: 'score'; uid: string; amount: number };
+
+export type StageName = 'Round start' | 'Toss' | 'Adjacency' | 'Round end' | 'Scoring';
+
+export interface BreakdownLine {
+  label: string;
+  amount: number;
+  uid?: string;
+  kind: 'coin' | 'ability' | 'charm';
+}
+
+export interface RoundResult {
+  round: number;
+  phase: number;
+  events: GameEvent[];
+  breakdown: BreakdownLine[];
+  total: number;
+  table: TableCoin[];
+  destroyed: string[];
+}
+
+export type ShopItem =
+  | { kind: 'coin'; defId: string; price: number; sold?: boolean }
+  | { kind: 'charm'; charmId: string; price: number; sold?: boolean }
+  | { kind: 'engraving'; engravingId: string; price: number; sold?: boolean }
+  | { kind: 'token'; token: 'melt' | 'reroll'; price: number; sold?: boolean };
+
+export type Screen = 'pickCharm' | 'ready' | 'reward' | 'dues' | 'shop' | 'won' | 'lost';
+
+export interface PhaseReport {
+  phase: number;
+  events: GameEvent[];
+  gold: number;
+}
+
+export interface RunStats {
+  roundsPlayed: number;
+  bestRound: number;
+  goldEarned: number;
+  coinsDestroyed: number;
+  fusions: number;
+}
+
+export interface RunState {
+  version: number;
+  seed: number;
+  /** Set for a Daily bazaar run: the local date (YYYY-MM-DD) whose seed it uses. */
+  daily?: string;
+  /** Guild rank (difficulty), 1-5. Missing means 1. */
+  rank?: number;
+  /** The coins drawn for the round about to be tossed (uids, in toss order). */
+  hand?: string[];
+  /** Free swaps left this round; further swaps cost a Reroll token. */
+  freeSwaps?: number;
+  rng: number;
+  screen: Screen;
+  phase: number; // 1-based
+  round: number; // 1-based within phase; the round about to be played (or just played on reward)
+  gold: number;
+  bag: CoinInstance[];
+  charms: string[];
+  meltTokens: number;
+  rerollTokens: number;
+  nextUid: number;
+  rewardChoices: string[];
+  shop: ShopItem[];
+  shopRerolls: number;
+  lastRound?: RoundResult;
+  phaseReport?: PhaseReport;
+  starterChoices: string[];
+  log: string[];
+  stats: RunStats;
+  fusionNotes: string[];
+}
